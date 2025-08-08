@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { StockData, ValuationReportData } from '../../../types'
 
-const OPUS4_API_URL = 'https://api.nuwaapi.com'
+const OPUS4_API_URL = 'https://api.nuwaapi.com/v1/chat/completions'
 const OPUS4_API_KEY = 'sk-GNBf5QFmnepeBZddwH612o5vEJQFMq6z8gUAyre7tAIrGeA8'
 
 export async function POST(request: NextRequest) {
@@ -59,6 +59,8 @@ export async function POST(request: NextRequest) {
 
     for (const model of models) {
       try {
+        console.log(`Trying model: ${model}`)
+        
         const response = await fetch(OPUS4_API_URL, {
           method: 'POST',
           headers: {
@@ -79,7 +81,9 @@ export async function POST(request: NextRequest) {
         })
 
         if (!response.ok) {
-          console.log(`Model ${model} failed, trying next...`)
+          console.log(`Model ${model} failed with status: ${response.status}`)
+          const errorText = await response.text()
+          console.log(`Error response: ${errorText}`)
           continue
         }
 
@@ -116,6 +120,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(reportData)
     } catch (parseError) {
       console.error('Error parsing AI response:', parseError)
+      console.error('Raw content:', content)
       return NextResponse.json(
         { error: 'Failed to parse AI response. Please try again.' },
         { status: 500 }

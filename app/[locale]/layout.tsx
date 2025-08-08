@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Stock Valuation Analyzer',
   description: 'Professional AI-powered stock analysis platform',
+  icons: {
+    icon: '/favicon.ico',
+  },
 }
 
 export async function generateStaticParams() {
@@ -22,6 +25,9 @@ interface RootLayoutProps {
 export default function RootLayout({ children, params }: RootLayoutProps) {
   return (
     <html lang={params.locale}>
+      <head>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>" />
+      </head>
       <body className={inter.className}>{children}</body>
     </html>
   )
