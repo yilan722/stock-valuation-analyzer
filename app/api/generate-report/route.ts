@@ -1,104 +1,97 @@
 import { NextRequest, NextResponse } from 'next/server'
-import axios from 'axios'
-import { Opus4Request, Opus4Response, ValuationReportData } from '../../../types'
+import { StockData, ValuationReportData } from '../../../types'
 
-const OPUS4_API_URL = process.env.OPUS4_API_URL || 'https://api.nuwaapi.com'
-const OPUS4_API_KEY = process.env.OPUS4_API_KEY || 'sk-GNBf5QFmnepeBZddwH612o5vEJQFMq6z8gUAyre7tAIrGeA8'
+const OPUS4_API_URL = 'https://api.nuwaapi.com'
+const OPUS4_API_KEY = 'sk-GNBf5QFmnepeBZddwH612o5vEJQFMq6z8gUAyre7tAIrGeA8'
 
 export async function POST(request: NextRequest) {
   try {
-    const { stockData, financialData } = await request.json()
+    const { stockData, locale } = await request.json()
 
-    const systemPrompt = `You are a professional financial analyst specializing in stock valuation. 
-    Your task is to generate a comprehensive valuation report for a company based on the provided data.
-    
-    The report should include:
-    1. Basic company information and market metrics
-    2. Business segment analysis with revenue breakdown
-    3. Growth catalysts and opportunities
-    4. Detailed valuation analysis using multiple methods (DCF, P/E, P/B ratios)
-    
-    Provide specific, data-driven insights without generic statements. Include actual numbers and percentages where possible.`
+    if (!stockData) {
+      return NextResponse.json(
+        { error: 'Stock data is required' },
+        { status: 400 }
+      )
+    }
 
-    const userPrompt = `Please analyze the following stock data and generate a professional valuation report:
+    const isEnglish = locale === 'en'
     
-    Stock Symbol: ${stockData.symbol}
-    Company Name: ${stockData.name}
-    Current Price: $${stockData.price}
-    Market Cap: $${stockData.marketCap.toLocaleString()}
-    P/E Ratio: ${stockData.peRatio}
-    
-    Financial Data: ${JSON.stringify(financialData, null, 2)}
-    
-    Please provide a structured analysis with:
-    1. Company overview and market position
-    2. Business segment breakdown with revenue and growth metrics
-    3. Key growth catalysts and opportunities
-    4. Valuation analysis with target price and recommendation
-    5. Supporting data tables and metrics
-    
-    Format the response as a JSON object with the following structure:
-    {
-      "basicInfo": {
-        "companyName": "string",
-        "ticker": "string", 
-        "currentPrice": number,
-        "marketCap": number,
-        "peRatio": number,
-        "description": "string"
-      },
-      "businessSegments": [
-        {
-          "name": "string",
-          "revenue": number,
-          "growth": number,
-          "margin": number
-        }
-      ],
-      "growthCatalysts": ["string"],
-      "valuation": {
-        "dcfValue": number,
-        "peBasedValue": number,
-        "pbBasedValue": number,
-        "targetPrice": number,
-        "recommendation": "BUY|HOLD|SELL",
-        "reasoning": "string"
+    const prompt = isEnglish ? 
+      `Generate a comprehensive stock valuation analysis report for ${stockData.name} (${stockData.symbol}) with the following data:
+      
+      Current Price: $${stockData.price}
+      Market Cap: $${(stockData.marketCap / 1e9).toFixed(2)}B
+      P/E Ratio: ${stockData.peRatio}
+      Volume: ${(stockData.volume / 1e6).toFixed(2)}M
+      Change: ${stockData.change >= 0 ? '+' : ''}${stockData.change.toFixed(2)} (${stockData.changePercent.toFixed(2)}%)
+
+      Please provide a detailed analysis in the following JSON format:
+      {
+        "fundamentalAnalysis": "HTML content with fundamental analysis including company overview, latest financials, and key metrics",
+        "businessSegments": "HTML content with business segment analysis and revenue breakdown",
+        "growthCatalysts": "HTML content with growth catalysts and future opportunities",
+        "valuationAnalysis": "HTML content with detailed valuation methodology and investment recommendation"
       }
-    }`
 
-    // 尝试使用不同的模型
+      Make the analysis professional, data-driven, and include specific valuation logic. Use proper HTML formatting with tables, lists, and emphasis where appropriate.` :
+      
+      `为${stockData.name} (${stockData.symbol})生成一份全面的股票估值分析报告，数据如下：
+      
+      当前价格: $${stockData.price}
+      市值: $${(stockData.marketCap / 1e9).toFixed(2)}B
+      市盈率: ${stockData.peRatio}
+      成交量: ${(stockData.volume / 1e6).toFixed(2)}M
+      涨跌幅: ${stockData.change >= 0 ? '+' : ''}${stockData.change.toFixed(2)} (${stockData.changePercent.toFixed(2)}%)
+
+      请提供详细分析，使用以下JSON格式：
+      {
+        "fundamentalAnalysis": "基本面分析的HTML内容，包括公司概况、最新财务数据和关键指标",
+        "businessSegments": "业务细分分析的HTML内容，包括收入分解",
+        "growthCatalysts": "增长催化剂的HTML内容，包括未来机会",
+        "valuationAnalysis": "详细估值方法和投资建议的HTML内容"
+      }
+
+      使分析专业、数据驱动，并包含具体的估值逻辑。使用适当的HTML格式，包括表格、列表和重点强调。`
+
     const models = ['claude-opus-4-20250514', 'opus4', 'gpt-4', 'gpt-3.5-turbo']
-    let response: any = null
-    let content = ''
+    let content: string | null = null
 
     for (const model of models) {
       try {
-        const opus4Request: Opus4Request = {
-          model: model,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt }
-          ],
-          temperature: 0.3,
-          max_tokens: 4000
+        const response = await fetch(OPUS4_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${OPUS4_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: model,
+            messages: [
+              {
+                role: 'user',
+                content: prompt
+              }
+            ],
+            max_tokens: 4000,
+            temperature: 0.7
+          })
+        })
+
+        if (!response.ok) {
+          console.log(`Model ${model} failed, trying next...`)
+          continue
         }
 
-        response = await axios.post<Opus4Response>(
-          `${OPUS4_API_URL}/v1/chat/completions`,
-          opus4Request,
-          {
-            headers: {
-              'Authorization': `Bearer ${OPUS4_API_KEY}`,
-              'Content-Type': 'application/json',
-            },
-            timeout: 30000
-          }
-        )
+        const data = await response.json()
+        content = data.choices?.[0]?.message?.content
 
-        content = response.data.choices[0].message.content
-        break
+        if (content) {
+          console.log(`Successfully generated report using ${model}`)
+          break
+        }
       } catch (error) {
-        console.log(`Model ${model} failed, trying next...`)
+        console.log(`Error with model ${model}:`, error)
         continue
       }
     }
@@ -131,7 +124,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error generating report:', error)
     return NextResponse.json(
-      { error: 'Failed to generate valuation report' },
+      { error: 'Internal server error' },
       { status: 500 }
     )
   }
