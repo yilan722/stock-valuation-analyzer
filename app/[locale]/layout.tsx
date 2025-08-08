@@ -8,9 +8,6 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Stock Valuation Analyzer',
   description: 'Professional AI-powered stock analysis platform',
-  icons: {
-    icon: '/favicon.ico',
-  },
 }
 
 export async function generateStaticParams() {
