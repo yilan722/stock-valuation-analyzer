@@ -1,23 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyToken, getUserById } from '../../../../lib/auth'
+import { createClient } from '../../../../lib/supabase'
+import { createPayment } from '../../../../lib/supabase-auth'
 import { createAlipayOrder, SUBSCRIPTION_PLANS, SubscriptionPlanType } from '../../../../lib/alipay'
-import { prisma } from '../../../../lib/database'
 
 export async function POST(request: NextRequest) {
   try {
-    const token = request.cookies.get('token')?.value
-
-    if (!token) {
+    const supabase = createClient()
+    
+    // Get current user
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    
+    if (authError || !user) {
       return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401 }
-      )
-    }
-
-    const userSession = verifyToken(token)
-    if (!userSession) {
-      return NextResponse.json(
-        { error: 'Invalid token' },
+        { error: 'Authentication required' },
         { status: 401 }
       )
     }
@@ -32,25 +27,14 @@ export async function POST(request: NextRequest) {
     }
 
     const plan = SUBSCRIPTION_PLANS[planType as SubscriptionPlanType]
-    const user = await getUserById(userSession.userId)
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      )
-    }
 
     // Create payment record
-    const payment = await prisma.payment.create({
-      data: {
-        userId: user.id,
-        amount: plan.price,
-        type: planType === 'pay_per_report' ? 'pay_per_report' : 'subscription',
-        subscriptionType: plan.type,
-        reportLimit: plan.reports,
-        status: 'pending'
-      }
+    const payment = await createPayment({
+      userId: user.id,
+      amount: plan.price,
+      type: planType === 'pay_per_report' ? 'pay_per_report' : 'subscription',
+      subscriptionType: plan.type,
+      reportLimit: plan.reports
     })
 
     // Create Alipay order

@@ -1,45 +1,40 @@
 'use client'
 
 import React, { useState } from 'react'
-import { User, LogOut, CreditCard, BarChart3 } from 'lucide-react'
+import { User, LogOut, CreditCard, BarChart3, LogIn } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { signOut } from '../lib/supabase-auth'
 
 interface UserData {
   id: string
   email: string
   name?: string
-  freeReportsUsed: number
-  paidReportsUsed: number
-  subscriptionType?: string
-  subscriptionEnd?: string
-  monthlyReportLimit: number
+  free_reports_used: number
+  paid_reports_used: number
+  subscription_type?: string
+  subscription_end?: string
+  monthly_report_limit: number
 }
 
 interface UserInfoProps {
   user: UserData | null
   onLogout: () => void
   onRefresh: () => void
+  onLogin: () => void
   locale: string
 }
 
-export default function UserInfo({ user, onLogout, onRefresh, locale }: UserInfoProps) {
+export default function UserInfo({ user, onLogout, onRefresh, onLogin, locale }: UserInfoProps) {
   const [isLoading, setIsLoading] = useState(false)
 
   const handleLogout = async () => {
     setIsLoading(true)
     try {
-      const response = await fetch('/api/auth/logout', {
-        method: 'POST'
-      })
-
-      if (response.ok) {
-        toast.success('已退出登录')
-        onLogout()
-      } else {
-        toast.error('退出登录失败')
-      }
+      await signOut()
+      toast.success('已退出登录')
+      onLogout()
     } catch (error) {
-      toast.error('网络错误')
+      toast.error('退出登录失败')
     } finally {
       setIsLoading(false)
     }
@@ -48,12 +43,12 @@ export default function UserInfo({ user, onLogout, onRefresh, locale }: UserInfo
   const getSubscriptionStatus = () => {
     if (!user) return { status: '未登录', color: 'text-gray-500' }
     
-    if (user.freeReportsUsed === 0) {
+    if (user.free_reports_used === 0) {
       return { status: '免费试用', color: 'text-green-600' }
     }
 
-    if (user.subscriptionType && user.subscriptionEnd) {
-      const endDate = new Date(user.subscriptionEnd)
+    if (user.subscription_type && user.subscription_end) {
+      const endDate = new Date(user.subscription_end)
       if (endDate > new Date()) {
         return { status: '订阅中', color: 'text-blue-600' }
       }
@@ -65,12 +60,12 @@ export default function UserInfo({ user, onLogout, onRefresh, locale }: UserInfo
   const getRemainingReports = () => {
     if (!user) return 0
     
-    if (user.freeReportsUsed === 0) return 1
+    if (user.free_reports_used === 0) return 1
     
-    if (user.subscriptionType && user.subscriptionEnd) {
-      const endDate = new Date(user.subscriptionEnd)
+    if (user.subscription_type && user.subscription_end) {
+      const endDate = new Date(user.subscription_end)
       if (endDate > new Date()) {
-        return user.monthlyReportLimit - user.paidReportsUsed
+        return user.monthly_report_limit - user.paid_reports_used
       }
     }
     
@@ -97,7 +92,7 @@ export default function UserInfo({ user, onLogout, onRefresh, locale }: UserInfo
           </div>
         </div>
         
-        {user && (
+        {user ? (
           <button
             onClick={handleLogout}
             disabled={isLoading}
@@ -106,10 +101,18 @@ export default function UserInfo({ user, onLogout, onRefresh, locale }: UserInfo
             <LogOut size={16} />
             <span>退出</span>
           </button>
+        ) : (
+          <button
+            onClick={onLogin}
+            className="flex items-center space-x-2 px-4 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors"
+          >
+            <LogIn size={16} />
+            <span>登录</span>
+          </button>
         )}
       </div>
 
-      {user && (
+      {user ? (
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-gray-50 p-4 rounded-lg">
@@ -128,18 +131,18 @@ export default function UserInfo({ user, onLogout, onRefresh, locale }: UserInfo
                 <span className="text-sm font-medium text-gray-600">已使用</span>
               </div>
               <p className="text-2xl font-bold text-gray-900">
-                {user.freeReportsUsed + user.paidReportsUsed}
+                {user.free_reports_used + user.paid_reports_used}
               </p>
             </div>
           </div>
 
-          {user.subscriptionType && user.subscriptionEnd && (
+          {user.subscription_type && user.subscription_end && (
             <div className="bg-blue-50 p-4 rounded-lg">
               <h4 className="font-medium text-blue-900 mb-2">订阅信息</h4>
               <div className="text-sm text-blue-800">
-                <p>类型: {user.subscriptionType === 'monthly_99' ? '月度订阅 (99元)' : '月度订阅 (199元)'}</p>
-                <p>到期: {new Date(user.subscriptionEnd).toLocaleDateString()}</p>
-                <p>本月已用: {user.paidReportsUsed}/{user.monthlyReportLimit}</p>
+                <p>类型: {user.subscription_type === 'monthly_99' ? '月度订阅 (99元)' : '月度订阅 (199元)'}</p>
+                <p>到期: {new Date(user.subscription_end).toLocaleDateString()}</p>
+                <p>本月已用: {user.paid_reports_used}/{user.monthly_report_limit}</p>
               </div>
             </div>
           )}
@@ -158,6 +161,19 @@ export default function UserInfo({ user, onLogout, onRefresh, locale }: UserInfo
               </button>
             </div>
           )}
+        </div>
+      ) : (
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <h4 className="font-medium text-gray-900 mb-2">开始使用</h4>
+          <p className="text-sm text-gray-600 mb-3">
+            登录后即可获得1篇免费报告，或选择订阅计划获得更多报告。
+          </p>
+          <button
+            onClick={onLogin}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm"
+          >
+            立即登录
+          </button>
         </div>
       )}
     </div>

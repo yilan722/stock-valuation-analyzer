@@ -11,6 +11,7 @@ import SubscriptionModal from '../../components/SubscriptionModal'
 import { StockData, ValuationReportData } from '../../types'
 import { type Locale } from '../../lib/i18n'
 import { getTranslation } from '../../lib/translations'
+import { getCurrentUser } from '../../lib/supabase-auth'
 import toast from 'react-hot-toast'
 
 interface PageProps {
@@ -54,11 +55,8 @@ export default function HomePage({ params }: PageProps) {
 
   const loadUser = async () => {
     try {
-      const response = await fetch('/api/auth/me')
-      if (response.ok) {
-        const data = await response.json()
-        setUser(data.user)
-      }
+      const userData = await getCurrentUser()
+      setUser(userData)
     } catch (error) {
       console.error('Failed to load user:', error)
     } finally {
@@ -72,6 +70,10 @@ export default function HomePage({ params }: PageProps) {
 
   const handleLogout = () => {
     setUser(null)
+  }
+
+  const handleLogin = () => {
+    setShowAuthModal(true)
   }
 
   const handleGenerateReport = async () => {
@@ -135,6 +137,7 @@ export default function HomePage({ params }: PageProps) {
               user={user}
               onLogout={handleLogout}
               onRefresh={loadUser}
+              onLogin={handleLogin}
               locale={params.locale}
             />
           </div>

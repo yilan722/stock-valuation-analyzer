@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyAlipayPayment } from '../../../../lib/alipay'
-import { prisma } from '../../../../lib/database'
+import { updatePaymentStatus, updateUserSubscription } from '../../../../lib/supabase-auth'
 
 export async function POST(request: NextRequest) {
   try {
     const params = await request.json()
-    
+
     // Verify Alipay signature
     const isValid = await verifyAlipayPayment(params)
     if (!isValid) {
@@ -19,29 +19,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Update payment status
-    const payment = await prisma.payment.update({
-      where: { id: out_trade_no },
-      data: {
-        status: 'completed',
-        alipayTradeNo: trade_no,
-        alipayOrderId: out_trade_no
-      }
-    })
+    const payment = await updatePaymentStatus(out_trade_no, 'completed', trade_no)
 
     // Update user subscription if it's a subscription payment
-    if (payment.type === 'subscription' && payment.subscriptionType) {
+    if (payment.type === 'subscription' && payment.subscription_type) {
       const subscriptionEnd = new Date()
       subscriptionEnd.setMonth(subscriptionEnd.getMonth() + 1)
 
-      await prisma.user.update({
-        where: { id: payment.userId },
-        data: {
-          subscriptionType: payment.subscriptionType,
-          subscriptionStart: new Date(),
-          subscriptionEnd: subscriptionEnd,
-          monthlyReportLimit: payment.reportLimit || 0,
-          paidReportsUsed: 0 // Reset monthly usage
-        }
+      await updateUserSubscription(payment.user_id, {
+        subscriptionType: payment.subscription_type,
+        reportLimit: payment.report_limit || 0,
+        subscriptionEnd: subscriptionEnd.toISOString()
       })
     }
 

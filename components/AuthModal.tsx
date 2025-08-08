@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { X, Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { signIn, signUp } from '../lib/supabase-auth'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -24,27 +25,19 @@ export default function AuthModal({ isOpen, onClose, onSuccess, locale }: AuthMo
     setIsLoading(true)
 
     try {
-      const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register'
-      const body = isLogin ? { email, password } : { email, password, name }
-
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        toast.success(isLogin ? '登录成功！' : '注册成功！')
-        onSuccess()
-        onClose()
-        resetForm()
+      if (isLogin) {
+        await signIn(email, password)
+        toast.success('登录成功！')
       } else {
-        toast.error(data.error || '操作失败')
+        await signUp(email, password, name)
+        toast.success('注册成功！请检查邮箱验证邮件。')
       }
+      
+      onSuccess()
+      onClose()
+      resetForm()
     } catch (error) {
-      toast.error('网络错误，请重试')
+      toast.error(error instanceof Error ? error.message : '操作失败')
     } finally {
       setIsLoading(false)
     }
