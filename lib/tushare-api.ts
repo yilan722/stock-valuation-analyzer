@@ -21,8 +21,8 @@ export const fetchAStockData = async (ticker: string): Promise<StockData> => {
   }
 
   try {
-    // 调用Tushare API获取实时行情
-    const response = await axios.post(TUSHARE_API_URL, {
+    // 获取实时行情数据
+    const dailyResponse = await axios.post(TUSHARE_API_URL, {
       api_name: 'daily',
       token: TUSHARE_TOKEN,
       params: {
@@ -31,47 +31,110 @@ export const fetchAStockData = async (ticker: string): Promise<StockData> => {
       fields: 'ts_code,trade_date,open,high,low,close,vol,amount'
     })
 
-    if (response.data.data && response.data.data.items && response.data.data.items.length > 0) {
-      const latestData = response.data.data.items[0]
-      const fields = response.data.data.fields
-      
-      // 找到对应的字段索引
-      const closeIndex = fields.indexOf('close')
-      const volIndex = fields.indexOf('vol')
-      const openIndex = fields.indexOf('open')
-      
-      const currentPrice = parseFloat(latestData[closeIndex])
-      const openPrice = parseFloat(latestData[openIndex])
-      const change = currentPrice - openPrice
-      const changePercent = (change / openPrice) * 100
+    if (!dailyResponse.data.data || !dailyResponse.data.data.items || dailyResponse.data.data.items.length === 0) {
+      throw new Error('No daily data found')
+    }
 
-      return {
-        symbol: ticker,
-        name: companyName,
-        price: currentPrice,
-        marketCap: currentPrice * 1000000000, // 估算市值
-        peRatio: 15.5, // 估算P/E
-        volume: parseInt(latestData[volIndex]) || 0,
-        change: change,
-        changePercent: changePercent
+    const latestData = dailyResponse.data.data.items[0]
+    const fields = dailyResponse.data.data.fields
+    
+    // 找到对应的字段索引
+    const closeIndex = fields.indexOf('close')
+    const volIndex = fields.indexOf('vol')
+    const openIndex = fields.indexOf('open')
+    const amountIndex = fields.indexOf('amount')
+    
+    const currentPrice = parseFloat(latestData[closeIndex])
+    const openPrice = parseFloat(latestData[openIndex])
+    const volume = parseInt(latestData[volIndex]) || 0
+    const amount = parseFloat(latestData[amountIndex]) || 0
+    const change = currentPrice - openPrice
+    const changePercent = (change / openPrice) * 100
+
+    // 获取基本面数据（市值、P/E等）
+    let marketCap = 0
+    let peRatio = 0
+    
+    try {
+      const basicResponse = await axios.post(TUSHARE_API_URL, {
+        api_name: 'daily_basic',
+        token: TUSHARE_TOKEN,
+        params: {
+          ts_code: `${ticker}${marketSuffix}`,
+          trade_date: latestData[fields.indexOf('trade_date')]
+        },
+        fields: 'ts_code,trade_date,total_mv,pe,pb,ps,dv_ratio,dv_ttm'
+      })
+
+      if (basicResponse.data.data && basicResponse.data.data.items && basicResponse.data.data.items.length > 0) {
+        const basicData = basicResponse.data.data.items[0]
+        const basicFields = basicResponse.data.data.fields
+        
+        const totalMvIndex = basicFields.indexOf('total_mv')
+        const peIndex = basicFields.indexOf('pe')
+        
+        marketCap = parseFloat(basicData[totalMvIndex]) || 0
+        peRatio = parseFloat(basicData[peIndex]) || 0
+      }
+    } catch (basicError) {
+      console.log('Failed to fetch basic financial data')
+    }
+
+    // 如果P/E为0或null，尝试通过income API计算
+    if (!peRatio || peRatio === 0) {
+      try {
+        const incomeResponse = await axios.post(TUSHARE_API_URL, {
+          api_name: 'income',
+          token: TUSHARE_TOKEN,
+          params: {
+            ts_code: `${ticker}${marketSuffix}`
+          },
+          fields: 'ts_code,ann_date,end_date,revenue,n_income'
+        })
+
+        if (incomeResponse.data.data && incomeResponse.data.data.items && incomeResponse.data.data.items.length > 0) {
+          const incomeData = incomeResponse.data.data.items[0]
+          const incomeFields = incomeResponse.data.data.fields
+          
+          const netIncomeIndex = incomeFields.indexOf('n_income')
+          const netIncome = parseFloat(incomeData[netIncomeIndex]) || 0
+          
+          // 计算P/E比率：市值 / 净利润
+          if (netIncome > 0 && marketCap > 0) {
+            peRatio = (marketCap * 10000) / (netIncome * 10000) // 转换为元
+          }
+        }
+      } catch (incomeError) {
+        console.log('Failed to fetch income data for P/E calculation')
       }
     }
 
-    throw new Error('No data found')
-  } catch (error) {
-    console.error('Error fetching A-stock data from Tushare:', error)
+    // 检查必要的数据
+    if (!marketCap || marketCap === 0) {
+      throw new Error('Market cap data not available from Tushare API')
+    }
     
-    // 如果Tushare API失败，返回模拟数据
+    if (!peRatio || peRatio === 0) {
+      throw new Error('P/E ratio data not available from Tushare API')
+    }
+    
+    if (!volume || volume === 0) {
+      throw new Error('Volume data not available from Tushare API')
+    }
+
     return {
       symbol: ticker,
       name: companyName,
-      price: Math.random() * 100 + 10,
-      marketCap: Math.random() * 100000000000 + 10000000000,
-      peRatio: Math.random() * 50 + 5,
-      volume: Math.random() * 100000000 + 10000000,
-      change: (Math.random() - 0.5) * 5,
-      changePercent: (Math.random() - 0.5) * 10
+      price: currentPrice,
+      marketCap: marketCap * 10000, // Tushare返回的是万元，转换为元
+      peRatio: peRatio,
+      volume: volume,
+      change: change,
+      changePercent: changePercent
     }
+  } catch (error) {
+    console.error('Error fetching A-stock data from Tushare:', error)
+    throw error // 不再返回模拟数据，直接抛出错误
   }
 }
 
