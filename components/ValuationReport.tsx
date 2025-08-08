@@ -16,11 +16,19 @@ interface ValuationReportProps {
 export default function ValuationReport({ stockData, reportData, isLoading, locale }: ValuationReportProps) {
   const [activeTab, setActiveTab] = useState('fundamental')
 
-  const formatNumber = (num: number) => {
-    if (num >= 1e9) return `$${(num / 1e9).toFixed(2)}B`
-    if (num >= 1e6) return `$${(num / 1e6).toFixed(2)}M`
-    if (num >= 1e3) return `$${(num / 1e3).toFixed(2)}K`
-    return `$${num.toFixed(2)}`
+  const formatNumber = (num: number, withCurrency = true) => {
+    const prefix = withCurrency ? '$' : ''
+    if (num >= 1e9) return `${prefix}${(num / 1e9).toFixed(2)}B`
+    if (num >= 1e6) return `${prefix}${(num / 1e6).toFixed(2)}M`
+    if (num >= 1e3) return `${prefix}${(num / 1e3).toFixed(2)}K`
+    return `${prefix}${num.toFixed(2)}`
+  }
+
+  const formatVolume = (num: number) => {
+    if (num >= 1e9) return `${(num / 1e9).toFixed(2)}B`
+    if (num >= 1e6) return `${(num / 1e6).toFixed(2)}M`
+    if (num >= 1e3) return `${(num / 1e3).toFixed(2)}K`
+    return num.toLocaleString()
   }
 
   if (!stockData) return null
@@ -78,7 +86,7 @@ export default function ValuationReport({ stockData, reportData, isLoading, loca
             <span className="text-sm font-medium text-gray-600">{getTranslation(locale, 'volume')}</span>
           </div>
           <p className="text-lg font-semibold text-gray-900">
-            {formatNumber(stockData.volume)}
+            {formatVolume(stockData.volume)}
           </p>
         </div>
       </div>
