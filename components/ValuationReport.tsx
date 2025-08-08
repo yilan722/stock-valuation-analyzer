@@ -121,36 +121,36 @@ export default function ValuationReport({ stockData, reportData, isLoading, loca
           {/* Tab Content */}
           <div className="min-h-[400px]">
             {activeTab === 'fundamental' && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">{getTranslation(locale, 'fundamentalAnalysis')}</h3>
-                <div className="prose max-w-none">
+              <div className="space-y-6">
+                <h3 className="text-xl font-bold text-gray-900 border-b border-gray-200 pb-2">{getTranslation(locale, 'fundamentalAnalysis')}</h3>
+                <div className="prose max-w-none report-content">
                   <div dangerouslySetInnerHTML={{ __html: reportData.fundamentalAnalysis }} />
                 </div>
               </div>
             )}
 
             {activeTab === 'segments' && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">{getTranslation(locale, 'businessSegments')}</h3>
-                <div className="prose max-w-none">
+              <div className="space-y-6">
+                <h3 className="text-xl font-bold text-gray-900 border-b border-gray-200 pb-2">{getTranslation(locale, 'businessSegments')}</h3>
+                <div className="prose max-w-none report-content">
                   <div dangerouslySetInnerHTML={{ __html: reportData.businessSegments }} />
                 </div>
               </div>
             )}
 
             {activeTab === 'catalysts' && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">{getTranslation(locale, 'growthCatalysts')}</h3>
-                <div className="prose max-w-none">
+              <div className="space-y-6">
+                <h3 className="text-xl font-bold text-gray-900 border-b border-gray-200 pb-2">{getTranslation(locale, 'growthCatalysts')}</h3>
+                <div className="prose max-w-none report-content">
                   <div dangerouslySetInnerHTML={{ __html: reportData.growthCatalysts }} />
                 </div>
               </div>
             )}
 
             {activeTab === 'valuation' && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">{getTranslation(locale, 'valuationAnalysis')}</h3>
-                <div className="prose max-w-none">
+              <div className="space-y-6">
+                <h3 className="text-xl font-bold text-gray-900 border-b border-gray-200 pb-2">{getTranslation(locale, 'valuationAnalysis')}</h3>
+                <div className="prose max-w-none report-content">
                   <div dangerouslySetInnerHTML={{ __html: reportData.valuationAnalysis }} />
                 </div>
               </div>
