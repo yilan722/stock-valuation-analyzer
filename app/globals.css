@@ -44,19 +44,29 @@ a {
 }
 
 .report-content h2 {
-  @apply text-2xl font-bold text-gray-900 mt-8 mb-4 pb-2 border-b-2 border-blue-200;
+  @apply text-3xl font-bold text-gray-900 mt-10 mb-6 pb-3 border-b-2 border-blue-300 !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
 }
 
 .report-content h3 {
-  @apply text-xl font-semibold text-gray-800 mt-6 mb-3;
+  @apply text-xl font-semibold text-gray-800 mt-8 mb-4 !important;
+  color: #1f2937 !important;
+  border-left: 4px solid #3b82f6 !important;
+  padding-left: 12px !important;
 }
 
 .report-content h4 {
-  @apply text-lg font-medium text-gray-700 mt-4 mb-2;
+  @apply text-lg font-medium text-gray-700 mt-6 mb-3 !important;
+  color: #374151 !important;
 }
 
 .report-content p {
-  @apply mb-4 text-gray-700 leading-7;
+  @apply mb-6 text-gray-700 leading-8 !important;
+  font-size: 16px !important;
+  line-height: 1.8 !important;
 }
 
 .report-content ul {
@@ -67,64 +77,99 @@ a {
   @apply mb-2 text-gray-700;
 }
 
-/* Table styles */
+/* Table styles - Professional */
 .report-content table {
-  @apply w-full border-collapse mb-6 bg-white rounded-lg shadow-sm overflow-hidden;
+  @apply w-full border-collapse mb-8 bg-white rounded-xl shadow-lg overflow-hidden !important;
+  border: 2px solid #e5e7eb !important;
 }
 
 .report-content table.metric-table {
-  @apply border border-gray-200;
+  @apply border-2 border-gray-300 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
 }
 
 .report-content table th {
-  @apply bg-gray-50 text-left px-4 py-3 text-sm font-semibold text-gray-700 border-b border-gray-200;
+  @apply bg-gradient-to-r from-blue-50 to-indigo-50 text-left px-6 py-4 text-sm font-bold text-gray-800 border-b-2 border-blue-200 !important;
+  font-size: 14px !important;
+  letter-spacing: 0.5px !important;
 }
 
 .report-content table td {
-  @apply px-4 py-3 text-sm text-gray-700 border-b border-gray-100;
+  @apply px-6 py-4 text-sm text-gray-700 border-b border-gray-100 !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
 }
 
 .report-content table tr:nth-child(even) {
-  @apply bg-gray-50;
+  @apply bg-gray-50 !important;
+}
+
+.report-content table tr:nth-child(odd) {
+  @apply bg-white !important;
 }
 
 .report-content table tr:hover {
-  @apply bg-blue-50;
+  @apply bg-blue-50 !important;
+  transform: translateY(-1px) !important;
+  transition: all 0.2s ease !important;
 }
 
-/* Highlight boxes */
+.report-content table tr:last-child td {
+  @apply border-b-0 !important;
+}
+
+/* Highlight boxes - Professional */
 .report-content .highlight-box {
-  @apply bg-blue-50 border-l-4 border-blue-400 p-4 mb-4 rounded-r-lg;
+  @apply bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 p-6 mb-6 rounded-r-xl !important;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1), 0 2px 4px -1px rgba(59, 130, 246, 0.06) !important;
 }
 
 .report-content .highlight-box h4 {
-  @apply text-blue-800 font-semibold mb-2;
+  @apply text-blue-900 font-bold mb-3 !important;
+  font-size: 18px !important;
 }
 
 .report-content .highlight-box p {
-  @apply text-blue-700 mb-0;
+  @apply text-blue-800 mb-0 !important;
+  font-size: 15px !important;
+  line-height: 1.7 !important;
 }
 
-/* Data grid */
+/* Data grid - Enhanced */
 .report-content .data-grid {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6;
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 !important;
 }
 
 .report-content .data-grid .grid-item {
-  @apply bg-white p-4 rounded-lg border border-gray-200 shadow-sm;
+  @apply bg-white p-4 rounded-lg border border-gray-200 shadow-sm !important;
 }
 
-/* Color coding for values */
+/* Color coding for values - Professional */
 .report-content .positive {
-  @apply text-green-600 font-semibold;
+  @apply text-green-600 font-bold !important;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  font-size: 15px !important;
 }
 
 .report-content .negative {
-  @apply text-red-600 font-semibold;
+  @apply text-red-600 font-bold !important;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  font-size: 15px !important;
 }
 
 .report-content .neutral {
-  @apply text-blue-600 font-semibold;
+  @apply text-blue-600 font-bold !important;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  font-size: 15px !important;
 }
 
 /* Progress indicators */
@@ -136,17 +181,20 @@ a {
   @apply bg-blue-500 h-2 rounded-full transition-all duration-300;
 }
 
-/* Recommendation boxes */
+/* Recommendation boxes - Professional */
 .report-content .recommendation-buy {
-  @apply bg-green-50 border border-green-200 p-4 rounded-lg mb-4;
+  @apply bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 p-6 rounded-xl mb-6 !important;
+  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.1), 0 2px 4px -1px rgba(16, 185, 129, 0.06) !important;
 }
 
 .report-content .recommendation-sell {
-  @apply bg-red-50 border border-red-200 p-4 rounded-lg mb-4;
+  @apply bg-gradient-to-r from-red-50 to-pink-50 border-2 border-red-300 p-6 rounded-xl mb-6 !important;
+  box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.1), 0 2px 4px -1px rgba(239, 68, 68, 0.06) !important;
 }
 
 .report-content .recommendation-hold {
-  @apply bg-yellow-50 border border-yellow-200 p-4 rounded-lg mb-4;
+  @apply bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-300 p-6 rounded-xl mb-6 !important;
+  box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.1), 0 2px 4px -1px rgba(245, 158, 11, 0.06) !important;
 }
 
 /* Financial metrics styling */
