@@ -1,8 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
+  // 移除过时的appDir配置
 }
 
 module.exports = nextConfig 

@@ -34,7 +34,16 @@ export interface BasicInfo {
   description: string
 }
 
+// 新的API响应结构
 export interface ValuationReportData {
+  fundamentalAnalysis: string
+  businessSegments: string
+  growthCatalysts: string
+  valuationAnalysis: string
+}
+
+// 旧的API响应结构（保留用于兼容性）
+export interface LegacyValuationReportData {
   basicInfo: BasicInfo
   businessSegments: BusinessSegment[]
   growthCatalysts: string[]
