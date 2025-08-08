@@ -1,11 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { StockData, ValuationReportData } from '../../../types'
+import { verifyToken, canGenerateReport, incrementReportUsage } from '../../../lib/auth'
+import { prisma } from '../../../lib/database'
 
 const OPUS4_API_URL = 'https://api.nuwaapi.com/v1/chat/completions'
 const OPUS4_API_KEY = 'sk-GNBf5QFmnepeBZddwH612o5vEJQFMq6z8gUAyre7tAIrGeA8'
 
 export async function POST(request: NextRequest) {
   try {
+    // Check authentication
+    const token = request.cookies.get('token')?.value
+    if (!token) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      )
+    }
+
+    const userSession = verifyToken(token)
+    if (!userSession) {
+      return NextResponse.json(
+        { error: 'Invalid token' },
+        { status: 401 }
+      )
+    }
+
+    // Check if user can generate report
+    const canGenerate = await canGenerateReport(userSession.userId)
+    if (!canGenerate.canGenerate) {
+      return NextResponse.json(
+        { error: canGenerate.reason || 'Cannot generate report' },
+        { status: 403 }
+      )
+    }
+
     const { stockData, locale } = await request.json()
 
     if (!stockData) {
@@ -127,6 +155,28 @@ export async function POST(request: NextRequest) {
       }
 
       const reportData = JSON.parse(cleanContent) as ValuationReportData
+      
+      // Save report to database
+      await prisma.report.create({
+        data: {
+          userId: userSession.userId,
+          stockSymbol: stockData.symbol,
+          stockName: stockData.name,
+          reportData: JSON.stringify(reportData)
+        }
+      })
+
+      // Increment report usage
+      const user = await prisma.user.findUnique({
+        where: { id: userSession.userId }
+      })
+      
+      if (user && user.freeReportsUsed === 0) {
+        await incrementReportUsage(userSession.userId, true)
+      } else {
+        await incrementReportUsage(userSession.userId, false)
+      }
+
       return NextResponse.json(reportData)
     } catch (parseError) {
       console.error('Error parsing AI response:', parseError)

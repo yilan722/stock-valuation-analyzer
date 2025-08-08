@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Subscription and usage tracking
+  freeReportsUsed Int @default(0)
+  paidReportsUsed Int @default(0)
+  
+  // Subscription details
+  subscriptionId    String?
+  subscriptionType  String? // 'monthly_99', 'monthly_199', 'pay_per_report'
+  subscriptionStart DateTime?
+  subscriptionEnd   DateTime?
+  monthlyReportLimit Int @default(0)
+  
+  // Payment tracking
+  payments Payment[]
+  reports  Report[]
+}
+
+model Payment {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  
+  amount    Float
+  currency  String   @default("CNY")
+  type      String   // 'subscription', 'pay_per_report'
+  status    String   @default("pending") // 'pending', 'completed', 'failed'
+  
+  // Alipay specific fields
+  alipayTradeNo String?
+  alipayOrderId String?
+  
+  // Subscription details for subscription payments
+  subscriptionType String?
+  reportLimit      Int?
+  
+  // Report details for pay-per-report payments
+  reportId         String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Report {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  
+  stockSymbol String
+  stockName   String
+  reportData  String // JSON string of the report
+  
+  createdAt DateTime @default(now())
+} 
