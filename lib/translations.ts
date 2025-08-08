@@ -104,16 +104,12 @@ export const translations = {
 } as const
 
 export function getTranslation(locale: Locale, key: keyof typeof translations.en): string {
-  console.log('getTranslation called with:', { locale, key, availableLocales: Object.keys(translations) })
-  
   if (!translations[locale]) {
     console.error(`Locale '${locale}' not found in translations`)
     return translations.en[key] || key
   }
   
-  const result = translations[locale][key] || translations.en[key] || key
-  console.log('getTranslation result:', result)
-  return result
+  return translations[locale][key] || translations.en[key] || key
 }
 
 export type TranslationKey = keyof typeof translations.en 
