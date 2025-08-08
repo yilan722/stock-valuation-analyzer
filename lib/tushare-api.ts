@@ -113,13 +113,13 @@ export const fetchAStockData = async (ticker: string): Promise<StockData> => {
     if (!marketCap || marketCap === 0) {
       throw new Error('Market cap data not available from Tushare API')
     }
-    
+
     if (!peRatio || peRatio === 0) {
       throw new Error('P/E ratio data not available from Tushare API')
     }
-    
-    if (!volume || volume === 0) {
-      throw new Error('Volume data not available from Tushare API')
+
+    if (!amount || amount === 0) {
+      throw new Error('Amount data not available from Tushare API')
     }
 
     return {
@@ -128,7 +128,7 @@ export const fetchAStockData = async (ticker: string): Promise<StockData> => {
       price: currentPrice,
       marketCap: marketCap * 10000, // Tushare返回的是万元，转换为元
       peRatio: peRatio,
-      volume: volume,
+      amount: amount, // 成交额（万元）
       change: change,
       changePercent: changePercent
     }

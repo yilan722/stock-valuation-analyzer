@@ -37,11 +37,15 @@ export const fetchAlphaVantageStockData = async (ticker: string): Promise<StockD
       }
       
       const volume = parseInt(quote['06. volume']) || 0
-      if (!volume || volume === 0) {
-        throw new Error('Volume data not available from Alpha Vantage API')
+      const currentPrice = parseFloat(quote['05. price'])
+      
+      // 计算成交额：成交量 * 当前价格
+      const amount = volume * currentPrice
+      
+      if (!amount || amount === 0) {
+        throw new Error('Amount data not available from Alpha Vantage API')
       }
       
-      const currentPrice = parseFloat(quote['05. price'])
       const previousClose = parseFloat(quote['08. previous close'])
       const change = parseFloat(quote['09. change'])
       const changePercent = parseFloat(quote['10. change percent'].replace('%', ''))
@@ -52,7 +56,7 @@ export const fetchAlphaVantageStockData = async (ticker: string): Promise<StockD
         price: currentPrice,
         marketCap: marketCap,
         peRatio: peRatio,
-        volume: volume,
+        amount: amount, // 成交额（美元）
         change: change,
         changePercent: changePercent
       }

@@ -16,7 +16,7 @@ export const translations = {
     price: 'Price',
     marketCap: 'Market Cap',
     peRatio: 'P/E Ratio',
-    volume: 'Volume',
+    amount: 'Amount',
     
     // Report Sections
     fundamentalAnalysis: 'Fundamental Analysis',
@@ -66,7 +66,7 @@ export const translations = {
     price: '价格',
     marketCap: '市值',
     peRatio: '市盈率',
-    volume: '成交量',
+    amount: '成交额',
     
     // Report Sections
     fundamentalAnalysis: '基本面分析',
