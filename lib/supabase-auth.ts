@@ -153,14 +153,17 @@ export async function canGenerateReport(userId: string): Promise<{ canGenerate: 
   try {
     // 获取用户信息
     const { data: userProfile, error: profileError } = await supabase
-      .from('user_profiles')
+      .from('users')
       .select('*')
       .eq('id', userId)
       .single()
 
     if (profileError || !userProfile) {
+      console.error('用户资料查询失败:', profileError)
       return { canGenerate: false, reason: '用户资料不存在' }
     }
+
+    console.log('检查白名单状态，用户邮箱:', userProfile.email)
 
     // 🔥 新增：检查是否在白名单中
     const { data: whitelistUser, error: whitelistError } = await supabase
@@ -170,8 +173,12 @@ export async function canGenerateReport(userId: string): Promise<{ canGenerate: 
       .single()
 
     if (whitelistUser && !whitelistError) {
+      console.log('用户在白名单中:', whitelistUser)
+      
       // 白名单用户：检查今日报告数量
       const today = new Date().toISOString().split('T')[0]
+      console.log('检查今日报告数量，日期:', today)
+      
       const { count: todayReports, error: countError } = await supabase
         .from('reports')
         .select('*', { count: 'exact', head: true })
@@ -184,21 +191,27 @@ export async function canGenerateReport(userId: string): Promise<{ canGenerate: 
         return { canGenerate: false, reason: '统计失败' }
       }
 
+      console.log('今日已生成报告数量:', todayReports)
       const remaining = whitelistUser.daily_report_limit - (todayReports || 0)
+      console.log('剩余报告数量:', remaining)
       
       if (remaining > 0) {
+        console.log('白名单用户，可以生成报告')
         return { 
           canGenerate: true, 
           reason: '白名单用户', 
           remainingReports: remaining 
         }
       } else {
+        console.log('白名单用户，今日额度已用完')
         return { 
           canGenerate: false, 
           reason: '今日白名单额度已用完', 
           remainingReports: 0 
         }
       }
+    } else {
+      console.log('用户不在白名单中，白名单查询结果:', { whitelistUser, whitelistError })
     }
 
     // 非白名单用户：使用原有逻辑
