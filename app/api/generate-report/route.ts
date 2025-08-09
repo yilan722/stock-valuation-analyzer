@@ -1,15 +1,75 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '../../../lib/supabase'
+import { createApiSupabaseClient } from '../../../lib/supabase-server'
 import { canGenerateReport, incrementReportUsage, createReport } from '../../../lib/supabase-auth'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = createApiSupabaseClient(request)
     
-    // Get current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    // 获取用户信息 - 优先使用Authorization头
+    let user = null
     
-    if (authError || !user) {
+    // 方法1: 尝试从Authorization头获取用户ID
+    const authHeader = request.headers.get('authorization')
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const userId = authHeader.replace('Bearer ', '')
+      console.log('User ID found in Authorization header:', userId)
+      
+      // 验证用户ID是否有效
+      try {
+        const { data: userProfile, error: profileError } = await supabase
+          .from('users')
+          .select('id, email, created_at, updated_at')
+          .eq('id', userId)
+          .single()
+        
+        if (userProfile && !profileError) {
+          user = {
+            id: userProfile.id,
+            email: userProfile.email,
+            created_at: userProfile.created_at,
+            updated_at: userProfile.updated_at
+          }
+          console.log('User verified from Authorization header:', user.id)
+        } else {
+          console.log('User profile not found for ID:', userId)
+        }
+      } catch (error) {
+        console.log('Error verifying user from Authorization header:', error)
+      }
+    }
+    
+    // 方法2: 如果Authorization头没有提供用户，尝试获取会话
+    if (!user) {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      
+      if (session && session.user) {
+        user = session.user
+        console.log('Session found, user:', user.id)
+      } else {
+        console.log('No session found')
+      }
+    }
+    
+    // 方法3: 如果仍然没有用户，尝试获取用户
+    if (!user) {
+      const { data: { user: userData }, error: userError } = await supabase.auth.getUser()
+      
+      if (userData) {
+        user = userData
+        console.log('User found via getUser:', user.id)
+      } else {
+        console.log('No user found via getUser')
+      }
+    }
+    
+    console.log('Server-side auth check:', { 
+      user: user?.id || 'null'
+    })
+    
+    // 要求用户必须登录
+    if (!user) {
+      console.log('Authentication required for report generation')
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -25,7 +85,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { stockData, locale } = await request.json()
+    // 安全地解析请求体
+    let stockData, locale
+    try {
+      const body = await request.json()
+      stockData = body.stockData
+      locale = body.locale
+    } catch (error) {
+      console.error('Error parsing request body:', error)
+      return NextResponse.json(
+        { error: 'Invalid request body' },
+        { status: 400 }
+      )
+    }
 
     if (!stockData) {
       return NextResponse.json(
@@ -54,32 +126,78 @@ export async function POST(request: NextRequest) {
             messages: [
               {
                 role: 'system',
-                content: `You are a professional stock analyst. Generate a comprehensive valuation report in ${locale === 'zh' ? 'Chinese' : 'English'} for the given stock data. The report should include:
+                content: `You are a professional stock analyst with expertise in fundamental analysis and valuation. Generate a comprehensive, detailed valuation report in ${locale === 'zh' ? 'Chinese' : 'English'} for the given stock data.
 
-1. Fundamental Analysis (fundamentalAnalysis): Company overview, key financial metrics, latest quarterly/annual performance
-2. Business Segments Analysis (businessSegments): Revenue breakdown, segment performance, market analysis
-3. Growth Catalysts (growthCatalysts): Growth drivers, opportunities, strategic initiatives
-4. Valuation Analysis (valuationAnalysis): DCF analysis, comparable company analysis, target price, investment recommendation
+REPORT STRUCTURE (return as valid JSON with these exact keys):
 
-Use the latest 2024 annual and 2025 quarterly financial data. Display "Trading Amount" instead of "Volume".
+1. fundamentalAnalysis: 
+   - Company overview and business model
+   - Key financial metrics (P/E, P/B, ROE, ROA, debt ratios)
+   - Latest quarterly/annual performance with year-over-year comparisons
+   - Revenue growth, profit margins, cash flow analysis
+   - Industry position and competitive advantages
 
-Format each section as HTML with professional styling using classes like 'metric-table', 'highlight-box', 'positive', 'negative', 'neutral', 'recommendation-buy', 'recommendation-sell', 'recommendation-hold'.
+2. businessSegments: 
+   - Detailed revenue breakdown by business segments
+   - Segment performance analysis with growth rates
+   - Geographic revenue distribution
+   - Market share analysis by segment
+   - Segment profitability and margins
+   - Future segment growth projections
 
-Return a valid JSON object with these four sections as HTML strings.`
+3. growthCatalysts: 
+   - Primary growth drivers and market opportunities
+   - Strategic initiatives and expansion plans
+   - New product/service launches
+   - Market expansion opportunities
+   - Technology investments and R&D
+   - Regulatory tailwinds or headwinds
+   - Competitive advantages and moats
+
+4. valuationAnalysis: 
+   - DCF analysis with detailed assumptions
+   - Comparable company analysis (P/E, EV/EBITDA, P/S ratios)
+   - Sum-of-parts valuation if applicable
+   - Target price calculation with multiple methodologies
+   - Risk-adjusted return analysis
+   - Investment recommendation (BUY/HOLD/SELL) with rationale
+   - Key risks and mitigating factors
+
+REQUIREMENTS:
+- Use latest 2024 annual and 2025 quarterly financial data
+- Display "Trading Amount" instead of "Volume"
+- Include specific numbers, percentages, and data points
+- Provide detailed analysis with supporting evidence
+- Use professional HTML styling with classes: 'metric-table', 'highlight-box', 'positive', 'negative', 'neutral', 'recommendation-buy', 'recommendation-sell', 'recommendation-hold'
+- Ensure JSON is properly formatted and valid
+- Each section should be comprehensive and detailed (minimum 500 words per section)
+
+Return ONLY a valid JSON object with these four sections as HTML strings.`
               },
               {
                 role: 'user',
-                content: `Generate a professional stock valuation report for ${stockData.name} (${stockData.symbol}) with the following data:
+                content: `Generate a comprehensive, professional stock valuation report for ${stockData.name} (${stockData.symbol}) with the following data:
+
+STOCK DATA:
 - Current Price: $${stockData.price}
 - Market Cap: $${stockData.marketCap}
 - P/E Ratio: ${stockData.peRatio}
 - Trading Amount: $${stockData.amount}
 
-Please provide a comprehensive analysis in ${locale === 'zh' ? 'Chinese' : 'English'}.`
+REQUIREMENTS:
+- Provide detailed, professional analysis with specific data points and percentages
+- Include comprehensive business segment analysis with revenue breakdowns
+- Analyze growth catalysts with specific market opportunities
+- Provide detailed valuation analysis with multiple methodologies
+- Use the latest 2024 annual and 2025 quarterly financial data
+- Ensure each section is comprehensive and detailed
+- Format as professional HTML with proper styling
+
+Please provide a comprehensive, detailed analysis in ${locale === 'zh' ? 'Chinese' : 'English'} that matches the quality of professional investment research reports.`
               }
             ],
             temperature: 0.7,
-            max_tokens: 4000
+            max_tokens: 8000
           })
         })
 
@@ -101,12 +219,19 @@ Please provide a comprehensive analysis in ${locale === 'zh' ? 'Chinese' : 'Engl
             const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/)
             const jsonString = jsonMatch ? jsonMatch[1] : content
             
-            reportData = JSON.parse(jsonString)
+            // Clean up the JSON string
+            let cleanedJson = jsonString
+              .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
+              .replace(/\n\s*\n/g, '\n') // Remove extra newlines
+              .replace(/,\s*}/g, '}') // Remove trailing commas
+              .replace(/,\s*]/g, ']') // Remove trailing commas in arrays
+            
+            reportData = JSON.parse(cleanedJson)
             console.log(`Successfully generated report using ${model}`)
             break
           } catch (parseError) {
             console.error(`Error parsing AI response:`, parseError)
-            console.log('Raw content:', content)
+            console.log('Raw content:', content.substring(0, 500) + '...')
             lastError = new Error('Failed to parse AI response')
             continue
           }

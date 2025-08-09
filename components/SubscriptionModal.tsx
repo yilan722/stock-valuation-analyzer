@@ -1,171 +1,258 @@
 'use client'
 
 import React, { useState } from 'react'
-import { X, Check, CreditCard } from 'lucide-react'
+import { X, Check, CreditCard, Zap, Crown, Star } from 'lucide-react'
 import toast from 'react-hot-toast'
+import UserAgreementModal from './UserAgreementModal'
+
+interface SubscriptionPlan {
+  id: string
+  name: string
+  price: number
+  reports: number
+  features: string[]
+  popular?: boolean
+  bestValue?: boolean
+  icon: React.ReactNode
+}
 
 interface SubscriptionModalProps {
   isOpen: boolean
   onClose: () => void
-  onSuccess: () => void
+  userId: string
   locale: string
 }
 
-const SUBSCRIPTION_PLANS = {
-  monthly_99: {
-    name: '月度订阅 (99元)',
-    price: 99,
-    reports: 30,
-    features: ['30篇报告/月', '专业估值分析', '实时数据更新', '优先客服支持']
-  },
-  monthly_199: {
-    name: '月度订阅 (199元)',
-    price: 199,
-    reports: 65,
-    features: ['65篇报告/月', '专业估值分析', '实时数据更新', '优先客服支持', '高级分析功能']
-  },
-  pay_per_report: {
-    name: '单篇报告 (5元)',
-    price: 5,
-    reports: 1,
-    features: ['1篇报告', '专业估值分析', '实时数据更新']
-  }
-}
-
-export default function SubscriptionModal({ isOpen, onClose, onSuccess, locale }: SubscriptionModalProps) {
-  const [selectedPlan, setSelectedPlan] = useState<keyof typeof SUBSCRIPTION_PLANS | null>(null)
+export default function SubscriptionModal({ isOpen, onClose, userId, locale }: SubscriptionModalProps) {
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [showAgreement, setShowAgreement] = useState(false)
+  const [pendingPlanId, setPendingPlanId] = useState<string | null>(null)
 
-  const handlePayment = async () => {
-    if (!selectedPlan) {
-      toast.error('请选择订阅计划')
+  const plans: SubscriptionPlan[] = [
+    {
+      id: 'single_report',
+      name: '单篇报告',
+      price: 5,
+      reports: 1,
+      features: ['1篇专业股票分析报告', '实时市场数据', 'AI驱动分析'],
+      icon: <CreditCard className="h-6 w-6" />
+    },
+    {
+      id: 'monthly_30',
+      name: '月度订阅',
+      price: 99,
+      reports: 30,
+      features: ['30篇专业股票分析报告', '实时市场数据', 'AI驱动分析', '优先客服支持'],
+      popular: true,
+      icon: <Zap className="h-6 w-6" />
+    },
+    {
+      id: 'monthly_70',
+      name: '高级订阅',
+      price: 199,
+      reports: 70,
+      features: ['70篇专业股票分析报告', '实时市场数据', 'AI驱动分析', '优先客服支持', '深度行业分析'],
+      bestValue: true,
+      icon: <Star className="h-6 w-6" />
+    },
+    {
+      id: 'premium_300',
+      name: '专业版',
+      price: 998,
+      reports: 300,
+      features: ['300篇专业股票分析报告', '实时市场数据', 'AI驱动分析', '优先客服支持', '深度行业分析', '每日K线技术分析', 'VIP专属服务'],
+      icon: <Crown className="h-6 w-6" />
+    }
+  ]
+
+  const handleSubscribe = async (planId: string) => {
+    if (!userId) {
+      toast.error('请先登录')
       return
     }
 
+    // 显示用户协议
+    setPendingPlanId(planId)
+    setShowAgreement(true)
+  }
+
+  const handleAgreementConfirm = async () => {
+    if (!pendingPlanId) return
+
     setIsLoading(true)
     try {
+      const plan = plans.find(p => p.id === pendingPlanId)
+      if (!plan) {
+        toast.error('无效的订阅计划')
+        return
+      }
+
       const response = await fetch('/api/payment/create', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ planType: selectedPlan })
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: plan.price,
+          type: pendingPlanId === 'single_report' ? 'single_report' : 'subscription',
+          subscriptionType: pendingPlanId,
+          reportLimit: plan.reports
+        }),
       })
 
-      const data = await response.json()
-
-      if (response.ok) {
-        // Redirect to Alipay
-        window.location.href = data.paymentUrl
-      } else {
-        toast.error(data.error || '创建支付失败')
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || '创建支付订单失败')
       }
+
+      const { paymentUrl } = await response.json()
+      
+      // 跳转到支付宝支付页面
+      window.open(paymentUrl, '_blank')
+      
+      toast.success('正在跳转到支付宝支付...')
+      onClose()
     } catch (error) {
-      toast.error('网络错误，请重试')
+      console.error('订阅失败:', error)
+      toast.error('订阅失败，请稍后重试')
     } finally {
       setIsLoading(false)
+      setShowAgreement(false)
+      setPendingPlanId(null)
     }
   }
 
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">
-            选择订阅计划
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <X size={24} />
-          </button>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-gray-900">选择订阅计划</h2>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="h-6 w-6" />
+            </button>
+          </div>
+          <p className="text-gray-600 mt-2">
+            选择最适合您的订阅计划，享受专业的股票分析服务
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          {Object.entries(SUBSCRIPTION_PLANS).map(([key, plan]) => (
-            <div
-              key={key}
-              className={`border-2 rounded-lg p-6 cursor-pointer transition-all ${
-                selectedPlan === key
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
-              onClick={() => setSelectedPlan(key as keyof typeof SUBSCRIPTION_PLANS)}
-            >
-              <div className="text-center mb-4">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {plans.map((plan) => (
+              <div
+                key={plan.id}
+                className={`relative bg-white border-2 rounded-lg p-6 transition-all duration-200 hover:shadow-lg ${
+                  selectedPlan === plan.id
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                } ${plan.popular ? 'ring-2 ring-yellow-400' : ''} ${plan.bestValue ? 'ring-2 ring-green-400' : ''}`}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+                      最受欢迎
+                    </span>
+                  </div>
+                )}
+                {plan.bestValue && (
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+                      超值推荐
+                    </span>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-center mb-4">
+                  <div className="p-3 bg-blue-100 rounded-full text-blue-600">
+                    {plan.icon}
+                  </div>
+                </div>
+
+                <h3 className="text-xl font-bold text-gray-900 text-center mb-2">
                   {plan.name}
                 </h3>
-                <div className="text-3xl font-bold text-blue-600">
-                  ¥{plan.price}
+
+                <div className="text-center mb-4">
+                  <span className="text-3xl font-bold text-gray-900">¥{plan.price}</span>
+                  {plan.id !== 'single_report' && (
+                    <span className="text-gray-500 text-sm">/月</span>
+                  )}
                 </div>
-                <p className="text-sm text-gray-600 mt-1">
-                  {plan.reports}篇报告
-                </p>
+
+                <div className="space-y-3 mb-6">
+                  {plan.features.map((feature, index) => (
+                    <div key={index} className="flex items-start space-x-2">
+                      <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-gray-600">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => setSelectedPlan(plan.id)}
+                  className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
+                    selectedPlan === plan.id
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {selectedPlan === plan.id ? '已选择' : '选择此计划'}
+                </button>
               </div>
-
-              <ul className="space-y-3">
-                {plan.features.map((feature, index) => (
-                  <li key={index} className="flex items-center space-x-2">
-                    <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                    <span className="text-sm text-gray-700">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              {selectedPlan === key && (
-                <div className="mt-4 text-center">
-                  <Check className="h-6 w-6 text-blue-500 mx-auto mb-2" />
-                  <span className="text-sm text-blue-600 font-medium">已选择</span>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        <div className="border-t pt-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h4 className="text-lg font-semibold text-gray-900">支付方式</h4>
-              <p className="text-sm text-gray-600">使用支付宝安全支付</p>
-            </div>
-            <CreditCard className="h-8 w-8 text-blue-600" />
+            ))}
           </div>
 
           {selectedPlan && (
-            <div className="bg-gray-50 p-4 rounded-lg mb-4">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-700">总计:</span>
-                <span className="text-xl font-bold text-gray-900">
-                  ¥{SUBSCRIPTION_PLANS[selectedPlan].price}
-                </span>
+            <div className="mt-8 p-6 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    确认订阅
+                  </h3>
+                  <p className="text-gray-600 mt-1">
+                    您选择的计划将通过支付宝安全支付
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleSubscribe(selectedPlan)}
+                  disabled={isLoading}
+                  className="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                >
+                  {isLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <span>处理中...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="h-4 w-4" />
+                      <span>立即支付</span>
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           )}
-
-          <div className="flex space-x-4">
-            <button
-              onClick={onClose}
-              className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
-            >
-              取消
-            </button>
-            <button
-              onClick={handlePayment}
-              disabled={!selectedPlan || isLoading}
-              className="flex-1 bg-blue-600 text-white px-4 py-3 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? '处理中...' : '立即支付'}
-            </button>
-          </div>
-        </div>
-
-        <div className="mt-6 text-center text-sm text-gray-500">
-          <p>点击支付后将跳转到支付宝完成付款</p>
-          <p>付款成功后即可使用所有功能</p>
         </div>
       </div>
+
+      {/* 用户协议模态框 */}
+      <UserAgreementModal
+        isOpen={showAgreement}
+        onClose={() => {
+          setShowAgreement(false)
+          setPendingPlanId(null)
+        }}
+        onConfirm={handleAgreementConfirm}
+        locale={locale}
+      />
     </div>
   )
 } 

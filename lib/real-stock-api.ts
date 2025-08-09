@@ -39,7 +39,7 @@ export const fetchYahooStockData = async (ticker: string): Promise<StockData> =>
         price: currentPrice,
         marketCap: marketCap,
         peRatio: peRatio,
-        volume: volume,
+        amount: volume,
         change: currentPrice - price,
         changePercent: ((currentPrice - price) / price) * 100
       }
@@ -66,7 +66,7 @@ export const fetchAlphaVantageData = async (ticker: string, apiKey: string): Pro
         price: parseFloat(quote['05. price']),
         marketCap: parseFloat(quote['07. market cap']) || 0,
         peRatio: parseFloat(quote['09. price to earnings ratio']) || 0,
-        volume: parseInt(quote['06. volume']),
+        amount: parseInt(quote['06. volume']),
         change: parseFloat(quote['09. change']),
         changePercent: parseFloat(quote['10. change percent'].replace('%', ''))
       }

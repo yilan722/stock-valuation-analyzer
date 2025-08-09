@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { DollarSign, TrendingUp, BarChart3, TrendingDown } from 'lucide-react'
+import React, { useState } from 'react'
+import { DollarSign, TrendingUp, BarChart3, TrendingDown, Download } from 'lucide-react'
 import { StockData, ValuationReportData } from '../types'
 import { type Locale } from '../lib/i18n'
 import { getTranslation } from '../lib/translations'
@@ -15,6 +15,7 @@ interface ValuationReportProps {
 
 export default function ValuationReport({ stockData, reportData, isLoading, locale }: ValuationReportProps) {
   const [activeTab, setActiveTab] = useState('fundamental')
+  const [isDownloading, setIsDownloading] = useState(false)
 
   const formatNumber = (num: number, withCurrency = true) => {
     const prefix = withCurrency ? '$' : ''
@@ -31,6 +32,44 @@ export default function ValuationReport({ stockData, reportData, isLoading, loca
     return num.toLocaleString()
   }
 
+  const handleDownloadPDF = async () => {
+    if (!reportData || !stockData) return
+
+    setIsDownloading(true)
+    try {
+      const response = await fetch('/api/download-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          reportData,
+          stockName: stockData.name,
+          stockSymbol: stockData.symbol
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF')
+      }
+
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${stockData.symbol}_valuation_report.pdf`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    } catch (error) {
+      console.error('Download error:', error)
+      alert(getTranslation(locale, 'downloadError'))
+    } finally {
+      setIsDownloading(false)
+    }
+  }
+
   if (!stockData) return null
 
   return (
@@ -43,6 +82,16 @@ export default function ValuationReport({ stockData, reportData, isLoading, loca
           </h2>
           <p className="text-sm text-gray-600">{getTranslation(locale, 'stockInformation')}</p>
         </div>
+        {reportData && (
+          <button
+            onClick={handleDownloadPDF}
+            disabled={isDownloading}
+            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            <Download className="h-4 w-4" />
+            <span>{isDownloading ? getTranslation(locale, 'generatingPDF') : getTranslation(locale, 'downloadPDF')}</span>
+          </button>
+        )}
       </div>
 
       {/* Stock Metrics */}

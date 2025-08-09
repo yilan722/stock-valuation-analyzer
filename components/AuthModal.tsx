@@ -28,14 +28,19 @@ export default function AuthModal({ isOpen, onClose, onSuccess, locale }: AuthMo
       if (isLogin) {
         await signIn(email, password)
         toast.success('登录成功！')
+        // 登录成功后等待一下再关闭模态框
+        setTimeout(() => {
+          onSuccess()
+          onClose()
+          resetForm()
+        }, 500)
       } else {
         await signUp(email, password, name)
         toast.success('注册成功！请检查邮箱验证邮件。')
+        onSuccess()
+        onClose()
+        resetForm()
       }
-      
-      onSuccess()
-      onClose()
-      resetForm()
     } catch (error) {
       toast.error(error instanceof Error ? error.message : '操作失败')
     } finally {

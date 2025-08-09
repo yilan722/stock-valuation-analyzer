@@ -50,22 +50,29 @@ export default function HomePage({ params }: PageProps) {
 
   // Load user data on mount
   useEffect(() => {
+    console.log('Component mounted, loading user...')
     loadUser()
   }, [])
 
   const loadUser = async () => {
     try {
+      console.log('Loading user...')
       const userData = await getCurrentUser()
+      console.log('User data loaded:', userData)
       setUser(userData)
     } catch (error) {
       console.error('Failed to load user:', error)
+      setUser(null)
     } finally {
       setIsLoadingUser(false)
     }
   }
 
-  const handleAuthSuccess = () => {
-    loadUser()
+  const handleAuthSuccess = async () => {
+    // 等待一下让 Supabase 会话更新
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    console.log('Auth success, reloading user...')
+    await loadUser()
   }
 
   const handleLogout = () => {
@@ -76,6 +83,10 @@ export default function HomePage({ params }: PageProps) {
     setShowAuthModal(true)
   }
 
+  const handleOpenSubscription = () => {
+    setShowSubscriptionModal(true)
+  }
+
   const handleGenerateReport = async () => {
     if (!stockData) {
       toast.error(getTranslation(params.locale, 'stockNotFound'))
@@ -83,17 +94,23 @@ export default function HomePage({ params }: PageProps) {
     }
 
     if (!user) {
+      console.log('No user found, showing auth modal')
       setShowAuthModal(true)
       return
     }
 
+    console.log('Generating report for user:', user.id)
     setIsGeneratingReport(true)
     try {
+      // 确保请求包含认证信息
       const response = await fetch('/api/generate-report', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          // 添加认证头 - 使用用户ID作为备选方案
+          'Authorization': `Bearer ${user.id}`,
         },
+        credentials: 'include', // 确保包含cookies
         body: JSON.stringify({
           stockData,
           locale: params.locale
@@ -103,10 +120,12 @@ export default function HomePage({ params }: PageProps) {
       if (!response.ok) {
         const errorData = await response.json()
         if (response.status === 401) {
+          console.log('Authentication failed, showing auth modal')
           setShowAuthModal(true)
           return
         }
         if (response.status === 403) {
+          console.log('Access denied, showing subscription modal')
           setShowSubscriptionModal(true)
           return
         }
@@ -138,6 +157,7 @@ export default function HomePage({ params }: PageProps) {
               onLogout={handleLogout}
               onRefresh={loadUser}
               onLogin={handleLogin}
+              onOpenSubscription={handleOpenSubscription}
               locale={params.locale}
             />
           </div>
@@ -176,7 +196,7 @@ export default function HomePage({ params }: PageProps) {
       <SubscriptionModal
         isOpen={showSubscriptionModal}
         onClose={() => setShowSubscriptionModal(false)}
-        onSuccess={handleAuthSuccess}
+        userId={user?.id || ''}
         locale={params.locale}
       />
       

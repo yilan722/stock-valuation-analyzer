@@ -10,7 +10,7 @@ const mockStockData: Record<string, StockData> = {
     price: 175.43,
     marketCap: 2750000000000,
     peRatio: 28.5,
-    volume: 45000000,
+    amount: 45000000,
     change: 2.15,
     changePercent: 1.24
   },
@@ -20,7 +20,7 @@ const mockStockData: Record<string, StockData> = {
     price: 338.11,
     marketCap: 2510000000000,
     peRatio: 32.1,
-    volume: 22000000,
+    amount: 22000000,
     change: -1.23,
     changePercent: -0.36
   },
@@ -30,7 +30,7 @@ const mockStockData: Record<string, StockData> = {
     price: 142.56,
     marketCap: 1790000000000,
     peRatio: 25.8,
-    volume: 18000000,
+    amount: 18000000,
     change: 0.87,
     changePercent: 0.61
   },
@@ -40,7 +40,7 @@ const mockStockData: Record<string, StockData> = {
     price: 145.24,
     marketCap: 1510000000000,
     peRatio: 45.2,
-    volume: 35000000,
+    amount: 35000000,
     change: 3.45,
     changePercent: 2.43
   },
@@ -50,7 +50,7 @@ const mockStockData: Record<string, StockData> = {
     price: 248.50,
     marketCap: 789000000000,
     peRatio: 78.9,
-    volume: 55000000,
+    amount: 55000000,
     change: -5.20,
     changePercent: -2.05
   },
@@ -61,7 +61,7 @@ const mockStockData: Record<string, StockData> = {
     price: 12.85,
     marketCap: 248000000000,
     peRatio: 8.5,
-    volume: 125000000,
+    amount: 125000000,
     change: 0.15,
     changePercent: 1.18
   },
@@ -71,7 +71,7 @@ const mockStockData: Record<string, StockData> = {
     price: 18.32,
     marketCap: 203000000000,
     peRatio: 12.3,
-    volume: 89000000,
+    amount: 89000000,
     change: -0.28,
     changePercent: -1.51
   },
@@ -81,7 +81,7 @@ const mockStockData: Record<string, StockData> = {
     price: 35.67,
     marketCap: 901000000000,
     peRatio: 9.8,
-    volume: 45000000,
+    amount: 45000000,
     change: 0.67,
     changePercent: 1.91
   },
@@ -91,7 +91,7 @@ const mockStockData: Record<string, StockData> = {
     price: 1689.00,
     marketCap: 2120000000000,
     peRatio: 32.5,
-    volume: 2800000,
+    amount: 2800000,
     change: 25.00,
     changePercent: 1.50
   },
@@ -101,7 +101,7 @@ const mockStockData: Record<string, StockData> = {
     price: 156.80,
     marketCap: 609000000000,
     peRatio: 28.7,
-    volume: 8500000,
+    amount: 8500000,
     change: 2.80,
     changePercent: 1.82
   },
@@ -111,7 +111,7 @@ const mockStockData: Record<string, StockData> = {
     price: 32.45,
     marketCap: 304000000000,
     peRatio: 18.9,
-    volume: 15000000,
+    amount: 15000000,
     change: -0.55,
     changePercent: -1.67
   },
@@ -121,7 +121,7 @@ const mockStockData: Record<string, StockData> = {
     price: 18.45,
     marketCap: 285000000000,
     peRatio: 25.3,
-    volume: 35000000,
+    amount: 35000000,
     change: 0.45,
     changePercent: 2.50
   },
@@ -131,7 +131,7 @@ const mockStockData: Record<string, StockData> = {
     price: 8.45,
     marketCap: 45000000000,
     peRatio: 35.2,
-    volume: 25000000,
+    amount: 25000000,
     change: 0.15,
     changePercent: 1.81
   },
@@ -141,7 +141,7 @@ const mockStockData: Record<string, StockData> = {
     price: 45.67,
     marketCap: 18500000000,
     peRatio: 45.2,
-    volume: 850000,
+    amount: 850000,
     change: 1.67,
     changePercent: 3.80
   }

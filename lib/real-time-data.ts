@@ -23,7 +23,7 @@ export const fetchRealTimeStockData = async (ticker: string): Promise<StockData>
         price: Math.random() * 100 + 10,
         marketCap: Math.random() * 100000000000 + 10000000000,
         peRatio: Math.random() * 50 + 5,
-        volume: Math.random() * 100000000 + 10000000,
+        amount: Math.random() * 100000000 + 10000000,
         change: (Math.random() - 0.5) * 5,
         changePercent: (Math.random() - 0.5) * 10
       }
@@ -35,7 +35,7 @@ export const fetchRealTimeStockData = async (ticker: string): Promise<StockData>
         price: Math.random() * 200 + 50,
         marketCap: Math.random() * 10000000000 + 1000000000,
         peRatio: Math.random() * 30 + 10,
-        volume: Math.random() * 5000000 + 1000000,
+        amount: Math.random() * 5000000 + 1000000,
         change: (Math.random() - 0.5) * 10,
         changePercent: (Math.random() - 0.5) * 10
       }

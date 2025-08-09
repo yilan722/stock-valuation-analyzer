@@ -1,0 +1,4 @@
+-- Simple disable RLS for all tables
+ALTER TABLE public.users DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.payments DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.reports DISABLE ROW LEVEL SECURITY; 

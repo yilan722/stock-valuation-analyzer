@@ -21,10 +21,11 @@ interface UserInfoProps {
   onLogout: () => void
   onRefresh: () => void
   onLogin: () => void
+  onOpenSubscription: () => void
   locale: string
 }
 
-export default function UserInfo({ user, onLogout, onRefresh, onLogin, locale }: UserInfoProps) {
+export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSubscription, locale }: UserInfoProps) {
   const [isLoading, setIsLoading] = useState(false)
 
   const handleLogout = async () => {
@@ -147,6 +148,27 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, locale }:
             </div>
           )}
 
+          {/* 订阅计划按钮 - 始终显示 */}
+          <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+            <h4 className="font-medium text-blue-900 mb-2">订阅计划</h4>
+            <p className="text-sm text-blue-800 mb-3">
+              {remainingReports > 0 
+                ? `您还有 ${remainingReports} 篇报告可用，也可以选择订阅获得更多报告。`
+                : '您的免费报告已用完，请选择订阅计划继续使用。'
+              }
+            </p>
+            <button
+              onClick={onOpenSubscription}
+              className={`px-4 py-2 rounded-md text-sm ${
+                remainingReports > 0 
+                  ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                  : 'bg-yellow-600 text-white hover:bg-yellow-700'
+              }`}
+            >
+              查看订阅计划
+            </button>
+          </div>
+
           {remainingReports === 0 && (
             <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
               <h4 className="font-medium text-yellow-900 mb-2">需要订阅</h4>
@@ -154,7 +176,7 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, locale }:
                 您的免费报告已用完，请选择订阅计划继续使用。
               </p>
               <button
-                onClick={() => {/* TODO: Open subscription modal */}}
+                onClick={onOpenSubscription}
                 className="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 text-sm"
               >
                 查看订阅计划

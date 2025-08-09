@@ -85,7 +85,7 @@ export const fetchAStockData = async (ticker: string): Promise<StockData> => {
         console.log(`No basic data found for ${ticker} on ${tradeDate}`)
       }
     } catch (basicError) {
-      console.log(`Failed to fetch basic financial data for ${ticker}:`, basicError.message)
+      console.log(`Failed to fetch basic financial data for ${ticker}:`, (basicError as Error).message)
     }
 
     // 如果P/E为0或null，尝试通过income API计算
@@ -114,7 +114,7 @@ export const fetchAStockData = async (ticker: string): Promise<StockData> => {
           }
         }
       } catch (incomeError) {
-        console.log(`Failed to fetch income data for P/E calculation for ${ticker}:`, incomeError.message)
+        console.log(`Failed to fetch income data for P/E calculation for ${ticker}:`, (incomeError as Error).message)
       }
     }
 

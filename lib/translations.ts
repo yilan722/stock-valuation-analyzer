@@ -49,7 +49,12 @@ export const translations = {
     
     // Success
     reportGenerated: 'Report generated successfully',
-    dataUpdated: 'Data updated successfully'
+    dataUpdated: 'Data updated successfully',
+    
+    // Download
+    downloadPDF: 'Download PDF',
+    generatingPDF: 'Generating PDF...',
+    downloadError: 'Download failed, please try again'
   },
   zh: {
     // Header
@@ -99,7 +104,12 @@ export const translations = {
     
     // Success
     reportGenerated: '报告生成成功',
-    dataUpdated: '数据更新成功'
+    dataUpdated: '数据更新成功',
+    
+    // Download
+    downloadPDF: '下载PDF',
+    generatingPDF: '生成PDF中...',
+    downloadError: '下载失败，请稍后重试'
   }
 } as const
 

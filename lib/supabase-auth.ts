@@ -15,27 +15,36 @@ export async function signUp(email: string, password: string, name?: string) {
   })
 
   if (error) {
+    console.error('Sign up error:', error)
     throw new Error(error.message)
   }
 
-  // Create user profile in our custom users table
+  // Create user profile directly
   if (data.user) {
-    const { error: profileError } = await supabase
-      .from('users')
-      .insert({
-        id: data.user.id,
-        email: data.user.email!,
-        name: name || null,
-        free_reports_used: 0,
-        paid_reports_used: 0,
-        monthly_report_limit: 0
-      })
+    console.log('Creating user profile for:', data.user.id)
+    try {
+      const { data: profile, error: profileError } = await supabase
+        .from('users')
+        .insert({
+          id: data.user.id,
+          email: data.user.email!,
+          name: name || null,
+          free_reports_used: 0,
+          paid_reports_used: 0,
+          monthly_report_limit: 0
+        })
+        .select()
+        .single()
 
-    if (profileError) {
-      console.error('Error creating user profile:', profileError)
+      if (profileError) {
+        console.error('Error creating user profile:', profileError)
+      } else {
+        console.log('User profile created successfully')
+      }
+    } catch (error) {
+      console.error('Error creating profile:', error)
     }
   }
-
   return data
 }
 
@@ -46,6 +55,7 @@ export async function signIn(email: string, password: string) {
   })
 
   if (error) {
+    console.error('Sign in error:', error)
     throw new Error(error.message)
   }
 
@@ -54,38 +64,74 @@ export async function signIn(email: string, password: string) {
 
 export async function signOut() {
   const { error } = await supabase.auth.signOut()
-  
   if (error) {
+    console.error('Sign out error:', error)
     throw new Error(error.message)
   }
 }
 
 export async function getCurrentUser() {
+  console.log('Getting current user...')
   const { data: { user }, error } = await supabase.auth.getUser()
-  
+
   if (error) {
+    console.error('Error getting auth user:', error)
     throw new Error(error.message)
   }
 
   if (!user) {
+    console.log('No authenticated user found')
     return null
   }
 
-  // Get user profile from our custom users table
-  const { data: profile, error: profileError } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', user.id)
-    .single()
+  console.log('Auth user found:', user.id)
 
-  if (profileError) {
-    console.error('Error fetching user profile:', profileError)
-    return null
-  }
+  // Try to get user profile directly from client
+  try {
+    const { data: profile, error: profileError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', user.id)
+      .single()
 
-  return {
-    ...user,
-    ...profile
+    if (profileError) {
+      console.error('Error fetching user profile:', profileError)
+      
+      // If profile doesn't exist, create it
+      if (profileError.code === 'PGRST116') {
+        console.log('Creating missing user profile...')
+        const { data: newProfile, error: createError } = await supabase
+          .from('users')
+          .insert({
+            id: user.id,
+            email: user.email!,
+            name: user.user_metadata?.name || null,
+            free_reports_used: 0,
+            paid_reports_used: 0,
+            monthly_report_limit: 0
+          })
+          .select()
+          .single()
+
+        if (createError) {
+          console.error('Error creating missing profile:', createError)
+          // Return user without profile for now
+          return user
+        }
+
+        console.log('User profile created successfully')
+        return { ...user, ...newProfile }
+      }
+      
+      // Return user without profile for now
+      return user
+    }
+
+    console.log('User profile found:', profile)
+    return { ...user, ...profile }
+  } catch (error) {
+    console.error('Error in getCurrentUser:', error)
+    return user
   }
 }
 
@@ -132,9 +178,21 @@ export async function canGenerateReport(userId: string): Promise<{ canGenerate: 
 }
 
 export async function incrementReportUsage(userId: string, isFree: boolean = true) {
+  // First get current values
+  const { data: currentUser, error: fetchError } = await supabase
+    .from('users')
+    .select('free_reports_used, paid_reports_used')
+    .eq('id', userId)
+    .single()
+
+  if (fetchError) {
+    throw new Error(fetchError.message)
+  }
+
+  // Update the appropriate counter
   const updateData = isFree 
-    ? { free_reports_used: supabase.rpc('increment', { row_id: userId, column_name: 'free_reports_used' }) }
-    : { paid_reports_used: supabase.rpc('increment', { row_id: userId, column_name: 'paid_reports_used' }) }
+    ? { free_reports_used: (currentUser.free_reports_used || 0) + 1 }
+    : { paid_reports_used: (currentUser.paid_reports_used || 0) + 1 }
 
   const { error } = await supabase
     .from('users')
@@ -196,7 +254,6 @@ export async function createPayment(paymentData: {
 
 export async function updatePaymentStatus(paymentId: string, status: string, alipayTradeNo?: string) {
   const updateData: any = { status }
-  
   if (alipayTradeNo) {
     updateData.alipay_trade_no = alipayTradeNo
   }
@@ -227,7 +284,7 @@ export async function updateUserSubscription(userId: string, subscriptionData: {
       subscription_start: new Date().toISOString(),
       subscription_end: subscriptionData.subscriptionEnd,
       monthly_report_limit: subscriptionData.reportLimit,
-      paid_reports_used: 0 // Reset monthly usage
+      paid_reports_used: 0
     })
     .eq('id', userId)
 
