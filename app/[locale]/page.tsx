@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast'
 import Header from '../../components/Header'
 import SearchForm from '../../components/SearchForm'
 import ValuationReport from '../../components/ValuationReport'
+import ReportDemo from '../../components/ReportDemo'
 import AuthModal from '../../components/AuthModal'
 import SubscriptionModal from '../../components/SubscriptionModal'
 import { StockData, ValuationReportData } from '../../types'
@@ -179,6 +180,9 @@ export default function HomePage({ params }: PageProps) {
             isLoading={isLoading || isGeneratingReport}
             locale={params.locale}
           />
+          
+          {/* Report Demo Section */}
+          <ReportDemo locale={params.locale} />
           
           {stockData && (
             <ValuationReport
