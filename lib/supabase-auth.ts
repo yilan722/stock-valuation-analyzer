@@ -149,32 +149,88 @@ export async function getUserProfile(userId: string) {
   return data
 }
 
-export async function canGenerateReport(userId: string): Promise<{ canGenerate: boolean; reason?: string }> {
-  const profile = await getUserProfile(userId)
-  
-  if (!profile) {
-    return { canGenerate: false, reason: 'User not found' }
-  }
+export async function canGenerateReport(userId: string): Promise<{ canGenerate: boolean; reason?: string; remainingReports?: number }> {
+  try {
+    // 获取用户信息
+    const { data: userProfile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', userId)
+      .single()
 
-  // Check if user has free reports available
-  if (profile.free_reports_used === 0) {
-    return { canGenerate: true }
-  }
+    if (profileError || !userProfile) {
+      return { canGenerate: false, reason: '用户资料不存在' }
+    }
 
-  // Check subscription status
-  if (profile.subscription_type && profile.subscription_end) {
-    const endDate = new Date(profile.subscription_end)
-    if (endDate > new Date()) {
-      const reportsUsedThisMonth = profile.paid_reports_used
-      if (reportsUsedThisMonth < profile.monthly_report_limit) {
-        return { canGenerate: true }
+    // 🔥 新增：检查是否在白名单中
+    const { data: whitelistUser, error: whitelistError } = await supabase
+      .from('whitelist_users')
+      .select('*')
+      .eq('email', userProfile.email)
+      .single()
+
+    if (whitelistUser && !whitelistError) {
+      // 白名单用户：检查今日报告数量
+      const today = new Date().toISOString().split('T')[0]
+      const { count: todayReports, error: countError } = await supabase
+        .from('reports')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .gte('created_at', `${today}T00:00:00`)
+        .lte('created_at', `${today}T23:59:59`)
+
+      if (countError) {
+        console.error('统计今日报告失败:', countError)
+        return { canGenerate: false, reason: '统计失败' }
+      }
+
+      const remaining = whitelistUser.daily_report_limit - (todayReports || 0)
+      
+      if (remaining > 0) {
+        return { 
+          canGenerate: true, 
+          reason: '白名单用户', 
+          remainingReports: remaining 
+        }
       } else {
-        return { canGenerate: false, reason: 'Monthly report limit reached' }
+        return { 
+          canGenerate: false, 
+          reason: '今日白名单额度已用完', 
+          remainingReports: 0 
+        }
       }
     }
-  }
 
-  return { canGenerate: false, reason: 'No free reports or active subscription' }
+    // 非白名单用户：使用原有逻辑
+    const profile = await getUserProfile(userId)
+    
+    if (!profile) {
+      return { canGenerate: false, reason: 'User not found' }
+    }
+
+    // Check if user has free reports available
+    if (profile.free_reports_used === 0) {
+      return { canGenerate: true, reason: '免费报告可用' }
+    }
+
+    // Check subscription status
+    if (profile.subscription_type && profile.subscription_end) {
+      const endDate = new Date(profile.subscription_end)
+      if (endDate > new Date()) {
+        const reportsUsedThisMonth = profile.paid_reports_used
+        if (reportsUsedThisMonth < profile.monthly_report_limit) {
+          return { canGenerate: true, reason: '订阅报告可用' }
+        } else {
+          return { canGenerate: false, reason: 'Monthly report limit reached' }
+        }
+      }
+    }
+
+    return { canGenerate: false, reason: 'No free reports or active subscription' }
+  } catch (error) {
+    console.error('检查报告权限失败:', error)
+    return { canGenerate: false, reason: '检查权限时出错' }
+  }
 }
 
 export async function incrementReportUsage(userId: string, isFree: boolean = true) {

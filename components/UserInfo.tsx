@@ -14,6 +14,12 @@ interface UserData {
   subscription_type?: string
   subscription_end?: string
   monthly_report_limit: number
+  // 新增白名单相关字段
+  whitelistStatus?: {
+    canGenerate: boolean;
+    reason?: string;
+    remainingReports?: number;
+  };
 }
 
 interface UserInfoProps {
@@ -43,6 +49,14 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSub
 
   const getSubscriptionStatus = () => {
     if (!user) return { status: '未登录', color: 'text-gray-500' }
+    
+    // 🔥 新增：检查白名单状态
+    if (user.whitelistStatus?.canGenerate && user.whitelistStatus.reason === '白名单用户') {
+      return { 
+        status: `白名单用户 (剩余${user.whitelistStatus.remainingReports}次)`, 
+        color: 'text-purple-600' 
+      }
+    }
     
     if (user.free_reports_used === 0) {
       return { status: '免费试用', color: 'text-green-600' }

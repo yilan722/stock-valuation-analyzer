@@ -11,7 +11,7 @@ import SubscriptionModal from '../../components/SubscriptionModal'
 import { StockData, ValuationReportData } from '../../types'
 import { type Locale } from '../../lib/i18n'
 import { getTranslation } from '../../lib/translations'
-import { getCurrentUser } from '../../lib/supabase-auth'
+import { getCurrentUser, canGenerateReport } from '../../lib/supabase-auth'
 import toast from 'react-hot-toast'
 
 interface PageProps {
@@ -59,7 +59,24 @@ export default function HomePage({ params }: PageProps) {
       console.log('Loading user...')
       const userData = await getCurrentUser()
       console.log('User data loaded:', userData)
-      setUser(userData)
+      
+      if (userData) {
+        // 🔥 新增：获取白名单状态
+        try {
+          const whitelistStatus = await canGenerateReport(userData.id)
+          const userWithWhitelist = {
+            ...userData,
+            whitelistStatus
+          }
+          setUser(userWithWhitelist)
+          console.log('User with whitelist status:', userWithWhitelist)
+        } catch (whitelistError) {
+          console.error('获取白名单状态失败:', whitelistError)
+          setUser(userData)
+        }
+      } else {
+        setUser(null)
+      }
     } catch (error) {
       console.error('Failed to load user:', error)
       setUser(null)
