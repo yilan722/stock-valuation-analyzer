@@ -4,6 +4,8 @@ import React, { useState } from 'react'
 import { X, Check, CreditCard, Zap, Crown, Star } from 'lucide-react'
 import toast from 'react-hot-toast'
 import UserAgreementModal from './UserAgreementModal'
+import { getTranslation } from '../lib/translations'
+import { Locale } from '../lib/i18n'
 
 interface SubscriptionPlan {
   id: string
@@ -20,7 +22,7 @@ interface SubscriptionModalProps {
   isOpen: boolean
   onClose: () => void
   userId: string
-  locale: string
+  locale: Locale
 }
 
 export default function SubscriptionModal({ isOpen, onClose, userId, locale }: SubscriptionModalProps) {
@@ -32,43 +34,66 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
   const plans: SubscriptionPlan[] = [
     {
       id: 'single_report',
-      name: '单篇报告',
+      name: getTranslation(locale, 'singleReport'),
       price: 5,
       reports: 1,
-      features: ['1篇专业股票分析报告', '实时市场数据', 'AI驱动分析'],
+      features: [
+        `1${getTranslation(locale, 'professionalStockAnalysis')}`,
+        getTranslation(locale, 'realTimeMarketData'),
+        getTranslation(locale, 'aiDrivenAnalysis')
+      ],
       icon: <CreditCard className="h-6 w-6" />
     },
     {
       id: 'monthly_30',
-      name: '月度订阅',
+      name: getTranslation(locale, 'monthlySubscription'),
       price: 99,
       reports: 30,
-      features: ['30篇专业股票分析报告', '实时市场数据', 'AI驱动分析', '优先客服支持'],
+      features: [
+        `30${getTranslation(locale, 'professionalStockAnalysis')}`,
+        getTranslation(locale, 'realTimeMarketData'),
+        getTranslation(locale, 'aiDrivenAnalysis'),
+        getTranslation(locale, 'prioritySupport')
+      ],
       popular: true,
       icon: <Zap className="h-6 w-6" />
     },
     {
       id: 'monthly_70',
-      name: '高级订阅',
+      name: getTranslation(locale, 'advancedSubscription'),
       price: 199,
       reports: 70,
-      features: ['70篇专业股票分析报告', '实时市场数据', 'AI驱动分析', '优先客服支持', '深度行业分析'],
+      features: [
+        `70${getTranslation(locale, 'professionalStockAnalysis')}`,
+        getTranslation(locale, 'realTimeMarketData'),
+        getTranslation(locale, 'aiDrivenAnalysis'),
+        getTranslation(locale, 'prioritySupport'),
+        getTranslation(locale, 'deepIndustryAnalysis')
+      ],
       bestValue: true,
       icon: <Star className="h-6 w-6" />
     },
     {
       id: 'premium_300',
-      name: '专业版',
+      name: getTranslation(locale, 'premiumVersion'),
       price: 998,
       reports: 300,
-      features: ['300篇专业股票分析报告', '实时市场数据', 'AI驱动分析', '优先客服支持', '深度行业分析', '每日K线技术分析', 'VIP专属服务'],
+      features: [
+        `300${getTranslation(locale, 'professionalStockAnalysis')}`,
+        getTranslation(locale, 'realTimeMarketData'),
+        getTranslation(locale, 'aiDrivenAnalysis'),
+        getTranslation(locale, 'prioritySupport'),
+        getTranslation(locale, 'deepIndustryAnalysis'),
+        getTranslation(locale, 'dailyKLineAnalysis'),
+        getTranslation(locale, 'vipExclusiveService')
+      ],
       icon: <Crown className="h-6 w-6" />
     }
   ]
 
   const handleSubscribe = async (planId: string) => {
     if (!userId) {
-      toast.error('请先登录')
+      toast.error(getTranslation(locale, 'pleaseLoginFirstToast'))
       return
     }
 
@@ -84,7 +109,7 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
     try {
       const plan = plans.find(p => p.id === pendingPlanId)
       if (!plan) {
-        toast.error('无效的订阅计划')
+        toast.error(getTranslation(locale, 'invalidPlan'))
         return
       }
 
@@ -98,24 +123,24 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
           type: pendingPlanId === 'single_report' ? 'single_report' : 'subscription',
           subscriptionType: pendingPlanId,
           reportLimit: plan.reports
-        }),
+        })
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || '创建支付订单失败')
+        throw new Error('Payment creation failed')
       }
 
-      const { paymentUrl } = await response.json()
+      const data = await response.json()
       
-      // 跳转到支付宝支付页面
-      window.open(paymentUrl, '_blank')
-      
-      toast.success('正在跳转到支付宝支付...')
-      onClose()
+      if (data.success && data.paymentUrl) {
+        // 跳转到支付宝支付页面
+        window.location.href = data.paymentUrl
+      } else {
+        toast.error(getTranslation(locale, 'paymentCreationFailed'))
+      }
     } catch (error) {
-      console.error('订阅失败:', error)
-      toast.error('订阅失败，请稍后重试')
+      console.error('Payment error:', error)
+      toast.error(getTranslation(locale, 'paymentCreationFailed'))
     } finally {
       setIsLoading(false)
       setShowAgreement(false)
@@ -127,132 +152,110 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900">选择订阅计划</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <X className="h-6 w-6" />
-            </button>
-          </div>
-          <p className="text-gray-600 mt-2">
-            选择最适合您的订阅计划，享受专业的股票分析服务
-          </p>
+      <div className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex justify-between items-center p-6 border-b">
+          <h2 className="text-2xl font-bold text-gray-900">
+            {getTranslation(locale, 'subscriptionPlans')}
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <X className="h-6 w-6" />
+          </button>
         </div>
 
+        {/* Plans Grid */}
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {plans.map((plan) => (
               <div
                 key={plan.id}
                 className={`relative bg-white border-2 rounded-lg p-6 transition-all duration-200 hover:shadow-lg ${
-                  selectedPlan === plan.id
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
-                } ${plan.popular ? 'ring-2 ring-yellow-400' : ''} ${plan.bestValue ? 'ring-2 ring-green-400' : ''}`}
+                  plan.popular ? 'border-blue-500 shadow-lg' : 'border-gray-200'
+                } ${plan.bestValue ? 'border-purple-500 shadow-lg' : ''}`}
               >
+                {/* Popular Badge */}
                 {plan.popular && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-medium">
-                      最受欢迎
-                    </span>
-                  </div>
-                )}
-                {plan.bestValue && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
-                      超值推荐
+                    <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                      {getTranslation(locale, 'popular')}
                     </span>
                   </div>
                 )}
 
-                <div className="flex items-center justify-center mb-4">
-                  <div className="p-3 bg-blue-100 rounded-full text-blue-600">
+                {/* Best Value Badge */}
+                {plan.bestValue && (
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                      {getTranslation(locale, 'bestValue')}
+                    </span>
+                  </div>
+                )}
+
+                {/* Plan Icon */}
+                <div className="flex justify-center mb-4">
+                  <div className="bg-blue-100 p-3 rounded-full">
                     {plan.icon}
                   </div>
                 </div>
 
-                <h3 className="text-xl font-bold text-gray-900 text-center mb-2">
-                  {plan.name}
-                </h3>
+                {/* Plan Name */}
+                <h3 className="text-xl font-bold text-center mb-2">{plan.name}</h3>
 
+                {/* Price */}
                 <div className="text-center mb-4">
-                  <span className="text-3xl font-bold text-gray-900">¥{plan.price}</span>
+                  <span className="text-3xl font-bold text-blue-600">¥{plan.price}</span>
                   {plan.id !== 'single_report' && (
-                    <span className="text-gray-500 text-sm">/月</span>
+                    <span className="text-gray-500 ml-1">/月</span>
                   )}
                 </div>
 
-                <div className="space-y-3 mb-6">
-                  {plan.features.map((feature, index) => (
-                    <div key={index} className="flex items-start space-x-2">
-                      <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm text-gray-600">{feature}</span>
-                    </div>
-                  ))}
+                {/* Reports Count */}
+                <div className="text-center mb-6">
+                  <span className="text-lg font-semibold text-gray-700">
+                    {plan.reports} {getTranslation(locale, 'professionalStockAnalysis')}
+                  </span>
                 </div>
 
+                {/* Features */}
+                <ul className="space-y-3 mb-6">
+                  {plan.features.map((feature, index) => (
+                    <li key={index} className="flex items-start">
+                      <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                      <span className="text-gray-700 text-sm">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Subscribe Button */}
                 <button
-                  onClick={() => setSelectedPlan(plan.id)}
+                  onClick={() => handleSubscribe(plan.id)}
+                  disabled={isLoading}
                   className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
-                    selectedPlan === plan.id
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    plan.popular
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : plan.bestValue
+                      ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                      : 'bg-gray-600 hover:bg-gray-700 text-white'
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
-                  {selectedPlan === plan.id ? '已选择' : '选择此计划'}
+                  {isLoading ? getTranslation(locale, 'loading') : getTranslation(locale, 'subscribe')}
                 </button>
               </div>
             ))}
           </div>
-
-          {selectedPlan && (
-            <div className="mt-8 p-6 bg-gray-50 rounded-lg">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    确认订阅
-                  </h3>
-                  <p className="text-gray-600 mt-1">
-                    您选择的计划将通过支付宝安全支付
-                  </p>
-                </div>
-                <button
-                  onClick={() => handleSubscribe(selectedPlan)}
-                  disabled={isLoading}
-                  className="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-                >
-                  {isLoading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      <span>处理中...</span>
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard className="h-4 w-4" />
-                      <span>立即支付</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          )}
         </div>
-      </div>
 
-      {/* 用户协议模态框 */}
-      <UserAgreementModal
-        isOpen={showAgreement}
-        onClose={() => {
-          setShowAgreement(false)
-          setPendingPlanId(null)
-        }}
-        onConfirm={handleAgreementConfirm}
-        locale={locale}
-      />
+        {/* User Agreement Modal */}
+        <UserAgreementModal
+          isOpen={showAgreement}
+          onClose={() => setShowAgreement(false)}
+          onConfirm={handleAgreementConfirm}
+          locale={locale}
+        />
+      </div>
     </div>
   )
 } 

@@ -6,7 +6,6 @@ import Header from '../../components/Header'
 import SearchForm from '../../components/SearchForm'
 import ValuationReport from '../../components/ValuationReport'
 import AuthModal from '../../components/AuthModal'
-import UserInfo from '../../components/UserInfo'
 import SubscriptionModal from '../../components/SubscriptionModal'
 import { StockData, ValuationReportData } from '../../types'
 import { type Locale } from '../../lib/i18n'
@@ -163,42 +162,32 @@ export default function HomePage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header locale={params.locale} />
+      <Header 
+        locale={params.locale} 
+        user={user}
+        onLogout={handleLogout}
+        onRefresh={loadUser}
+        onLogin={handleLogin}
+        onOpenSubscription={handleOpenSubscription}
+      />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* User Info Sidebar */}
-          <div className="lg:col-span-1">
-            <UserInfo
-              user={user}
-              onLogout={handleLogout}
-              onRefresh={loadUser}
-              onLogin={handleLogin}
-              onOpenSubscription={handleOpenSubscription}
+        <div className="space-y-8">
+          <SearchForm
+            onSearch={handleSearch}
+            onGenerateReport={handleGenerateReport}
+            isLoading={isLoading || isGeneratingReport}
+            locale={params.locale}
+          />
+          
+          {stockData && (
+            <ValuationReport
+              stockData={stockData}
+              reportData={reportData}
+              isLoading={isGeneratingReport}
               locale={params.locale}
             />
-          </div>
-
-          {/* Main Content */}
-          <div className="lg:col-span-3">
-            <div className="space-y-8">
-              <SearchForm
-                onSearch={handleSearch}
-                onGenerateReport={handleGenerateReport}
-                isLoading={isLoading || isGeneratingReport}
-                locale={params.locale}
-              />
-              
-              {stockData && (
-                <ValuationReport
-                  stockData={stockData}
-                  reportData={reportData}
-                  isLoading={isGeneratingReport}
-                  locale={params.locale}
-                />
-              )}
-            </div>
-          </div>
+          )}
         </div>
       </main>
 

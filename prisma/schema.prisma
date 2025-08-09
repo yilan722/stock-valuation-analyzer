@@ -24,7 +24,7 @@ model User {
   
   // Subscription details
   subscriptionId    String?
-  subscriptionType  String? // 'monthly_99', 'monthly_199', 'pay_per_report'
+  subscriptionType  String? // 'single_report', 'monthly_30', 'monthly_70', 'premium_300'
   subscriptionStart DateTime?
   subscriptionEnd   DateTime?
   monthlyReportLimit Int @default(0)

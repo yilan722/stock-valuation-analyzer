@@ -1,12 +1,18 @@
 import LanguageSwitcher from './LanguageSwitcher'
+import UserInfo from './UserInfo'
 import { type Locale } from '../lib/i18n'
 import { getTranslation } from '../lib/translations'
 
 interface HeaderProps {
   locale: Locale
+  user: any
+  onLogout: () => void
+  onRefresh: () => void
+  onLogin: () => void
+  onOpenSubscription: () => void
 }
 
-export default function Header({ locale }: HeaderProps) {
+export default function Header({ locale, user, onLogout, onRefresh, onLogin, onOpenSubscription }: HeaderProps) {
   return (
     <header className="bg-white shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -19,7 +25,19 @@ export default function Header({ locale }: HeaderProps) {
               {getTranslation(locale, 'subtitle')}
             </p>
           </div>
-          <LanguageSwitcher currentLocale={locale} />
+          
+          <div className="flex items-center space-x-4">
+            <LanguageSwitcher currentLocale={locale} />
+            <UserInfo
+              user={user}
+              onLogout={onLogout}
+              onRefresh={onRefresh}
+              onLogin={onLogin}
+              onOpenSubscription={onOpenSubscription}
+              locale={locale}
+              isCompact={true}
+            />
+          </div>
         </div>
       </div>
     </header>
