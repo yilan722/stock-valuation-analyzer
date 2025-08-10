@@ -1,16 +1,13 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { 
   TrendingUp, 
   BarChart3, 
   Target, 
   Zap, 
   DollarSign, 
-  Activity,
-  ChevronRight,
-  Play,
-  Pause
+  Activity
 } from 'lucide-react'
 import { type Locale } from '../lib/i18n'
 import { getTranslation } from '../lib/translations'
@@ -21,7 +18,6 @@ interface ReportDemoProps {
 
 export default function ReportDemo({ locale }: ReportDemoProps) {
   const [activeSection, setActiveSection] = useState(0)
-  const [isPlaying, setIsPlaying] = useState(false)
 
   // Complete Coinbase Report Data - Based on the actual report
   const demoReport = {
@@ -394,13 +390,14 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
     { id: 'valuation', label: 'Valuation Analysis', icon: Target }
   ]
 
-  const handlePlayPause = () => {
-    setIsPlaying(!isPlaying)
-  }
-
-  const handleNext = () => {
-    setActiveSection((prev) => (prev + 1) % sections.length)
-  }
+  // Auto-scroll through sections every 2 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveSection((prev) => (prev + 1) % sections.length)
+    }, 2000)
+    
+    return () => clearInterval(interval)
+  }, [])
 
   return (
     <div className="min-h-screen bg-slate-900">
@@ -474,23 +471,7 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
           ))}
         </div>
 
-        {/* Playback Controls */}
-        <div className="flex justify-center items-center space-x-4 mb-8">
-          <button
-            onClick={handlePlayPause}
-            className="flex items-center space-x-2 px-6 py-3 bg-white/10 text-white rounded-full hover:bg-white/20 transition-colors"
-          >
-            {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-            <span>{isPlaying ? 'Pause' : 'Play'}</span>
-          </button>
-          <button
-            onClick={handleNext}
-            className="flex items-center space-x-2 px-6 py-3 bg-white/10 text-white rounded-full hover:bg-white/20 transition-colors"
-          >
-            <span>Next</span>
-            <ChevronRight className="h-5 w-5" />
-          </button>
-        </div>
+
 
         {/* Content Sections */}
         <div className="space-y-12">

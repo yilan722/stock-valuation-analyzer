@@ -182,6 +182,7 @@ export default function HomePage({ params }: PageProps) {
               onGenerateReport={handleGenerateReport}
               isLoading={isLoading || isGeneratingReport}
               locale={params.locale}
+              isGeneratingReport={isGeneratingReport}
             />
             
             {/* Stock Data Display - Above Demo */}

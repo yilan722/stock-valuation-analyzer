@@ -160,7 +160,7 @@ REPORT STRUCTURE (return as valid JSON with these exact keys):
    - Sum-of-parts valuation if applicable
    - Target price calculation with multiple methodologies
    - Risk-adjusted return analysis
-   - Investment recommendation (BUY/HOLD/SELL) with rationale
+   - Target price analysis (NO buy/sell recommendations)
    - Key risks and mitigating factors
 
 REQUIREMENTS:
@@ -168,9 +168,12 @@ REQUIREMENTS:
 - Display "Trading Amount" instead of "Volume"
 - Include specific numbers, percentages, and data points
 - Provide detailed analysis with supporting evidence
-- Use professional HTML styling with classes: 'metric-table', 'highlight-box', 'positive', 'negative', 'neutral', 'recommendation-buy', 'recommendation-sell', 'recommendation-hold'
+- Use professional HTML styling with classes: 'metric-table', 'highlight-box', 'positive', 'negative', 'neutral'
+- NO buy/sell investment recommendations - only provide target price analysis based on data
 - Ensure JSON is properly formatted and valid
 - Each section should be comprehensive and detailed (minimum 500 words per section)
+- Include data sources and references for key metrics and analysis points
+- Add source links where possible for users to verify data
 
 Return ONLY a valid JSON object with these four sections as HTML strings.`
               },
@@ -188,12 +191,12 @@ REQUIREMENTS:
 - Provide detailed, professional analysis with specific data points and percentages
 - Include comprehensive business segment analysis with revenue breakdowns
 - Analyze growth catalysts with specific market opportunities
-- Provide detailed valuation analysis with multiple methodologies
+- Provide detailed valuation analysis with multiple methodologies (NO buy/sell recommendations)
 - Use the latest 2024 annual and 2025 quarterly financial data
 - Ensure each section is comprehensive and detailed
 - Format as professional HTML with proper styling
 
-Please provide a comprehensive, detailed analysis in ${locale === 'zh' ? 'Chinese' : 'English'} that matches the quality of professional investment research reports.`
+Please provide a comprehensive, detailed analysis in ${locale === 'zh' ? 'Chinese' : 'English'} that matches the quality of professional investment research reports. Include data sources and references for key metrics to allow users to verify the information.`
               }
             ],
             temperature: 0.7,

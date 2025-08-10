@@ -10,9 +10,10 @@ interface SearchFormProps {
   onGenerateReport: () => void
   isLoading: boolean
   locale: Locale
+  isGeneratingReport?: boolean
 }
 
-export default function SearchForm({ onSearch, onGenerateReport, isLoading, locale }: SearchFormProps) {
+export default function SearchForm({ onSearch, onGenerateReport, isLoading, locale, isGeneratingReport }: SearchFormProps) {
   const [symbol, setSymbol] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -63,6 +64,32 @@ export default function SearchForm({ onSearch, onGenerateReport, isLoading, loca
             <ArrowRight className="h-5 w-5" />
           </button>
         </div>
+        
+        {/* Progress Bar for Report Generation */}
+        {isGeneratingReport && (
+          <div className="mt-4">
+            <div className="flex items-center justify-between text-sm text-amber-200 mb-2">
+              <span className="font-medium">Generating Report...</span>
+              <span className="text-amber-400">AI Analysis in Progress</span>
+            </div>
+            <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-amber-400 to-amber-600 rounded-full animate-pulse">
+                <div className="h-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 rounded-full animate-pulse" 
+                     style={{
+                       width: '100%',
+                       background: 'linear-gradient(90deg, #fbbf24, #f59e0b, #d97706)',
+                       backgroundSize: '200% 100%',
+                       animation: 'shimmer 2s ease-in-out infinite'
+                     }}
+                />
+              </div>
+            </div>
+            <div className="flex justify-between text-xs text-gray-400 mt-2">
+              <span>Analyzing financial data...</span>
+              <span>Processing market trends...</span>
+            </div>
+          </div>
+        )}
       </form>
     </div>
   )

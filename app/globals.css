@@ -242,4 +242,14 @@ a {
   .report-content .data-grid {
     @apply grid-cols-1;
   }
+}
+
+/* Shimmer animation for progress bar */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 } 
