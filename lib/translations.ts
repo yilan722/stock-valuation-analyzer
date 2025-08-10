@@ -16,6 +16,7 @@ export type TranslationKeys = {
   price: string
   marketCap: string
   peRatio: string
+  tradingVolume: string
   amount: string
   
   // 报告部分
@@ -209,6 +210,7 @@ export const translations: Record<Locale, TranslationKeys> = {
     price: 'Price',
     marketCap: 'Market Cap',
     peRatio: 'P/E Ratio',
+    tradingVolume: 'Trading Volume ($)',
     amount: 'Amount',
     
     // Report Sections
@@ -420,6 +422,7 @@ export const translations: Record<Locale, TranslationKeys> = {
     price: '价格',
     marketCap: '市值',
     peRatio: '市盈率',
+    tradingVolume: '成交额 ($)',
     amount: '成交额',
     
     // Report Sections

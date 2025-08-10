@@ -132,7 +132,7 @@ export default function ValuationReport({ stockData, reportData, isLoading, loca
         <div className="bg-gray-50 p-4 rounded-lg">
           <div className="flex items-center space-x-2 mb-2">
             <TrendingDown className="h-4 w-4 text-orange-600" />
-            <span className="text-sm font-medium text-gray-600">{getTranslation(locale, 'amount')}</span>
+            <span className="text-sm font-medium text-gray-600">{getTranslation(locale, 'tradingVolume')}</span>
           </div>
           <p className="text-lg font-semibold text-gray-900">
             {formatAmount(stockData.amount)}
