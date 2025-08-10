@@ -8,6 +8,7 @@ import ValuationReport from '../../components/ValuationReport'
 import ReportDemo from '../../components/ReportDemo'
 import AuthModal from '../../components/AuthModal'
 import SubscriptionModal from '../../components/SubscriptionModal'
+import Footer from '../../components/Footer'
 import { StockData, ValuationReportData } from '../../types'
 import { type Locale } from '../../lib/i18n'
 import { getTranslation } from '../../lib/translations'
@@ -174,16 +175,79 @@ export default function HomePage({ params }: PageProps) {
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
-          <SearchForm
-            onSearch={handleSearch}
-            onGenerateReport={handleGenerateReport}
-            isLoading={isLoading || isGeneratingReport}
-            locale={params.locale}
-          />
+          {/* Search Form and Stock Data Display */}
+          <div className="space-y-6">
+            <SearchForm
+              onSearch={handleSearch}
+              onGenerateReport={handleGenerateReport}
+              isLoading={isLoading || isGeneratingReport}
+              locale={params.locale}
+            />
+            
+            {/* Stock Data Display - Above Demo */}
+            {stockData && (
+                             <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-amber-500/30 shadow-lg p-6 mb-8">
+                <h2 className="text-2xl font-bold text-white mb-6 font-inter">
+                  {stockData.name} ({stockData.symbol}) Stock Information
+                </h2>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  <div className="text-center">
+                    <div className="flex items-center justify-center mb-2">
+                      <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                        <span className="text-green-400 text-lg font-bold">$</span>
+                      </div>
+                    </div>
+                    <p className="text-sm text-blue-200 mb-1 font-inter">Price</p>
+                    <p className="text-2xl font-bold text-white font-inter">${stockData.price}</p>
+                    <p className={`text-sm ${stockData.change >= 0 ? 'text-green-400' : 'text-red-400'} font-inter`}>
+                      {stockData.change >= 0 ? '+' : ''}{stockData.change} ({stockData.changePercent >= 0 ? '+' : ''}{stockData.changePercent}%)
+                    </p>
+                  </div>
+                  
+                  <div className="text-center">
+                    <div className="flex items-center justify-center mb-2">
+                      <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center">
+                        <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <p className="text-sm text-blue-200 mb-1 font-inter">Market Cap</p>
+                    <p className="text-2xl font-bold text-white font-inter">${(stockData.marketCap / 1e9).toFixed(2)}B</p>
+                  </div>
+                  
+                  <div className="text-center">
+                    <div className="flex items-center justify-center mb-2">
+                      <div className="w-8 h-8 bg-amber-500/20 rounded-full flex items-center justify-center">
+                        <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <p className="text-sm text-blue-200 mb-1 font-inter">P/E Ratio</p>
+                    <p className="text-2xl font-bold text-white font-inter">{stockData.peRatio}</p>
+                  </div>
+                  
+                  <div className="text-center">
+                    <div className="flex items-center justify-center mb-2">
+                      <div className="w-8 h-8 bg-orange-500/20 rounded-full flex items-center justify-center">
+                        <svg className="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </div>
+                    </div>
+                    <p className="text-sm text-blue-200 mb-1 font-inter">Amount</p>
+                    <p className="text-2xl font-bold text-white font-inter">{(stockData.amount / 1e9).toFixed(2)}B</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
           
           {/* Report Demo Section */}
           <ReportDemo locale={params.locale} />
           
+          {/* Valuation Report - Below Demo */}
           {stockData && (
             <ValuationReport
               stockData={stockData}
@@ -210,6 +274,7 @@ export default function HomePage({ params }: PageProps) {
         locale={params.locale}
       />
       
+      <Footer />
       <Toaster position="top-right" />
     </div>
   )

@@ -29,6 +29,7 @@ export type TranslationKeys = {
   language: string
   english: string
   chinese: string
+  free: string
   
   // 报告内容
   companyProfile: string
@@ -155,6 +156,36 @@ export type TranslationKeys = {
   subscriptionPlans: string
   planFeatures: string
   choosePlan: string
+  
+      // New subscription plan keys
+    basicPlan: string
+    standardPlan: string
+    proPlan: string
+    flagshipPlan: string
+    monthlyFee: string
+    welcomeCredits: string
+    monthlyCredits: string
+    dailyGrowth: string
+    totalMonthlyCredits: string
+    costPerReport: string
+    onDemandLimit: string
+    unlimited: string
+    aiDrivenDeepAnalysis: string
+    priorityCustomerSupport: string
+    technicalAnalysisVipConsulting: string
+    freeStart: string
+    upgradeSave34: string
+    upgradeToPro: string
+    contactUsUpgrade: string
+    credits: string
+    reports: string
+    perDay: string
+    perMonth: string
+    onDemandPurchase: string
+    dailyLimit2: string
+    noLimit: string
+    planComparison: string
+    buttonActions: string
 
   // 认证模态框额外键
   register: string
@@ -190,6 +221,7 @@ export const translations: Record<Locale, TranslationKeys> = {
     loading: 'Loading...',
     error: 'Error',
     noData: 'No data available',
+    free: 'Free',
     
     // Language
     language: 'Language',
@@ -332,6 +364,36 @@ export const translations: Record<Locale, TranslationKeys> = {
     planFeatures: 'Plan Features',
     choosePlan: 'Choose Plan',
 
+    // New subscription plan keys
+    basicPlan: 'Basic Plan',
+    standardPlan: 'Standard Plan',
+    proPlan: 'Pro Plan',
+    flagshipPlan: 'Flagship Plan',
+    monthlyFee: 'Monthly Fee',
+    welcomeCredits: 'Welcome Credits',
+    monthlyCredits: 'Monthly Credits',
+    dailyGrowth: 'Daily Growth',
+    totalMonthlyCredits: 'Total Monthly Credits',
+    costPerReport: 'Cost Per Report',
+    onDemandLimit: 'On-Demand Limit',
+    unlimited: 'Unlimited',
+    aiDrivenDeepAnalysis: 'AI-Driven Deep Analysis',
+    priorityCustomerSupport: 'Priority Customer Support',
+    technicalAnalysisVipConsulting: 'Technical Analysis VIP Consulting',
+    freeStart: 'Free Start',
+    upgradeSave34: 'Upgrade Save 34%',
+    upgradeToPro: 'Upgrade to Pro',
+    contactUsUpgrade: 'Contact Us for Upgrade',
+    credits: 'Credits',
+    reports: 'Reports',
+    perDay: 'Per Day',
+    perMonth: 'Per Month',
+    onDemandPurchase: 'On-Demand Purchase',
+    dailyLimit2: 'Daily Limit 2',
+    noLimit: 'No Limit',
+    planComparison: 'Plan Comparison',
+    buttonActions: 'Button Actions',
+
     // User Agreement Modal Additional Keys
     userConfirmation: 'I agree to the terms and conditions',
     userConfirmationText: 'By clicking "Agree and Continue", you acknowledge that you have read, understood, and accepted all terms and conditions of this agreement.',
@@ -370,6 +432,7 @@ export const translations: Record<Locale, TranslationKeys> = {
     loading: '加载中...',
     error: '错误',
     noData: '暂无数据',
+    free: '免费',
     
     // Language
     language: '语言',
@@ -509,6 +572,36 @@ export const translations: Record<Locale, TranslationKeys> = {
     subscriptionPlans: '订阅计划',
     planFeatures: '计划特色',
     choosePlan: '选择计划',
+
+    // New subscription plan keys
+    basicPlan: '基础版',
+    standardPlan: '标准版',
+    proPlan: '专业版',
+    flagshipPlan: '旗舰版',
+    monthlyFee: '月费',
+    welcomeCredits: '欢迎积分',
+    monthlyCredits: '每月积分',
+    dailyGrowth: '每日增长',
+    totalMonthlyCredits: '每月总积分',
+    costPerReport: '每份报告成本',
+    onDemandLimit: '按需限制',
+    unlimited: '无限',
+    aiDrivenDeepAnalysis: 'AI驱动深度分析',
+    priorityCustomerSupport: '优先客服支持',
+    technicalAnalysisVipConsulting: '技术分析VIP咨询',
+    freeStart: '免费开始',
+    upgradeSave34: '升级省34%',
+    upgradeToPro: '升级到专业版',
+    contactUsUpgrade: '联系我们升级',
+    credits: '积分',
+    reports: '报告',
+    perDay: '每日',
+    perMonth: '每月',
+    onDemandPurchase: '按需购买',
+    dailyLimit2: '每日限制2',
+    noLimit: '无限制',
+    planComparison: '计划对比',
+    buttonActions: '按钮操作',
 
     // User Agreement Modal Additional Keys
     userConfirmation: '我同意本协议的所有条款和条件',

@@ -34,7 +34,7 @@ export default function LanguageSwitcher({ currentLocale }: LanguageSwitcherProp
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-amber-300 bg-slate-800/50 border border-amber-500/30 rounded-md hover:bg-amber-500/20 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-slate-900 font-inter"
       >
         <Globe className="w-4 h-4" />
         <span>{localeNames[currentLocale]}</span>
@@ -42,15 +42,15 @@ export default function LanguageSwitcher({ currentLocale }: LanguageSwitcherProp
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg z-50">
+                 <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-amber-500/30 rounded-md shadow-lg z-50 backdrop-blur-sm">
           <div className="py-1">
             {locales.map((locale) => (
               <button
                 key={locale}
                 onClick={() => handleLanguageChange(locale)}
-                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                  locale === currentLocale ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
-                }`}
+                                 className={`w-full text-left px-4 py-2 text-sm hover:bg-amber-500/20 transition-colors ${
+                   locale === currentLocale ? 'bg-amber-500/20 text-amber-300' : 'text-gray-300'
+                 }`}
               >
                 {localeNames[locale]}
               </button>

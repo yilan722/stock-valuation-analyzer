@@ -121,7 +121,7 @@ export default function ValuationReport({ stockData, reportData, isLoading, loca
 
         <div className="bg-gray-50 p-4 rounded-lg">
           <div className="flex items-center space-x-2 mb-2">
-            <BarChart3 className="h-4 w-4 text-purple-600" />
+            <BarChart3 className="h-4 w-4 text-amber-500" />
             <span className="text-sm font-medium text-gray-600">{getTranslation(locale, 'peRatio')}</span>
           </div>
           <p className="text-lg font-semibold text-gray-900">

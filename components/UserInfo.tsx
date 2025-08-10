@@ -16,6 +16,10 @@ interface UserData {
   subscription_type?: string
   subscription_end?: string
   monthly_report_limit: number
+  // 新增积分相关字段
+  credits?: number
+  monthly_credits?: number
+  daily_growth?: number
   // 新增白名单相关字段
   whitelistStatus?: {
     canGenerate: boolean;
@@ -41,10 +45,10 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSub
     setIsLoading(true)
     try {
       await signOut()
-      toast.success('已退出登录')
+      toast.success('Logged out successfully')
       onLogout()
     } catch (error) {
-      toast.error('退出登录失败')
+      toast.error('Logout failed')
     } finally {
       setIsLoading(false)
     }
@@ -57,7 +61,7 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSub
     if (user.whitelistStatus?.canGenerate && user.whitelistStatus.reason === '白名单用户') {
       return { 
         status: `${getTranslation(locale, 'whitelist_user')} (剩余${user.whitelistStatus.remainingReports}次)`, 
-        color: 'text-purple-600' 
+        color: 'text-amber-500' 
       }
     }
     
@@ -84,6 +88,45 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSub
       const endDate = new Date(user.subscription_end)
       if (endDate > new Date()) {
         return user.monthly_report_limit - user.paid_reports_used
+      }
+    }
+    
+    return 0
+  }
+
+  const getCurrentCredits = () => {
+    if (!user) return 0
+    
+    // 如果是白名单用户，返回白名单积分
+    if (user.whitelistStatus?.canGenerate && user.whitelistStatus.reason === '白名单用户') {
+      return user.whitelistStatus.remainingReports || 0
+    }
+    
+    // 如果是免费用户且未使用过免费报告
+    if (user.free_reports_used === 0) {
+      return 20 // 20个欢迎积分
+    }
+    
+    // 如果有订阅，计算当前积分
+    if (user.subscription_type && user.subscription_end) {
+      const endDate = new Date(user.subscription_end)
+      if (endDate > new Date()) {
+        // 基础月积分
+        let totalCredits = user.monthly_credits || 0
+        
+        // 计算每日增长积分（从月初到现在）
+        if (user.daily_growth && user.daily_growth > 0) {
+          const now = new Date()
+          const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+          const daysSinceStart = Math.floor((now.getTime() - startOfMonth.getTime()) / (1000 * 60 * 60 * 24))
+          const growthCredits = daysSinceStart * user.daily_growth
+          totalCredits += growthCredits
+        }
+        
+        // 减去已使用的积分
+        totalCredits -= (user.free_reports_used + user.paid_reports_used)
+        
+        return Math.max(0, totalCredits)
       }
     }
     
@@ -123,7 +166,7 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSub
                   {user.name || user.email?.split('@')[0] || 'User'}
                 </p>
                 <p className={`text-xs ${subscriptionStatus.color}`}>
-                  {remainingReports > 0 ? `${remainingReports} reports` : '0 reports'}
+                  {getCurrentCredits()} credits
                 </p>
               </div>
             </div>
@@ -131,7 +174,7 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSub
             <div className="flex items-center space-x-2">
               <button
                 onClick={onOpenSubscription}
-                className="px-2 py-1 text-xs bg-blue-600 text-white hover:bg-blue-700 rounded transition-colors"
+                className="px-3 py-2 text-sm font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-md hover:bg-amber-500/30 transition-colors font-inter"
               >
                 {getTranslation(locale, 'subscription_plan')}
               </button>
@@ -203,17 +246,17 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSub
             <div className="bg-gray-50 p-4 rounded-lg">
               <div className="flex items-center space-x-2 mb-2">
                 <BarChart3 className="h-4 w-4 text-green-600" />
-                <span className="text-sm font-medium text-gray-600">{getTranslation(locale, 'remaining_reports')}</span>
+                <span className="text-sm font-medium text-gray-600">Available Credits</span>
               </div>
               <p className="text-2xl font-bold text-gray-900">
-                {remainingReports}
+                {getCurrentCredits()}
               </p>
             </div>
 
             <div className="bg-gray-50 p-4 rounded-lg">
               <div className="flex items-center space-x-2 mb-2">
                 <CreditCard className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-medium text-gray-600">{getTranslation(locale, 'reports_used')}</span>
+                <span className="text-sm font-medium text-gray-600">Credits Used</span>
               </div>
               <p className="text-2xl font-bold text-gray-900">
                 {user.free_reports_used + user.paid_reports_used}
@@ -223,11 +266,13 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSub
 
           {user.subscription_type && user.subscription_end && (
             <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-medium text-blue-900 mb-2">{getTranslation(locale, 'subscription_info')}</h4>
+              <h4 className="font-medium text-blue-900 mb-2">Subscription Info</h4>
               <div className="text-sm text-blue-800">
-                <p>{getTranslation(locale, 'subscription_type')}: {getSubscriptionTypeDisplayName(user.subscription_type)}</p>
-                <p>{getTranslation(locale, 'subscription_end')}: {new Date(user.subscription_end).toLocaleDateString()}</p>
-                <p>{getTranslation(locale, 'reports_used_this_month')}: {user.paid_reports_used}/{user.monthly_report_limit}</p>
+                <p>Plan: {getSubscriptionTypeDisplayName(user.subscription_type)}</p>
+                <p>Expires: {new Date(user.subscription_end).toLocaleDateString()}</p>
+                <p>Monthly Credits: {user.monthly_credits || 0}</p>
+                <p>Daily Growth: +{user.daily_growth || 0} credits/day</p>
+                <p>Credits Used: {user.paid_reports_used}</p>
               </div>
             </div>
           )}
@@ -236,20 +281,20 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSub
           <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
             <h4 className="font-medium text-blue-900 mb-2">{getTranslation(locale, 'subscription_plan')}</h4>
             <p className="text-sm text-blue-800 mb-3">
-              {remainingReports > 0 
-                ? `${getTranslation(locale, 'remaining_reports_available')} ${remainingReports} ${getTranslation(locale, 'or_choose_subscription')}`
-                : `${getTranslation(locale, 'free_reports_used_up')}. ${getTranslation(locale, 'please_choose_subscription_plan')}`
+              {getCurrentCredits() > 0 
+                ? `You have ${getCurrentCredits()} credits available. Upgrade for more credits and daily growth.`
+                : `No credits available. Choose a subscription plan to get started.`
               }
             </p>
             <button
               onClick={onOpenSubscription}
               className={`px-4 py-2 rounded-md text-sm ${
-                remainingReports > 0 
+                getCurrentCredits() > 0 
                   ? 'bg-blue-600 text-white hover:bg-blue-700' 
                   : 'bg-yellow-600 text-white hover:bg-yellow-700'
               }`}
             >
-              {getTranslation(locale, 'view_subscription_plan')}
+              View Subscription Plans
             </button>
           </div>
 

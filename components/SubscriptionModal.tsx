@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { X, Check, CreditCard, Zap, Crown, Star } from 'lucide-react'
+import { X, Check, CreditCard, Zap, Crown, Star, TrendingUp, Shield, Headphones, BarChart3 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import UserAgreementModal from './UserAgreementModal'
 import { getTranslation } from '../lib/translations'
@@ -10,12 +10,19 @@ import { Locale } from '../lib/i18n'
 interface SubscriptionPlan {
   id: string
   name: string
-  price: number
-  reports: number
+  monthlyFee: number
+  welcomeCredits: number
+  monthlyCredits: number
+  dailyGrowth: number
+  totalMonthlyCredits: number
+  costPerReport: number
+  onDemandLimit: string
   features: string[]
   popular?: boolean
   bestValue?: boolean
   icon: React.ReactNode
+  buttonText: string
+  buttonAction: string
 }
 
 interface SubscriptionModalProps {
@@ -33,73 +40,117 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
 
   const plans: SubscriptionPlan[] = [
     {
-      id: 'single_report',
-      name: getTranslation(locale, 'singleReport'),
-      price: 5,
-      reports: 1,
+      id: 'basic',
+      name: getTranslation(locale, 'basicPlan'),
+      monthlyFee: 0,
+      welcomeCredits: 20,
+      monthlyCredits: 0,
+      dailyGrowth: 1,
+      totalMonthlyCredits: 0,
+      costPerReport: 2.59,
+      onDemandLimit: getTranslation(locale, 'dailyLimit2'),
       features: [
-        `1${getTranslation(locale, 'professionalStockAnalysis')}`,
-        getTranslation(locale, 'realTimeMarketData'),
-        getTranslation(locale, 'aiDrivenAnalysis')
+        getTranslation(locale, 'aiDrivenDeepAnalysis'),
+        getTranslation(locale, 'realTimeMarketData')
       ],
-      icon: <CreditCard className="h-6 w-6" />
+      icon: <CreditCard className="h-6 w-6" />,
+      buttonText: getTranslation(locale, 'freeStart'),
+      buttonAction: 'free'
     },
     {
-      id: 'monthly_30',
-      name: getTranslation(locale, 'monthlySubscription'),
-      price: 99,
-      reports: 30,
+      id: 'standard',
+      name: getTranslation(locale, 'standardPlan'),
+      monthlyFee: 29,
+      welcomeCredits: 0,
+      monthlyCredits: 280,
+      dailyGrowth: 2,
+      totalMonthlyCredits: 340,
+      costPerReport: 1.70,
+      onDemandLimit: getTranslation(locale, 'unlimited'),
       features: [
-        `30${getTranslation(locale, 'professionalStockAnalysis')}`,
+        getTranslation(locale, 'aiDrivenDeepAnalysis'),
         getTranslation(locale, 'realTimeMarketData'),
-        getTranslation(locale, 'aiDrivenAnalysis'),
-        getTranslation(locale, 'prioritySupport')
+        getTranslation(locale, 'priorityCustomerSupport')
       ],
       popular: true,
-      icon: <Zap className="h-6 w-6" />
+      icon: <Zap className="h-6 w-6" />,
+      buttonText: getTranslation(locale, 'upgradeSave34'),
+      buttonAction: 'subscribe'
     },
     {
-      id: 'monthly_70',
-      name: getTranslation(locale, 'advancedSubscription'),
-      price: 199,
-      reports: 70,
+      id: 'pro',
+      name: getTranslation(locale, 'proPlan'),
+      monthlyFee: 59,
+      welcomeCredits: 0,
+      monthlyCredits: 620,
+      dailyGrowth: 4,
+      totalMonthlyCredits: 740,
+      costPerReport: 1.59,
+      onDemandLimit: getTranslation(locale, 'unlimited'),
       features: [
-        `70${getTranslation(locale, 'professionalStockAnalysis')}`,
+        getTranslation(locale, 'aiDrivenDeepAnalysis'),
         getTranslation(locale, 'realTimeMarketData'),
-        getTranslation(locale, 'aiDrivenAnalysis'),
-        getTranslation(locale, 'prioritySupport'),
-        getTranslation(locale, 'deepIndustryAnalysis')
+        getTranslation(locale, 'priorityCustomerSupport')
       ],
       bestValue: true,
-      icon: <Star className="h-6 w-6" />
+      icon: <Star className="h-6 w-6" />,
+      buttonText: getTranslation(locale, 'upgradeToPro'),
+      buttonAction: 'subscribe'
     },
     {
-      id: 'premium_300',
-      name: getTranslation(locale, 'premiumVersion'),
-      price: 998,
-      reports: 300,
+      id: 'flagship',
+      name: getTranslation(locale, 'flagshipPlan'),
+      monthlyFee: 129,
+      welcomeCredits: 0,
+      monthlyCredits: 1840,
+      dailyGrowth: 6,
+      totalMonthlyCredits: 2020,
+      costPerReport: 1.28,
+      onDemandLimit: getTranslation(locale, 'unlimited'),
       features: [
-        `300${getTranslation(locale, 'professionalStockAnalysis')}`,
+        getTranslation(locale, 'aiDrivenDeepAnalysis'),
         getTranslation(locale, 'realTimeMarketData'),
-        getTranslation(locale, 'aiDrivenAnalysis'),
-        getTranslation(locale, 'prioritySupport'),
-        getTranslation(locale, 'deepIndustryAnalysis'),
-        getTranslation(locale, 'dailyKLineAnalysis'),
-        getTranslation(locale, 'vipExclusiveService')
+        getTranslation(locale, 'priorityCustomerSupport'),
+        getTranslation(locale, 'technicalAnalysisVipConsulting')
       ],
-      icon: <Crown className="h-6 w-6" />
+      icon: <Crown className="h-6 w-6" />,
+      buttonText: getTranslation(locale, 'contactUsUpgrade'),
+      buttonAction: 'contact'
     }
   ]
 
   const handleSubscribe = async (planId: string) => {
-    if (!userId) {
-      toast.error(getTranslation(locale, 'pleaseLoginFirstToast'))
+    const plan = plans.find(p => p.id === planId)
+    if (!plan) {
+      toast.error(getTranslation(locale, 'invalidPlan'))
       return
     }
 
-    // 显示用户协议
-    setPendingPlanId(planId)
-    setShowAgreement(true)
+    // Handle different button actions
+    switch (plan.buttonAction) {
+      case 'free':
+        // For free plan, just show success message
+        toast.success(getTranslation(locale, 'freeStart'))
+        onClose()
+        return
+      case 'contact':
+        // For flagship plan, show contact message
+        toast('Please contact us for upgrade details')
+        onClose()
+        return
+      case 'subscribe':
+        // For paid plans, check login and show agreement
+        if (!userId) {
+          toast.error(getTranslation(locale, 'pleaseLoginFirstToast'))
+          return
+        }
+        setPendingPlanId(planId)
+        setShowAgreement(true)
+        return
+      default:
+        toast.error(getTranslation(locale, 'invalidPlan'))
+        return
+    }
   }
 
   const handleAgreementConfirm = async () => {
@@ -119,10 +170,10 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          amount: plan.price,
+          amount: plan.monthlyFee,
           type: pendingPlanId === 'single_report' ? 'single_report' : 'subscription',
           subscriptionType: pendingPlanId,
-          reportLimit: plan.reports
+          reportLimit: plan.totalMonthlyCredits
         })
       })
 
@@ -174,7 +225,7 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
                 key={plan.id}
                 className={`relative bg-white border-2 rounded-lg p-6 transition-all duration-200 hover:shadow-lg ${
                   plan.popular ? 'border-blue-500 shadow-lg' : 'border-gray-200'
-                } ${plan.bestValue ? 'border-purple-500 shadow-lg' : ''}`}
+                } ${plan.bestValue ? 'border-amber-500 shadow-lg' : ''}`}
               >
                 {/* Popular Badge */}
                 {plan.popular && (
@@ -188,7 +239,7 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
                 {/* Best Value Badge */}
                 {plan.bestValue && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                    <span className="bg-amber-500 text-white px-3 py-1 rounded-full text-sm font-medium">
                       {getTranslation(locale, 'bestValue')}
                     </span>
                   </div>
@@ -204,19 +255,36 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
                 {/* Plan Name */}
                 <h3 className="text-xl font-bold text-center mb-2">{plan.name}</h3>
 
-                {/* Price */}
+                {/* Monthly Fee */}
                 <div className="text-center mb-4">
-                  <span className="text-3xl font-bold text-blue-600">¥{plan.price}</span>
-                  {plan.id !== 'single_report' && (
-                    <span className="text-gray-500 ml-1">/月</span>
+                  <span className="text-3xl font-bold text-blue-600">
+                    {plan.monthlyFee === 0 ? getTranslation(locale, 'free') : `$${plan.monthlyFee}`}
+                  </span>
+                  {plan.monthlyFee > 0 && (
+                    <span className="text-gray-500 ml-1">/month</span>
                   )}
                 </div>
 
-                {/* Reports Count */}
-                <div className="text-center mb-6">
-                  <span className="text-lg font-semibold text-gray-700">
-                    {plan.reports} {getTranslation(locale, 'professionalStockAnalysis')}
-                  </span>
+                {/* Credits and Reports Info */}
+                <div className="text-center mb-6 space-y-2">
+                  <div className="text-lg font-semibold text-gray-700">
+                    {plan.welcomeCredits > 0 && (
+                      <div className="mb-2">
+                        <span className="text-amber-600 font-bold">{plan.welcomeCredits}</span> {getTranslation(locale, 'welcomeCredits')}
+                      </div>
+                    )}
+                    {plan.monthlyCredits > 0 && (
+                      <div className="mb-2">
+                        <span className="text-blue-600 font-bold">{plan.monthlyCredits}</span> {getTranslation(locale, 'monthlyCredits')}
+                      </div>
+                    )}
+                    <div className="text-sm text-gray-600">
+                      {getTranslation(locale, 'costPerReport')}: ${plan.costPerReport}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {getTranslation(locale, 'onDemandLimit')}: {plan.onDemandLimit}
+                    </div>
+                  </div>
                 </div>
 
                 {/* Features */}
@@ -229,7 +297,7 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
                   ))}
                 </ul>
 
-                {/* Subscribe Button */}
+                {/* Action Button */}
                 <button
                   onClick={() => handleSubscribe(plan.id)}
                   disabled={isLoading}
@@ -237,11 +305,11 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
                     plan.popular
                       ? 'bg-blue-600 hover:bg-blue-700 text-white'
                       : plan.bestValue
-                      ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                      ? 'bg-amber-600 hover:bg-amber-700 text-white'
                       : 'bg-gray-600 hover:bg-gray-700 text-white'
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
-                  {isLoading ? getTranslation(locale, 'loading') : getTranslation(locale, 'subscribe')}
+                  {isLoading ? getTranslation(locale, 'loading') : plan.buttonText}
                 </button>
               </div>
             ))}
