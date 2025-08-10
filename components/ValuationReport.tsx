@@ -73,11 +73,11 @@ export default function ValuationReport({ stockData, reportData, isLoading, loca
   if (!stockData) return null
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-white rounded-lg shadow-md p-3 sm:p-6">
       {/* Stock Information Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 space-y-3 sm:space-y-0">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
             {stockData.name} ({stockData.symbol})
           </h2>
           <p className="text-sm text-gray-600">{getTranslation(locale, 'stockInformation')}</p>
@@ -86,7 +86,7 @@ export default function ValuationReport({ stockData, reportData, isLoading, loca
           <button
             onClick={handleDownloadPDF}
             disabled={isDownloading}
-            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg transition-colors"
+            className="w-full sm:w-auto flex items-center justify-center sm:justify-start space-x-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg transition-colors"
           >
             <Download className="h-4 w-4" />
             <span>{isDownloading ? getTranslation(locale, 'generatingPDF') : getTranslation(locale, 'downloadPDF')}</span>
@@ -95,7 +95,7 @@ export default function ValuationReport({ stockData, reportData, isLoading, loca
       </div>
 
       {/* Stock Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
         <div className="bg-gray-50 p-4 rounded-lg">
           <div className="flex items-center space-x-2 mb-2">
             <DollarSign className="h-4 w-4 text-green-600" />

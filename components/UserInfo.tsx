@@ -154,15 +154,15 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSub
   // 紧凑模式渲染
   if (isCompact) {
     return (
-      <div className="flex items-center space-x-3">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
         {user ? (
           <>
             <div className="flex items-center space-x-2">
-              <div className="bg-blue-100 p-1.5 rounded-full">
-                <User className="h-4 w-4 text-blue-600" />
+              <div className="bg-blue-100 p-1 sm:p-1.5 rounded-full">
+                <User className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
               </div>
-              <div className="text-sm">
-                <p className="font-medium text-gray-900 truncate max-w-32">
+              <div className="text-xs sm:text-sm">
+                <p className="font-medium text-gray-900 truncate max-w-24 sm:max-w-32">
                   {user.name || user.email?.split('@')[0] || 'User'}
                 </p>
                 <p className={`text-xs ${subscriptionStatus.color}`}>
@@ -174,9 +174,10 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSub
             <div className="flex items-center space-x-2">
               <button
                 onClick={onOpenSubscription}
-                className="px-3 py-2 text-sm font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-md hover:bg-amber-500/30 transition-colors font-inter"
+                className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-md hover:bg-amber-500/30 transition-colors font-inter"
               >
-                {getTranslation(locale, 'subscription_plan')}
+                <span className="hidden sm:inline">{getTranslation(locale, 'subscription_plan')}</span>
+                <span className="sm:hidden">Plan</span>
               </button>
               
               <button
@@ -185,17 +186,18 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSub
                 className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
                 title={getTranslation(locale, 'logout')}
               >
-                <LogOut size={14} />
+                <LogOut size={12} className="sm:w-3.5 sm:h-3.5" />
               </button>
             </div>
           </>
         ) : (
           <button
             onClick={onLogin}
-            className="flex items-center space-x-2 px-3 py-1.5 text-sm bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors"
+            className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors"
           >
-            <LogIn size={14} />
-            <span>{getTranslation(locale, 'loginTitle')}</span>
+            <LogIn size={12} className="sm:w-3.5 sm:h-3.5" />
+            <span className="hidden sm:inline">{getTranslation(locale, 'loginTitle')}</span>
+            <span className="sm:hidden">Login</span>
           </button>
         )}
       </div>
@@ -204,17 +206,17 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSub
 
   // 完整模式渲染
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="flex items-center justify-between mb-4">
+    <div className="bg-white rounded-lg shadow-md p-3 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 space-y-3 sm:space-y-0">
         <div className="flex items-center space-x-3">
-          <div className="bg-blue-100 p-2 rounded-full">
-            <User className="h-6 w-6 text-blue-600" />
+          <div className="bg-blue-100 p-1.5 sm:p-2 rounded-full">
+            <User className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900">
               {user?.name || user?.email || getTranslation(locale, 'not_logged_in')}
             </h3>
-            <p className={`text-sm font-medium ${subscriptionStatus.color}`}>
+            <p className={`text-xs sm:text-sm font-medium ${subscriptionStatus.color}`}>
               {subscriptionStatus.status}
             </p>
           </div>
@@ -224,50 +226,50 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSub
           <button
             onClick={handleLogout}
             disabled={isLoading}
-            className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
+            className="flex items-center space-x-2 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors w-full sm:w-auto justify-center sm:justify-start"
           >
-            <LogOut size={16} />
+            <LogOut size={14} className="sm:w-4 sm:h-4" />
             <span>{getTranslation(locale, 'logout')}</span>
           </button>
         ) : (
           <button
             onClick={onLogin}
-            className="flex items-center space-x-2 px-4 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors"
+            className="flex items-center space-x-2 px-3 sm:px-4 py-2 text-xs sm:text-sm bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors w-full sm:w-auto justify-center sm:justify-start"
           >
-            <LogIn size={16} />
+            <LogIn size={14} className="sm:w-4 sm:h-4" />
             <span>{getTranslation(locale, 'loginTitle')}</span>
           </button>
         )}
       </div>
 
       {user ? (
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-gray-50 p-4 rounded-lg">
+        <div className="space-y-3 sm:space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
               <div className="flex items-center space-x-2 mb-2">
-                <BarChart3 className="h-4 w-4 text-green-600" />
-                <span className="text-sm font-medium text-gray-600">Available Credits</span>
+                <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
+                <span className="text-xs sm:text-sm font-medium text-gray-600">Available Credits</span>
               </div>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">
                 {getCurrentCredits()}
               </p>
             </div>
 
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
               <div className="flex items-center space-x-2 mb-2">
-                <CreditCard className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-medium text-gray-600">Credits Used</span>
+                <CreditCard className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+                <span className="text-xs sm:text-sm font-medium text-gray-600">Credits Used</span>
               </div>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">
                 {user.free_reports_used + user.paid_reports_used}
               </p>
             </div>
           </div>
 
           {user.subscription_type && user.subscription_end && (
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-medium text-blue-900 mb-2">Subscription Info</h4>
-              <div className="text-sm text-blue-800">
+            <div className="bg-blue-50 p-3 sm:p-4 rounded-lg">
+              <h4 className="text-sm sm:text-base font-medium text-blue-900 mb-2">Subscription Info</h4>
+              <div className="text-xs sm:text-sm text-blue-800 space-y-1">
                 <p>Plan: {getSubscriptionTypeDisplayName(user.subscription_type)}</p>
                 <p>Expires: {new Date(user.subscription_end).toLocaleDateString()}</p>
                 <p>Monthly Credits: {user.monthly_credits || 0}</p>
@@ -278,9 +280,9 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSub
           )}
 
           {/* 订阅计划按钮 - 始终显示 */}
-          <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
-            <h4 className="font-medium text-blue-900 mb-2">{getTranslation(locale, 'subscription_plan')}</h4>
-            <p className="text-sm text-blue-800 mb-3">
+          <div className="bg-blue-50 border border-blue-200 p-3 sm:p-4 rounded-lg">
+            <h4 className="text-sm sm:text-base font-medium text-blue-900 mb-2">{getTranslation(locale, 'subscription_plan')}</h4>
+            <p className="text-xs sm:text-sm text-blue-800 mb-3">
               {getCurrentCredits() > 0 
                 ? `You have ${getCurrentCredits()} credits available. Upgrade for more credits and daily growth.`
                 : `No credits available. Choose a subscription plan to get started.`
@@ -288,7 +290,7 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSub
             </p>
             <button
               onClick={onOpenSubscription}
-              className={`px-4 py-2 rounded-md text-sm ${
+              className={`px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm w-full sm:w-auto ${
                 getCurrentCredits() > 0 
                   ? 'bg-blue-600 text-white hover:bg-blue-700' 
                   : 'bg-yellow-600 text-white hover:bg-yellow-700'
@@ -301,14 +303,14 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSub
 
         </div>
       ) : (
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h4 className="font-medium text-gray-900 mb-2">{getTranslation(locale, 'start_using')}</h4>
-          <p className="text-sm text-gray-600 mb-3">
+        <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
+          <h4 className="text-sm sm:text-base font-medium text-gray-900 mb-2">{getTranslation(locale, 'start_using')}</h4>
+          <p className="text-xs sm:text-sm text-gray-600 mb-3">
             {getTranslation(locale, 'after_login_you_will_get_1_free_report_or_choose_subscription_plan')}
           </p>
           <button
             onClick={onLogin}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm"
+            className="bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-md hover:bg-blue-700 text-xs sm:text-sm w-full sm:w-auto"
           >
             {getTranslation(locale, 'login_now')}
           </button>

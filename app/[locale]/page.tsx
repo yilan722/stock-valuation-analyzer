@@ -173,10 +173,10 @@ export default function HomePage({ params }: PageProps) {
         onOpenSubscription={handleOpenSubscription}
       />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-8">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
+        <div className="space-y-6 sm:space-y-8">
           {/* Search Form and Stock Data Display */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <SearchForm
               onSearch={handleSearch}
               onGenerateReport={handleGenerateReport}
@@ -187,20 +187,20 @@ export default function HomePage({ params }: PageProps) {
             
             {/* Stock Data Display - Above Demo */}
             {stockData && (
-                             <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-amber-500/30 shadow-lg p-6 mb-8">
-                <h2 className="text-2xl font-bold text-white mb-6 font-inter">
+              <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-amber-500/30 shadow-lg p-3 sm:p-6 mb-6 sm:mb-8">
+                <h2 className="text-lg sm:text-2xl font-bold text-white mb-4 sm:mb-6 font-inter text-center sm:text-left">
                   {stockData.name} ({stockData.symbol}) Stock Information
                 </h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
                   <div className="text-center">
                     <div className="flex items-center justify-center mb-2">
-                      <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
-                        <span className="text-green-400 text-lg font-bold">$</span>
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                        <span className="text-green-400 text-sm sm:text-lg font-bold">$</span>
                       </div>
                     </div>
-                    <p className="text-sm text-blue-200 mb-1 font-inter">Price</p>
-                    <p className="text-2xl font-bold text-white font-inter">${stockData.price}</p>
-                    <p className={`text-sm ${stockData.change >= 0 ? 'text-green-400' : 'text-red-400'} font-inter`}>
+                    <p className="text-xs sm:text-sm text-blue-200 mb-1 font-inter">Price</p>
+                    <p className="text-lg sm:text-2xl font-bold text-white font-inter">${stockData.price}</p>
+                    <p className={`text-xs sm:text-sm ${stockData.change >= 0 ? 'text-green-400' : 'text-red-400'} font-inter`}>
                       {stockData.change >= 0 ? '+' : ''}{stockData.change} ({stockData.changePercent >= 0 ? '+' : ''}{stockData.changePercent}%)
                     </p>
                   </div>
@@ -213,8 +213,8 @@ export default function HomePage({ params }: PageProps) {
                         </svg>
                       </div>
                     </div>
-                    <p className="text-sm text-blue-200 mb-1 font-inter">Market Cap</p>
-                    <p className="text-2xl font-bold text-white font-inter">${(stockData.marketCap / 1e9).toFixed(2)}B</p>
+                    <p className="text-xs sm:text-sm text-blue-200 mb-1 font-inter">Market Cap</p>
+                    <p className="text-lg sm:text-2xl font-bold text-white font-inter">${(stockData.marketCap / 1e9).toFixed(2)}B</p>
                   </div>
                   
                   <div className="text-center">
@@ -225,8 +225,8 @@ export default function HomePage({ params }: PageProps) {
                         </svg>
                       </div>
                     </div>
-                    <p className="text-sm text-blue-200 mb-1 font-inter">P/E Ratio</p>
-                    <p className="text-2xl font-bold text-white font-inter">{stockData.peRatio}</p>
+                    <p className="text-xs sm:text-sm text-blue-200 mb-1 font-inter">P/E Ratio</p>
+                    <p className="text-lg sm:text-2xl font-bold text-white font-inter">{stockData.peRatio}</p>
                   </div>
                   
                   <div className="text-center">
@@ -237,8 +237,8 @@ export default function HomePage({ params }: PageProps) {
                         </svg>
                     </div>
                     </div>
-                    <p className="text-sm text-blue-200 mb-1 font-inter">Amount</p>
-                    <p className="text-2xl font-bold text-white font-inter">{(stockData.amount / 1e9).toFixed(2)}B</p>
+                    <p className="text-xs sm:text-sm text-blue-200 mb-1 font-inter">Trading Volume($)</p>
+                    <p className="text-lg sm:text-2xl font-bold text-white font-inter">{(stockData.amount / 1e9).toFixed(2)}B</p>
                   </div>
                 </div>
               </div>

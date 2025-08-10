@@ -404,48 +404,48 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-slate-800/30"></div>
-        <div className="relative z-10 text-center max-w-4xl mx-auto px-6">
-          <div className="mb-8">
-            <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-2 mb-6">
-              <Activity className="h-5 w-5 text-blue-400" />
-              <span className="text-sm font-medium">AI-Driven Research Report</span>
+        <div className="relative z-10 text-center max-w-4xl mx-auto px-3 sm:px-6">
+          <div className="mb-6 sm:mb-8">
+            <div className="inline-flex items-center space-x-1 sm:space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-3 sm:px-6 py-1.5 sm:py-2 mb-4 sm:mb-6">
+              <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-blue-400" />
+              <span className="text-xs sm:text-sm font-medium">AI-Driven Research Report</span>
             </div>
             
-            <div className="text-sm text-gray-400 mb-4">
+            <div className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4">
               Report Date: {demoReport.reportDate}
             </div>
             
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6">
               {demoReport.stockName}
             </h1>
-            <p className="text-2xl text-blue-400 font-semibold mb-8">
+            <p className="text-lg sm:text-xl md:text-2xl text-blue-400 font-semibold mb-6 sm:mb-8">
               {demoReport.stockSymbol}
             </p>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 max-w-3xl mx-auto">
               <div className="text-center">
-                <div className="text-3xl font-bold text-white mb-2">
+                <div className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">
                   ${demoReport.currentPrice}
                 </div>
-                <div className="text-sm text-gray-400">Current Price</div>
+                <div className="text-xs sm:text-sm text-gray-400">Current Price</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-white mb-2">
+                <div className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">
                   {formatNumber(demoReport.marketCap)}
                 </div>
-                <div className="text-sm text-gray-400">Market Cap</div>
+                <div className="text-xs sm:text-sm text-gray-400">Market Cap</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-white mb-2">
+                <div className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">
                   {demoReport.peRatio}
                 </div>
-                <div className="text-sm text-gray-400">P/E Ratio</div>
+                <div className="text-xs sm:text-sm text-gray-400">P/E Ratio</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-white mb-2">
+                <div className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">
                   {formatNumber(demoReport.volume)}
                 </div>
-                <div className="text-sm text-gray-400">Volume</div>
+                <div className="text-xs sm:text-sm text-gray-400">Volume</div>
               </div>
             </div>
           </div>
@@ -453,19 +453,19 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
       </div>
 
       {/* Navigation */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-8">
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-8 sm:mb-12">
           {sections.map((section, index) => (
             <button
               key={section.id}
               onClick={() => setActiveSection(index)}
-              className={`flex items-center space-x-2 px-6 py-3 rounded-full transition-all duration-300 ${
+              className={`flex items-center space-x-1 sm:space-x-2 px-3 sm:px-6 py-2 sm:py-3 rounded-full transition-all duration-300 text-sm sm:text-base ${
                 activeSection === index
                   ? 'bg-blue-600 text-white shadow-lg'
                   : 'bg-white/10 text-gray-300 hover:bg-white/20'
               }`}
             >
-              <section.icon className="h-5 w-5" />
+              <section.icon className="h-4 w-4 sm:h-5 sm:w-5" />
               <span>{section.label}</span>
             </button>
           ))}
@@ -474,40 +474,40 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
 
 
         {/* Content Sections */}
-        <div className="space-y-12">
+        <div className="space-y-8 sm:space-y-12">
           {/* Overview Section */}
           {activeSection === 0 && (
-            <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-3xl font-bold text-white">Company Overview</h2>
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-white/10">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-2 sm:space-y-0">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white">Company Overview</h2>
                 <a href="https://investor.coinbase.com/company-profile/default.aspx" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">
                   Source: Coinbase Company Profile
                 </a>
               </div>
-              <p className="text-lg text-gray-300 leading-relaxed mb-8">
+              <p className="text-base sm:text-lg text-gray-300 leading-relaxed mb-6 sm:mb-8">
                 {demoReport.fundamentalAnalysis.overview}
               </p>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                 <div>
-                  <h3 className="text-xl font-semibold text-blue-400 mb-4">Key Strengths</h3>
-                  <ul className="space-y-3">
+                  <h3 className="text-lg sm:text-xl font-semibold text-blue-400 mb-3 sm:mb-4">Key Strengths</h3>
+                  <ul className="space-y-2 sm:space-y-3">
                     {demoReport.fundamentalAnalysis.strengths.map((strength, idx) => (
-                      <li key={idx} className="flex items-start space-x-3">
-                        <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
-                        <span className="text-gray-300">{strength}</span>
+                      <li key={idx} className="flex items-start space-x-2 sm:space-x-3">
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
+                        <span className="text-sm sm:text-base text-gray-300">{strength}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
                 
                 <div>
-                  <h3 className="text-xl font-semibold text-orange-400 mb-4">Key Challenges</h3>
-                  <ul className="space-y-3">
+                  <h3 className="text-lg sm:text-xl font-semibold text-orange-400 mb-3 sm:mb-4">Key Challenges</h3>
+                  <ul className="space-y-2 sm:space-y-3">
                     {demoReport.fundamentalAnalysis.challenges.map((challenge, idx) => (
-                      <li key={idx} className="flex items-start space-x-3">
-                        <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                        <span className="text-gray-300">{challenge}</span>
+                      <li key={idx} className="flex items-start space-x-2 sm:space-x-3">
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                        <span className="text-sm sm:text-base text-gray-300">{challenge}</span>
                       </li>
                     ))}
                   </ul>
@@ -518,127 +518,127 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
 
           {/* Fundamental Analysis Section */}
           {activeSection === 1 && (
-            <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-3xl font-bold text-white">Fundamental Analysis</h2>
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-white/10">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-2 sm:space-y-0">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white">Fundamental Analysis</h2>
                 <a href="https://investor.coinbase.com/financials/default.aspx" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">
                   Source: Coinbase Financial Reports
                 </a>
               </div>
               
               {/* Q3 2024 Performance */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-blue-400">Q3 2024 Financial Performance</h3>
+              <div className="mb-6 sm:mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 space-y-2 sm:space-y-0">
+                  <h3 className="text-lg sm:text-xl font-semibold text-blue-400">Q3 2024 Financial Performance</h3>
                   <a href="https://investor.coinbase.com/financials/quarterly-results/default.aspx" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">
                     Source: Coinbase Q3 2024 Earnings
                   </a>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-2xl font-bold text-white mb-2">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                       {formatNumber(demoReport.fundamentalAnalysis.financialMetrics.q3_2024.revenue)}
                     </div>
-                    <div className="text-sm text-gray-400">Revenue</div>
+                    <div className="text-xs sm:text-sm text-gray-400">Revenue</div>
                     <div className="text-xs text-green-400 mt-1">
                       +{formatPercentage(demoReport.fundamentalAnalysis.financialMetrics.q3_2024.revenueGrowth)}
                     </div>
                   </div>
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-2xl font-bold text-white mb-2">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                       {formatNumber(demoReport.fundamentalAnalysis.financialMetrics.q3_2024.netIncome)}
                     </div>
-                    <div className="text-sm text-gray-400">Net Income</div>
+                    <div className="text-xs sm:text-sm text-gray-400">Net Income</div>
                     <div className="text-xs text-green-400 mt-1">
                       {demoReport.fundamentalAnalysis.financialMetrics.q3_2024.netIncomeChange}
                     </div>
                   </div>
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-2xl font-bold text-white mb-2">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                       {formatNumber(demoReport.fundamentalAnalysis.financialMetrics.q3_2024.adjustedEbitda)}
                     </div>
-                    <div className="text-sm text-gray-400">Adjusted EBITDA</div>
+                    <div className="text-xs sm:text-sm text-gray-400">Adjusted EBITDA</div>
                     <div className="text-xs text-blue-400 mt-1">
                       {formatPercentage(demoReport.fundamentalAnalysis.financialMetrics.q3_2024.ebitdaMargin)} margin
                     </div>
                   </div>
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-2xl font-bold text-white mb-2">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                       {formatNumber(demoReport.fundamentalAnalysis.financialMetrics.q3_2024.operatingCashFlow)}
                     </div>
-                    <div className="text-sm text-gray-400">Operating Cash Flow</div>
+                    <div className="text-xs sm:text-sm text-gray-400">Operating Cash Flow</div>
                   </div>
                 </div>
               </div>
 
               {/* Balance Sheet */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-blue-400">Balance Sheet Highlights</h3>
+              <div className="mb-6 sm:mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 space-y-2 sm:space-y-0">
+                  <h3 className="text-lg sm:text-xl font-semibold text-blue-400">Balance Sheet Highlights</h3>
                   <a href="https://investor.coinbase.com/financials/quarterly-results/default.aspx" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">
                     Source: Coinbase Q3 2024 Balance Sheet
                   </a>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-2xl font-bold text-white mb-2">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                       {formatNumber(demoReport.fundamentalAnalysis.financialMetrics.balanceSheet.cashAndEquivalents)}
                     </div>
-                    <div className="text-sm text-gray-400">Cash & Equivalents</div>
+                    <div className="text-xs sm:text-sm text-gray-400">Cash & Equivalents</div>
                   </div>
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-2xl font-bold text-white mb-2">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                       {formatNumber(demoReport.fundamentalAnalysis.financialMetrics.balanceSheet.customerCryptoAssets)}
                     </div>
-                    <div className="text-sm text-gray-400">Customer Crypto Assets</div>
+                    <div className="text-xs sm:text-sm text-gray-400">Customer Crypto Assets</div>
                   </div>
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-2xl font-bold text-white mb-2">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                       {formatNumber(demoReport.fundamentalAnalysis.financialMetrics.balanceSheet.totalAssets)}
                     </div>
-                    <div className="text-sm text-gray-400">Total Assets</div>
+                    <div className="text-xs sm:text-sm text-gray-400">Total Assets</div>
                   </div>
                 </div>
               </div>
 
               {/* Key Ratios */}
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-blue-400">Key Financial Ratios</h3>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 space-y-2 sm:space-y-0">
+                  <h3 className="text-lg sm:text-xl font-semibold text-blue-400">Key Financial Ratios</h3>
                   <a href="https://finance.yahoo.com/quote/COIN/key-statistics" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">
                     Source: Yahoo Finance Key Statistics
                   </a>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-2xl font-bold text-white mb-2">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-6">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                       {demoReport.fundamentalAnalysis.financialMetrics.keyRatios.peRatio}
                     </div>
-                    <div className="text-sm text-gray-400">P/E Ratio</div>
+                    <div className="text-xs sm:text-sm text-gray-400">P/E Ratio</div>
                   </div>
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-2xl font-bold text-white mb-2">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                       {demoReport.fundamentalAnalysis.financialMetrics.keyRatios.pbRatio}
                     </div>
-                    <div className="text-sm text-gray-400">P/B Ratio</div>
+                    <div className="text-xs sm:text-sm text-gray-400">P/B Ratio</div>
                   </div>
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-2xl font-bold text-white mb-2">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                       {formatPercentage(demoReport.fundamentalAnalysis.financialMetrics.keyRatios.roe)}
                     </div>
-                    <div className="text-sm text-gray-400">ROE</div>
+                    <div className="text-xs sm:text-sm text-gray-400">ROE</div>
                   </div>
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-2xl font-bold text-white mb-2">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                       {formatPercentage(demoReport.fundamentalAnalysis.financialMetrics.keyRatios.roa)}
                     </div>
-                    <div className="text-sm text-gray-400">ROA</div>
+                    <div className="text-xs sm:text-sm text-gray-400">ROA</div>
                   </div>
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-2xl font-bold text-white mb-2">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                       {demoReport.fundamentalAnalysis.financialMetrics.keyRatios.debtToEquity}
                     </div>
-                    <div className="text-sm text-gray-400">Debt/Equity</div>
+                    <div className="text-xs sm:text-sm text-gray-400">Debt/Equity</div>
                   </div>
                 </div>
               </div>
@@ -647,18 +647,18 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
 
           {/* Business Segments Section */}
           {activeSection === 2 && (
-            <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-3xl font-bold text-white">Business Segments Analysis</h2>
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-white/10">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-2 sm:space-y-0">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white">Business Segments Analysis</h2>
                 <a href="https://investor.coinbase.com/business/default.aspx" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">
                   Source: Coinbase Business Overview
                 </a>
               </div>
               
               {/* Revenue Structure Evolution */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-blue-400">Revenue Structure Evolution</h3>
+              <div className="mb-6 sm:mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 space-y-2 sm:space-y-0">
+                  <h3 className="text-lg sm:text-xl font-semibold text-blue-400">Revenue Structure Evolution</h3>
                   <a href="https://investor.coinbase.com/financials/quarterly-results/default.aspx" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">
                     Source: Coinbase Quarterly Reports
                   </a>
@@ -667,23 +667,23 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
                   <table className="w-full text-white">
                     <thead>
                       <tr className="border-b border-white/20">
-                        <th className="text-left py-3 px-4">Year</th>
-                        <th className="text-center py-3 px-4">Trading Revenue</th>
-                        <th className="text-center py-3 px-4">Subscription & Services</th>
+                        <th className="text-left py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base">Year</th>
+                        <th className="text-center py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base">Trading Revenue</th>
+                        <th className="text-center py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base">Subscription & Services</th>
                       </tr>
                     </thead>
                     <tbody>
                       {Object.entries(demoReport.revenueStructure.historical).map(([year, data]) => (
                         <tr key={year} className="border-b border-white/10">
-                          <td className="py-3 px-4 font-semibold">{year}</td>
-                          <td className="text-center py-3 px-4">{formatPercentage(data.trading)}</td>
-                          <td className="text-center py-3 px-4">{formatPercentage(data.subscription)}</td>
+                          <td className="py-2 sm:py-3 px-2 sm:px-4 font-semibold text-sm sm:text-base">{year}</td>
+                          <td className="text-center py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base">{formatPercentage(data.trading)}</td>
+                          <td className="text-center py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base">{formatPercentage(data.subscription)}</td>
                         </tr>
                       ))}
                       <tr className="bg-white/5 font-semibold">
-                        <td className="py-3 px-4">Current (2024)</td>
-                        <td className="text-center py-3 px-4">{formatPercentage(demoReport.revenueStructure.current.tradingRevenue)}</td>
-                        <td className="text-center py-3 px-4">{formatPercentage(demoReport.revenueStructure.current.subscriptionServices)}</td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base">Current (2024)</td>
+                        <td className="text-center py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base">{formatPercentage(demoReport.revenueStructure.current.tradingRevenue)}</td>
+                        <td className="text-center py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base">{formatPercentage(demoReport.revenueStructure.current.subscriptionServices)}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -691,24 +691,24 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
               </div>
 
               {/* Detailed Business Segments */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 {demoReport.businessSegments.map((segment, idx) => (
-                  <div key={idx} className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
-                    <div className="flex items-center justify-between mb-4">
-                      <h4 className="text-xl font-bold text-blue-400">{segment.name}</h4>
+                  <div key={idx} className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/10">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 space-y-2 sm:space-y-0">
+                      <h4 className="text-lg sm:text-xl font-bold text-blue-400">{segment.name}</h4>
                       <div className="text-right">
-                        <p className="text-2xl font-bold text-white">{formatNumber(segment.revenue)}</p>
+                        <p className="text-xl sm:text-2xl font-bold text-white">{formatNumber(segment.revenue)}</p>
                         <p className="text-sm text-gray-400">Revenue</p>
                       </div>
                     </div>
-                    <p className="text-gray-300 mb-4">{segment.description}</p>
-                    <div className="grid grid-cols-2 gap-4">
+                    <p className="text-sm sm:text-base text-gray-300 mb-3 sm:mb-4">{segment.description}</p>
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
                       <div className="text-center">
-                        <p className="text-lg font-bold text-green-400">{formatPercentage(segment.growth)}</p>
+                        <p className="text-base sm:text-lg font-bold text-green-400">{formatPercentage(segment.growth)}</p>
                         <p className="text-xs text-gray-400">Growth Rate</p>
                       </div>
                       <div className="text-center">
-                        <p className="text-lg font-bold text-blue-400">{formatPercentage(segment.margin)}</p>
+                        <p className="text-base sm:text-lg font-bold text-blue-400">{formatPercentage(segment.margin)}</p>
                         <p className="text-xs text-gray-400">Revenue Share</p>
                       </div>
                     </div>
@@ -717,157 +717,157 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
               </div>
 
               {/* Trading Volume Analysis */}
-              <div className="mt-8 mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-blue-400">Trading Volume Analysis</h3>
+              <div className="mt-6 sm:mt-8 mb-6 sm:mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 space-y-2 sm:space-y-0">
+                  <h3 className="text-lg sm:text-xl font-semibold text-blue-400">Trading Volume Analysis</h3>
                   <a href="https://investor.coinbase.com/financials/quarterly-results/default.aspx" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">
                     Source: Coinbase Q3 2024 Trading Metrics
                   </a>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
-                    <h4 className="text-lg font-bold text-blue-400 mb-4">Retail Trading</h4>
-                    <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                  <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/10">
+                    <h4 className="text-base sm:text-lg font-bold text-blue-400 mb-3 sm:mb-4">Retail Trading</h4>
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-white mb-2">
+                        <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                           {formatNumber(demoReport.tradingVolumeAnalysis.retail.volume)}
                         </div>
-                        <div className="text-sm text-gray-400">Volume</div>
+                        <div className="text-xs sm:text-sm text-gray-400">Volume</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-green-400 mb-2">
+                        <div className="text-xl sm:text-2xl font-bold text-green-400 mb-1 sm:mb-2">
                           {formatPercentage(demoReport.tradingVolumeAnalysis.retail.growth)}
                         </div>
-                        <div className="text-sm text-gray-400">Growth</div>
+                        <div className="text-xs sm:text-sm text-gray-400">Growth</div>
                       </div>
                     </div>
-                    <div className="mt-4 text-center">
-                      <div className="text-lg font-bold text-blue-400 mb-1">
+                    <div className="mt-3 sm:mt-4 text-center">
+                      <div className="text-base sm:text-lg font-bold text-blue-400 mb-1">
                         {formatPercentage(demoReport.tradingVolumeAnalysis.retail.fee)}
                       </div>
-                      <div className="text-sm text-gray-400">Average Fee Rate</div>
+                      <div className="text-xs sm:text-sm text-gray-400">Average Fee Rate</div>
                     </div>
-                    <div className="mt-4 text-center">
-                      <div className="text-lg font-bold text-white mb-1">
+                    <div className="mt-3 sm:mt-4 text-center">
+                      <div className="text-base sm:text-lg font-bold text-white mb-1">
                         {formatNumber(demoReport.tradingVolumeAnalysis.retail.activeUsers, false)}
                       </div>
-                      <div className="text-sm text-gray-400">Active Users</div>
+                      <div className="text-xs sm:text-sm text-gray-400">Active Users</div>
                     </div>
                   </div>
                   
-                  <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
-                    <h4 className="text-lg font-bold text-blue-400 mb-4">Institutional Trading</h4>
-                    <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/10">
+                    <h4 className="text-base sm:text-lg font-bold text-blue-400 mb-3 sm:mb-4">Institutional Trading</h4>
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-white mb-2">
+                        <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                           {formatNumber(demoReport.tradingVolumeAnalysis.institutional.volume)}
                         </div>
-                        <div className="text-sm text-gray-400">Volume</div>
+                        <div className="text-xs sm:text-sm text-gray-400">Volume</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-green-400 mb-2">
+                        <div className="text-base sm:text-lg font-bold text-green-400 mb-1 sm:mb-2">
                           {formatPercentage(demoReport.tradingVolumeAnalysis.institutional.growth)}
                         </div>
-                        <div className="text-sm text-gray-400">Growth</div>
+                        <div className="text-xs sm:text-sm text-gray-400">Growth</div>
                       </div>
                     </div>
-                    <div className="mt-4 text-center">
-                      <div className="text-lg font-bold text-blue-400 mb-1">
+                    <div className="mt-3 sm:mt-4 text-center">
+                      <div className="text-base sm:text-lg font-bold text-blue-400 mb-1">
                         {formatPercentage(demoReport.tradingVolumeAnalysis.institutional.fee)}
                       </div>
-                      <div className="text-sm text-gray-400">Average Fee Rate</div>
+                      <div className="text-xs sm:text-sm text-gray-400">Average Fee Rate</div>
                     </div>
-                    <div className="mt-4 text-center">
-                      <div className="text-lg font-bold text-white mb-1">
+                    <div className="mt-3 sm:mt-4 text-center">
+                      <div className="text-base sm:text-lg font-bold text-white mb-1">
                         {formatNumber(demoReport.tradingVolumeAnalysis.institutional.clients, false)}
                       </div>
-                      <div className="text-sm text-gray-400">Institutional Clients</div>
+                      <div className="text-xs sm:text-sm text-gray-400">Institutional Clients</div>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Base Blockchain Performance */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-blue-400">Base Blockchain Performance</h3>
+              <div className="mb-6 sm:mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 space-y-2 sm:space-y-0">
+                  <h3 className="text-lg sm:text-xl font-semibold text-blue-400">Base Blockchain Performance</h3>
                   <a href="https://defillama.com/chain/base" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">
                     Source: DeFi Llama Base Chain Data
                   </a>
                 </div>
-                <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
-                  <div className="text-center mb-6">
-                    <h4 className="text-xl font-bold text-blue-400 mb-2">
+                <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/10">
+                  <div className="text-center mb-4 sm:mb-6">
+                    <h4 className="text-lg sm:text-xl font-bold text-blue-400 mb-2">
                       {demoReport.baseBlockchain.marketPosition}
                     </h4>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-white mb-2">
+                      <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                         {formatNumber(demoReport.baseBlockchain.tvl)}
                       </div>
-                      <div className="text-sm text-gray-400">Total Value Locked</div>
+                      <div className="text-xs sm:text-sm text-gray-400">Total Value Locked</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-white mb-2">
+                      <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                         {formatNumber(demoReport.baseBlockchain.monthlyRevenue)}
                       </div>
-                      <div className="text-sm text-gray-400">Monthly Revenue</div>
+                      <div className="text-xs sm:text-sm text-gray-400">Monthly Revenue</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-white mb-2">
+                      <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                         {formatNumber(demoReport.baseBlockchain.developers, false)}
                       </div>
-                      <div className="text-sm text-gray-400">Developers</div>
+                      <div className="text-xs sm:text-sm text-gray-400">Developers</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-white mb-2">
+                      <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                         {formatNumber(demoReport.baseBlockchain.protocols, false)}
                       </div>
-                      <div className="text-sm text-gray-400">DeFi Protocols</div>
+                      <div className="text-xs sm:text-sm text-gray-400">DeFi Protocols</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-white mb-2">
+                      <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                         {formatNumber(demoReport.baseBlockchain.dailyTransactions, false)}
                       </div>
-                      <div className="text-sm text-gray-400">Daily Transactions</div>
+                      <div className="text-xs sm:text-sm text-gray-400">Daily Transactions</div>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Geographic Revenue Distribution */}
-              <div className="mt-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-blue-400">Geographic Revenue Distribution</h3>
+              <div className="mt-6 sm:mt-8">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 space-y-2 sm:space-y-0">
+                  <h3 className="text-lg sm:text-xl font-semibold text-blue-400">Geographic Revenue Distribution</h3>
                   <a href="https://investor.coinbase.com/financials/quarterly-results/default.aspx" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">
                     Source: Coinbase Geographic Revenue Data
                   </a>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-2xl font-bold text-white mb-2">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                       {formatPercentage(demoReport.geographicRevenue.unitedStates)}
                     </div>
-                    <div className="text-sm text-gray-400">United States</div>
+                    <div className="text-xs sm:text-sm text-gray-400">United States</div>
                   </div>
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-2xl font-bold text-white mb-2">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                       {formatPercentage(demoReport.geographicRevenue.europe)}
                     </div>
-                    <div className="text-sm text-gray-400">Europe</div>
+                    <div className="text-xs sm:text-sm text-gray-400">Europe</div>
                   </div>
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-2xl font-bold text-white mb-2">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                       {formatPercentage(demoReport.geographicRevenue.asia)}
                     </div>
-                    <div className="text-sm text-gray-400">Asia</div>
+                    <div className="text-xs sm:text-sm text-gray-400">Asia</div>
                   </div>
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-2xl font-bold text-white mb-2">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                       {formatPercentage(demoReport.geographicRevenue.other)}
                     </div>
-                    <div className="text-sm text-gray-400">Other</div>
+                    <div className="text-xs sm:text-sm text-gray-400">Other</div>
                   </div>
                 </div>
               </div>
@@ -876,38 +876,38 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
 
           {/* Growth Catalysts Section */}
           {activeSection === 3 && (
-            <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-3xl font-bold text-white">Growth Catalysts</h2>
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-white/10">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-2 sm:space-y-0">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white">Growth Catalysts</h2>
                 <a href="https://investor.coinbase.com/events-and-presentations/default.aspx" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">
                   Source: Coinbase Investor Presentations
                 </a>
               </div>
               
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {demoReport.growthCatalysts.map((catalyst, idx) => (
-                  <div key={idx} className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
-                    <div className="flex items-start justify-between mb-4">
+                  <div key={idx} className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/10">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 sm:mb-4 space-y-3 sm:space-y-0">
                       <div>
-                        <h3 className="text-xl font-bold text-blue-400 mb-2">{catalyst.title}</h3>
-                        <p className="text-gray-300 mb-3">{catalyst.description}</p>
+                        <h3 className="text-lg sm:text-xl font-bold text-blue-400 mb-2">{catalyst.title}</h3>
+                        <p className="text-sm sm:text-base text-gray-300 mb-3">{catalyst.description}</p>
                       </div>
                       <div className="text-right">
-                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                        <span className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${
                           catalyst.impact === 'High' ? 'bg-green-500/20 text-green-400' :
                           catalyst.impact === 'Medium-High' ? 'bg-blue-500/20 text-blue-400' :
                           'bg-yellow-500/20 text-yellow-400'
                         }`}>
                           {catalyst.impact} Impact
                         </span>
-                        <div className="text-sm text-gray-400 mt-1">{catalyst.timeline}</div>
+                        <div className="text-xs sm:text-sm text-gray-400 mt-1">{catalyst.timeline}</div>
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                       {Object.entries(catalyst.details).map(([key, value]) => (
-                        <div key={key} className="text-center bg-white/5 rounded-xl p-3">
-                          <div className="text-lg font-bold text-white mb-1">
+                        <div key={key} className="text-center bg-white/5 rounded-xl p-2 sm:p-3">
+                          <div className="text-base sm:text-lg font-bold text-white mb-1">
                             {typeof value === 'number' ? formatNumber(value, false) : value}
                           </div>
                           <div className="text-xs text-gray-400 capitalize">
@@ -924,47 +924,47 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
 
           {/* Valuation Analysis Section */}
           {activeSection === 4 && (
-            <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-3xl font-bold text-white">Valuation Analysis</h2>
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-white/10">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-2 sm:space-y-0">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white">Valuation Analysis</h2>
                 <a href="https://www.bloomberg.com/quote/COIN:US" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">
                   Source: Bloomberg Terminal Analysis
                 </a>
               </div>
               
               {/* DCF Scenarios */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-blue-400">DCF Valuation Scenarios</h3>
+              <div className="mb-6 sm:mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 space-y-2 sm:space-y-0">
+                  <h3 className="text-lg sm:text-xl font-semibold text-blue-400">DCF Valuation Scenarios</h3>
                   <a href="https://www.spglobal.com/marketintelligence/en/mi/research-analysis/equity-valuation-models.html" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">
                     Source: S&P Global Valuation Models
                   </a>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="text-center bg-white/5 rounded-xl p-6">
-                    <div className="text-3xl font-bold text-white mb-2">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+                  <div className="text-center bg-white/5 rounded-xl p-4 sm:p-6">
+                    <div className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">
                       ${demoReport.valuationAnalysis.dcfScenarios.base}
                     </div>
-                    <div className="text-lg text-blue-400 mb-2">Base Case</div>
-                    <div className="text-sm text-gray-400">
+                    <div className="text-base sm:text-lg text-blue-400 mb-2">Base Case</div>
+                    <div className="text-xs sm:text-sm text-gray-400">
                       {formatPercentage(demoReport.valuationAnalysis.upsidePotential.base)} upside
                     </div>
                   </div>
-                  <div className="text-center bg-white/5 rounded-xl p-6">
-                    <div className="text-3xl font-bold text-white mb-2">
+                  <div className="text-center bg-white/5 rounded-xl p-4 sm:p-6">
+                    <div className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">
                       ${demoReport.valuationAnalysis.dcfScenarios.optimistic}
                     </div>
-                    <div className="text-lg text-green-400 mb-2">Optimistic</div>
-                    <div className="text-sm text-gray-400">
+                    <div className="text-base sm:text-lg text-green-400 mb-2">Optimistic</div>
+                    <div className="text-xs sm:text-sm text-gray-400">
                       {formatPercentage(demoReport.valuationAnalysis.upsidePotential.optimistic)} upside
                     </div>
                   </div>
-                  <div className="text-center bg-white/5 rounded-xl p-6">
-                    <div className="text-3xl font-bold text-white mb-2">
+                  <div className="text-center bg-white/5 rounded-xl p-4 sm:p-6">
+                    <div className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">
                       ${demoReport.valuationAnalysis.dcfScenarios.pessimistic}
                     </div>
-                    <div className="text-lg text-red-400 mb-2">Pessimistic</div>
-                    <div className="text-sm text-gray-400">
+                    <div className="text-base sm:text-lg text-red-400 mb-2">Pessimistic</div>
+                    <div className="text-xs sm:text-sm text-gray-400">
                       {formatPercentage(demoReport.valuationAnalysis.upsidePotential.pessimistic)} downside
                     </div>
                   </div>
@@ -972,9 +972,9 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
               </div>
 
               {/* DCF Assumptions */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-blue-400">DCF Analysis Assumptions</h3>
+              <div className="mb-6 sm:mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 space-y-2 sm:space-y-0">
+                  <h3 className="text-lg sm:text-xl font-semibold text-blue-400">DCF Analysis Assumptions</h3>
                   <a href="https://www.investopedia.com/terms/d/dcf.asp" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">
                     Source: Financial Modeling Standards
                   </a>
@@ -983,88 +983,88 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
                   <table className="w-full text-white">
                     <thead>
                       <tr className="border-b border-white/20">
-                        <th className="text-left py-3 px-4">Year</th>
-                        <th className="text-center py-3 px-4">Growth Rate</th>
+                        <th className="text-left py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base">Year</th>
+                        <th className="text-center py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base">Growth Rate</th>
                       </tr>
                     </thead>
                     <tbody>
                       {Object.entries(demoReport.valuationAnalysis.dcfAssumptions.growthRate).map(([year, rate]) => (
                         <tr key={year} className="border-b border-white/10">
-                          <td className="py-3 px-4 font-semibold">{year}</td>
-                          <td className="text-center py-3 px-4">{formatPercentage(rate)}</td>
+                          <td className="py-2 sm:py-3 px-2 sm:px-4 font-semibold text-sm sm:text-base">{year}</td>
+                          <td className="text-center py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base">{formatPercentage(rate)}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-lg font-bold text-white mb-2">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mt-3 sm:mt-4">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-base sm:text-lg font-bold text-white mb-1 sm:mb-2">
                       {formatPercentage(demoReport.valuationAnalysis.dcfAssumptions.terminalGrowth)}
                     </div>
-                    <div className="text-sm text-gray-400">Terminal Growth</div>
+                    <div className="text-xs sm:text-sm text-gray-400">Terminal Growth</div>
                   </div>
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-lg font-bold text-white mb-2">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-base sm:text-lg font-bold text-white mb-1 sm:mb-2">
                       {formatPercentage(demoReport.valuationAnalysis.dcfAssumptions.discountRate)}
                     </div>
-                    <div className="text-sm text-gray-400">Discount Rate</div>
+                    <div className="text-xs sm:text-sm text-gray-400">Discount Rate</div>
                   </div>
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-lg font-bold text-white mb-2">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-base sm:text-lg font-bold text-white mb-1 sm:mb-2">
                       {demoReport.valuationAnalysis.dcfAssumptions.terminalMultiple}x
                     </div>
-                    <div className="text-sm text-gray-400">Terminal Multiple</div>
+                    <div className="text-xs sm:text-sm text-gray-400">Terminal Multiple</div>
                   </div>
                 </div>
               </div>
 
               {/* Sum of Parts Valuation */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-blue-400">Sum of Parts Valuation</h3>
+              <div className="mb-6 sm:mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 space-y-2 sm:space-y-0">
+                  <h3 className="text-lg sm:text-xl font-semibold text-blue-400">Sum of Parts Valuation</h3>
                   <a href="https://www.investopedia.com/terms/s/sumofpartsvaluation.asp" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">
                     Source: Sum of Parts Methodology
                   </a>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-2xl font-bold text-white mb-2">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                       ${demoReport.valuationAnalysis.sumOfParts.tradingBusiness}
                     </div>
-                    <div className="text-sm text-gray-400">Trading Business</div>
+                    <div className="text-xs sm:text-sm text-gray-400">Trading Business</div>
                   </div>
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-2xl font-bold text-white mb-2">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                       ${demoReport.valuationAnalysis.sumOfParts.subscriptionServices}
                     </div>
-                    <div className="text-sm text-gray-400">Subscription Services</div>
+                    <div className="text-xs sm:text-sm text-gray-400">Subscription Services</div>
                   </div>
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-2xl font-bold text-white mb-2">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                       ${demoReport.valuationAnalysis.sumOfParts.baseBlockchain}
                     </div>
-                    <div className="text-sm text-gray-400">Base Blockchain</div>
+                    <div className="text-xs sm:text-sm text-gray-400">Base Blockchain</div>
                   </div>
-                  <div className="text-center bg-white/5 rounded-xl p-4">
-                    <div className="text-2xl font-bold text-white mb-2">
+                  <div className="text-center bg-white/5 rounded-xl p-3 sm:p-4">
+                    <div className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">
                       ${demoReport.valuationAnalysis.sumOfParts.otherAssets}
                     </div>
-                    <div className="text-sm text-gray-400">Other Assets</div>
+                    <div className="text-xs sm:text-sm text-gray-400">Other Assets</div>
                   </div>
                 </div>
-                <div className="text-center mt-6">
-                  <div className="text-3xl font-bold text-white mb-2">
+                <div className="text-center mt-4 sm:mt-6">
+                  <div className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">
                     Total: ${demoReport.valuationAnalysis.sumOfParts.total}
                   </div>
-                  <div className="text-sm text-gray-400">Sum of Parts Valuation</div>
+                  <div className="text-xs sm:text-sm text-gray-400">Sum of Parts Valuation</div>
                 </div>
               </div>
 
               {/* Comparable Company Analysis - Complete table from the report */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-blue-400">Comparable Company Analysis</h3>
+              <div className="mb-6 sm:mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 space-y-2 sm:space-y-0">
+                  <h3 className="text-lg sm:text-xl font-semibold text-blue-400">Comparable Company Analysis</h3>
                   <a href="https://www.bloomberg.com/markets/stocks/pe-ratio/americas" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">
                     Source: Bloomberg Comparable Analysis
                   </a>
@@ -1073,11 +1073,11 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
                   <table className="w-full text-white">
                     <thead>
                       <tr className="border-b border-white/20">
-                        <th className="text-left py-3 px-4">Company</th>
-                        <th className="text-center py-3 px-4">P/E Ratio</th>
-                        <th className="text-center py-3 px-4">EV/EBITDA</th>
-                        <th className="text-center py-3 px-4">P/S Ratio</th>
-                        <th className="text-center py-3 px-4">Revenue Growth</th>
+                        <th className="text-left py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base">Company</th>
+                        <th className="text-center py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base">P/E Ratio</th>
+                        <th className="text-center py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base">EV/EBITDA</th>
+                        <th className="text-center py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base">P/S Ratio</th>
+                        <th className="text-center py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base">Revenue Growth</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1085,11 +1085,11 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
                         <tr key={idx} className={`border-b border-white/10 ${
                           company.company.includes('COIN') ? 'bg-blue-500/10' : ''
                         }`}>
-                          <td className="py-3 px-4 font-semibold">{company.company}</td>
-                          <td className="text-center py-3 px-4">{company.peRatio}x</td>
-                          <td className="text-center py-3 px-4">{company.evEbitda}x</td>
-                          <td className="text-center py-3 px-4">{company.psRatio}x</td>
-                          <td className="text-center py-3 px-4">{company.revenueGrowth}%</td>
+                          <td className="py-2 sm:py-3 px-2 sm:px-4 font-semibold text-sm sm:text-base">{company.company}</td>
+                          <td className="text-center py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base">{company.peRatio}x</td>
+                          <td className="text-center py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base">{company.evEbitda}x</td>
+                          <td className="text-center py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base">{company.psRatio}x</td>
+                          <td className="text-center py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base">{company.revenueGrowth}%</td>
                         </tr>
                       ))}
                     </tbody>
@@ -1098,56 +1098,56 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
               </div>
 
               {/* Target Price Analysis */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-blue-400">Target Price Analysis</h3>
+              <div className="mb-6 sm:mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 space-y-2 sm:space-y-0">
+                  <h3 className="text-lg sm:text-xl font-semibold text-blue-400">Target Price Analysis</h3>
                   <a href="https://www.spglobal.com/marketintelligence/en/mi/research-analysis/equity-valuation-models.html" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">
                     Source: S&P Global Target Price Models
                   </a>
                 </div>
-                <div className="bg-slate-800/50 rounded-2xl p-6 border border-amber-500/30">
-                  <div className="text-center mb-6">
-                    <div className="text-4xl font-bold text-white mb-2">
+                <div className="bg-slate-800/50 rounded-2xl p-4 sm:p-6 border border-amber-500/30">
+                  <div className="text-center mb-4 sm:mb-6">
+                    <div className="text-3xl sm:text-4xl font-bold text-white mb-1 sm:mb-2">
                       ${demoReport.valuationAnalysis.targetPrice}
                     </div>
-                    <div className="text-lg text-blue-300">
+                    <div className="text-base sm:text-lg text-blue-300">
                       Based on DCF and Comparable Analysis
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     <div>
-                      <h4 className="text-lg font-semibold text-blue-400 mb-3">Valuation Methods</h4>
-                      <ul className="space-y-2">
-                        <li className="flex items-start space-x-3">
-                          <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-gray-300">DCF Model: ${demoReport.valuationAnalysis.dcfValue}</span>
+                      <h4 className="text-base sm:text-lg font-semibold text-blue-400 mb-2 sm:mb-3">Valuation Methods</h4>
+                      <ul className="space-y-1 sm:space-y-2">
+                        <li className="flex items-start space-x-2 sm:space-x-3">
+                          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
+                          <span className="text-sm sm:text-base text-gray-300">DCF Model: ${demoReport.valuationAnalysis.dcfValue}</span>
                         </li>
-                        <li className="flex items-start space-x-3">
-                          <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-gray-300">Sum of Parts: ${demoReport.valuationAnalysis.sumOfParts.total}</span>
+                        <li className="flex items-start space-x-2 sm:space-x-3">
+                          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
+                          <span className="text-sm sm:text-base text-gray-300">Sum of Parts: ${demoReport.valuationAnalysis.sumOfParts.total}</span>
                         </li>
-                        <li className="flex items-start space-x-3">
-                          <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-gray-300">Comparable Analysis: ${demoReport.valuationAnalysis.comparableAnalysis.evEbitda}</span>
+                        <li className="flex items-start space-x-2 sm:space-x-3">
+                          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
+                          <span className="text-sm sm:text-base text-gray-300">Comparable Analysis: ${demoReport.valuationAnalysis.comparableAnalysis.evEbitda}</span>
                         </li>
                       </ul>
                     </div>
                     
                     <div>
-                      <h4 className="text-lg font-semibold text-amber-400 mb-3">Data Sources</h4>
-                      <ul className="space-y-2">
-                        <li className="flex items-start space-x-3">
-                          <div className="w-2 h-2 bg-amber-400 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-gray-300">Financial Data: SEC Filings</span>
+                      <h4 className="text-base sm:text-lg font-semibold text-amber-400 mb-2 sm:mb-3">Data Sources</h4>
+                      <ul className="space-y-1 sm:space-y-2">
+                        <li className="flex items-start space-x-2 sm:space-x-3">
+                          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-amber-400 rounded-full mt-2 flex-shrink-0"></div>
+                          <span className="text-sm sm:text-base text-gray-300">Financial Data: SEC Filings</span>
                         </li>
-                        <li className="flex items-start space-x-3">
-                          <div className="w-2 h-2 bg-amber-400 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-gray-300">Market Data: Bloomberg Terminal</span>
+                        <li className="flex items-start space-x-2 sm:space-x-3">
+                          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-amber-400 rounded-full mt-2 flex-shrink-0"></div>
+                          <span className="text-sm sm:text-base text-gray-300">Market Data: Bloomberg Terminal</span>
                         </li>
-                        <li className="flex items-start space-x-3">
-                          <div className="w-2 h-2 bg-amber-400 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-gray-300">Industry Analysis: S&P Global</span>
+                        <li className="flex items-start space-x-2 sm:space-x-3">
+                          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-amber-400 rounded-full mt-2 flex-shrink-0"></div>
+                          <span className="text-sm sm:text-base text-gray-300">Industry Analysis: S&P Global</span>
                         </li>
                       </ul>
                     </div>
@@ -1157,17 +1157,17 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
 
               {/* Risk Factors */}
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-red-400">Risk Factors</h3>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 space-y-2 sm:space-y-0">
+                  <h3 className="text-lg sm:text-xl font-semibold text-red-400">Risk Factors</h3>
                   <a href="https://investor.coinbase.com/risk-factors/default.aspx" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">
                     Source: Coinbase Risk Factors
                   </a>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                   {demoReport.valuationAnalysis.riskFactors.map((risk, idx) => (
-                    <div key={idx} className="flex items-start space-x-3 bg-white/5 rounded-xl p-4">
-                      <div className="w-2 h-2 bg-red-400 rounded-full mt-2 flex-shrink-0"></div>
-                      <span className="text-gray-300">{risk}</span>
+                    <div key={idx} className="flex items-start space-x-2 sm:space-x-3 bg-white/5 rounded-xl p-3 sm:p-4">
+                      <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-400 rounded-full mt-2 flex-shrink-0"></div>
+                      <span className="text-sm sm:text-base text-gray-300">{risk}</span>
                     </div>
                   ))}
                 </div>

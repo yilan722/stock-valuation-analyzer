@@ -43,21 +43,21 @@ interface HeaderProps {
 export default function Header({ locale, user, onLogout, onRefresh, onLogin, onOpenSubscription }: HeaderProps) {
   return (
     <header className="bg-slate-800 shadow-lg border-b border-amber-500/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-3 sm:py-0 sm:h-16 space-y-3 sm:space-y-0">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0">
             <div className="flex items-center">
               <SuperAnalystLogo />
-              <span className="ml-2 text-xl font-bold text-white font-inter">
+              <span className="ml-2 text-lg sm:text-xl font-bold text-white font-inter">
                 SuperAnalyst
               </span>
             </div>
-            <p className="ml-4 text-sm text-amber-200 font-inter">
+            <p className="ml-0 sm:ml-4 text-xs sm:text-sm text-amber-200 font-inter">
               AI-Powered Pro Equity Research
             </p>
           </div>
           
-          <div className="flex items-center space-x-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
             <LanguageSwitcher currentLocale={locale} />
             <UserInfo
               user={user}
