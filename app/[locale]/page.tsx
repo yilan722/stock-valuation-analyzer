@@ -244,11 +244,13 @@ export default function HomePage({ params }: PageProps) {
             )}
           </div>
           
-          {/* Report Demo Section */}
-          <ReportDemo locale={params.locale} />
+          {/* Report Demo Section - Only show when no report data */}
+          {!reportData && (
+            <ReportDemo locale={params.locale} />
+          )}
           
-          {/* Valuation Report - Below Demo */}
-          {stockData && (
+          {/* Valuation Report - Show when report data exists */}
+          {reportData && (
             <ValuationReport
               stockData={stockData}
               reportData={reportData}
