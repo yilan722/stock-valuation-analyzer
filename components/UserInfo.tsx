@@ -60,7 +60,7 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSub
     // 🔥 新增：检查白名单状态
     if (user.whitelistStatus?.canGenerate && user.whitelistStatus.reason === '白名单用户') {
       return { 
-        status: `${getTranslation(locale, 'whitelist_user')} (剩余${user.whitelistStatus.remainingReports}次)`, 
+        status: `${getTranslation(locale, 'whitelist_user')} (剩余${user.whitelistStatus.remainingReports}积分)`, 
         color: 'text-amber-500' 
       }
     }

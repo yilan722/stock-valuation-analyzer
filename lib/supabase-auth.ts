@@ -175,38 +175,44 @@ export async function canGenerateReport(userId: string): Promise<{ canGenerate: 
     if (whitelistUser && !whitelistError) {
       console.log('用户在白名单中:', whitelistUser)
       
-      // 白名单用户：检查今日报告数量
+      // 白名单用户：检查今日积分
       const today = new Date().toISOString().split('T')[0]
-      console.log('检查今日报告数量，日期:', today)
+      const lastResetDate = whitelistUser.credits_reset_date
       
-      const { count: todayReports, error: countError } = await supabase
-        .from('reports')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId)
-        .gte('created_at', `${today}T00:00:00`)
-        .lte('created_at', `${today}T23:59:59`)
-
-      if (countError) {
-        console.error('统计今日报告失败:', countError)
-        return { canGenerate: false, reason: '统计失败' }
+      // 如果日期不是今天，重置积分
+      if (lastResetDate !== today) {
+        console.log('日期已更新，重置白名单用户积分')
+        const { error: updateError } = await supabase
+          .from('whitelist_users')
+          .update({ 
+            daily_free_credits: 100,
+            credits_reset_date: today,
+            updated_at: new Date().toISOString()
+          })
+          .eq('email', userProfile.email)
+        
+        if (updateError) {
+          console.error('更新白名单用户积分失败:', updateError)
+        } else {
+          whitelistUser.daily_free_credits = 100
+          whitelistUser.credits_reset_date = today
+        }
       }
-
-      console.log('今日已生成报告数量:', todayReports)
-      const remaining = whitelistUser.daily_report_limit - (todayReports || 0)
-      console.log('剩余报告数量:', remaining)
       
-      if (remaining > 0) {
+      console.log('白名单用户今日可用积分:', whitelistUser.daily_free_credits)
+      
+      if (whitelistUser.daily_free_credits > 0) {
         console.log('白名单用户，可以生成报告')
         return { 
           canGenerate: true, 
           reason: '白名单用户', 
-          remainingReports: remaining 
+          remainingReports: whitelistUser.daily_free_credits 
         }
       } else {
-        console.log('白名单用户，今日额度已用完')
+        console.log('白名单用户，今日积分已用完')
         return { 
           canGenerate: false, 
-          reason: '今日白名单额度已用完', 
+          reason: '今日白名单积分已用完', 
           remainingReports: 0 
         }
       }
@@ -250,7 +256,7 @@ export async function incrementReportUsage(userId: string, isFree: boolean = tru
   // First get current values
   const { data: currentUser, error: fetchError } = await supabase
     .from('users')
-    .select('free_reports_used, paid_reports_used')
+    .select('free_reports_used, paid_reports_used, email')
     .eq('id', userId)
     .single()
 
@@ -258,18 +264,41 @@ export async function incrementReportUsage(userId: string, isFree: boolean = tru
     throw new Error(fetchError.message)
   }
 
-  // Update the appropriate counter
-  const updateData = isFree 
-    ? { free_reports_used: (currentUser.free_reports_used || 0) + 1 }
-    : { paid_reports_used: (currentUser.paid_reports_used || 0) + 1 }
+  // 检查是否是白名单用户
+  const { data: whitelistUser, error: whitelistError } = await supabase
+    .from('whitelist_users')
+    .select('*')
+    .eq('email', currentUser.email)
+    .single()
 
-  const { error } = await supabase
-    .from('users')
-    .update(updateData)
-    .eq('id', userId)
+  if (whitelistUser && !whitelistError) {
+    // 白名单用户：扣减积分
+    console.log('白名单用户生成报告，扣减积分')
+    const { error: updateError } = await supabase
+      .from('whitelist_users')
+      .update({ 
+        daily_free_credits: Math.max(0, whitelistUser.daily_free_credits - 1),
+        updated_at: new Date().toISOString()
+      })
+      .eq('email', currentUser.email)
+    
+    if (updateError) {
+      console.error('更新白名单用户积分失败:', updateError)
+    }
+  } else {
+    // 非白名单用户：使用原有逻辑
+    const updateData = isFree 
+      ? { free_reports_used: (currentUser.free_reports_used || 0) + 1 }
+      : { paid_reports_used: (currentUser.paid_reports_used || 0) + 1 }
 
-  if (error) {
-    throw new Error(error.message)
+    const { error } = await supabase
+      .from('users')
+      .update(updateData)
+      .eq('id', userId)
+
+    if (error) {
+      throw new Error(error.message)
+    }
   }
 }
 
