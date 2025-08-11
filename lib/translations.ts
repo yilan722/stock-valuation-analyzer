@@ -54,6 +54,18 @@ export type TranslationKeys = {
   generatingPDF: string
   downloadError: string
   
+  // 报告生成
+  generatingReport: string
+  reportGenerationInProgress: string
+  
+  // 报告历史
+  reportHistory: string
+  noReports: string
+  selectReportToView: string
+  confirmDeleteReport: string
+  deleteReport: string
+  deleteError: string
+  
           // 订阅计划
     singleReport: string
     monthlySubscription: string
@@ -77,9 +89,10 @@ export type TranslationKeys = {
     whitelist_user: string
     free_trial: string
     subscription_active: string
-    subscription_required: string
-    logout: string
-    login: string
+      subscription_required: string
+  accessDenied: string
+  logout: string
+  login: string
     remaining_reports: string
   reports_used: string
   subscription_info: string
@@ -251,6 +264,18 @@ export const translations: Record<Locale, TranslationKeys> = {
     downloadPDF: 'Download PDF',
     generatingPDF: 'Generating PDF...',
     downloadError: 'Download failed, please try again',
+    
+    // Report Generation
+    generatingReport: 'Generating Report',
+    reportGenerationInProgress: 'AI analysis in progress...',
+    
+    // Report History
+    reportHistory: 'Report History',
+    noReports: 'No reports found',
+    selectReportToView: 'Select a report to view',
+    confirmDeleteReport: 'Are you sure you want to delete this report?',
+    deleteReport: 'Delete Report',
+    deleteError: 'Failed to delete report',
 
     // Subscription Plans
     singleReport: 'Single Report',
@@ -276,6 +301,7 @@ export const translations: Record<Locale, TranslationKeys> = {
     free_trial: 'Free Trial',
     subscription_active: 'Subscribed',
     subscription_required: 'Need Subscription',
+    accessDenied: 'Access Denied',
     logout: 'Logout',
     login: 'Login',
     remaining_reports: 'Remaining Reports',
@@ -463,6 +489,18 @@ export const translations: Record<Locale, TranslationKeys> = {
     downloadPDF: '下载PDF',
     generatingPDF: '生成PDF中...',
     downloadError: '下载失败，请稍后重试',
+    
+    // Report Generation
+    generatingReport: '生成报告中',
+    reportGenerationInProgress: 'AI分析进行中...',
+    
+    // Report History
+    reportHistory: '报告历史',
+    noReports: '暂无报告',
+    selectReportToView: '选择报告查看',
+    confirmDeleteReport: '确定要删除这份报告吗？',
+    deleteReport: '删除报告',
+    deleteError: '删除报告失败',
 
     // Subscription Plans
     singleReport: '单篇报告',
@@ -488,6 +526,7 @@ export const translations: Record<Locale, TranslationKeys> = {
     free_trial: 'Free Trial',
     subscription_active: 'Subscribed',
     subscription_required: 'Need Subscription',
+    accessDenied: '访问被拒绝',
     logout: 'Logout',
     login: 'Login',
     remaining_reports: 'Remaining Reports',

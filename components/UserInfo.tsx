@@ -34,11 +34,12 @@ interface UserInfoProps {
   onRefresh: () => void
   onLogin: () => void
   onOpenSubscription: () => void
+  onOpenReportHistory: () => void
   locale: Locale
   isCompact?: boolean
 }
 
-export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSubscription, locale, isCompact = false }: UserInfoProps) {
+export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSubscription, onOpenReportHistory, locale, isCompact = false }: UserInfoProps) {
   const [isLoading, setIsLoading] = useState(false)
 
   const handleLogout = async () => {
@@ -173,6 +174,15 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSub
             
             <div className="flex items-center space-x-2">
               <button
+                onClick={onOpenReportHistory}
+                className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium bg-blue-500/20 text-blue-300 border border-blue-500/30 rounded-md hover:bg-blue-500/30 transition-colors font-inter"
+                title="Report Hub"
+              >
+                <span className="hidden sm:inline">Report Hub</span>
+                <span className="sm:hidden">Hub</span>
+              </button>
+              
+              <button
                 onClick={onOpenSubscription}
                 className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-md hover:bg-amber-500/30 transition-colors font-inter"
               >
@@ -278,6 +288,20 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSub
               </div>
             </div>
           )}
+
+          {/* 报告历史按钮 */}
+          <div className="bg-blue-50 border border-blue-200 p-3 sm:p-4 rounded-lg">
+            <h4 className="text-sm sm:text-base font-medium text-blue-900 mb-2">Report Hub</h4>
+            <p className="text-xs sm:text-sm text-blue-800 mb-3">
+              View and download all your previously generated reports
+            </p>
+            <button
+              onClick={onOpenReportHistory}
+              className="bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-md hover:bg-blue-700 text-xs sm:text-sm w-full sm:w-auto"
+            >
+              View Report Hub
+            </button>
+          </div>
 
           {/* 订阅计划按钮 - 始终显示 */}
           <div className="bg-blue-50 border border-blue-200 p-3 sm:p-4 rounded-lg">

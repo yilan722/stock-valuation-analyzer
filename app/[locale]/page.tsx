@@ -8,6 +8,8 @@ import ValuationReport from '../../components/ValuationReport'
 import ReportDemo from '../../components/ReportDemo'
 import AuthModal from '../../components/AuthModal'
 import SubscriptionModal from '../../components/SubscriptionModal'
+import ReportHistory from '../../components/ReportHistory'
+import GenerationModal from '../../components/GenerationModal'
 import Footer from '../../components/Footer'
 import { StockData, ValuationReportData } from '../../types'
 import { type Locale } from '../../lib/i18n'
@@ -29,6 +31,8 @@ export default function HomePage({ params }: PageProps) {
   const [user, setUser] = useState<any>(null)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false)
+  const [showReportHistory, setShowReportHistory] = useState(false)
+  const [showGenerationModal, setShowGenerationModal] = useState(false)
   const [isLoadingUser, setIsLoadingUser] = useState(true)
 
   const handleSearch = async (symbol: string) => {
@@ -105,6 +109,10 @@ export default function HomePage({ params }: PageProps) {
     setShowSubscriptionModal(true)
   }
 
+  const handleOpenReportHistory = () => {
+    setShowReportHistory(true)
+  }
+
   const handleGenerateReport = async () => {
     if (!stockData) {
       toast.error(getTranslation(params.locale, 'stockNotFound'))
@@ -118,6 +126,7 @@ export default function HomePage({ params }: PageProps) {
     }
 
     console.log('Generating report for user:', user.id)
+    setShowGenerationModal(true)
     setIsGeneratingReport(true)
     try {
       // 确保请求包含认证信息
@@ -144,7 +153,13 @@ export default function HomePage({ params }: PageProps) {
         }
         if (response.status === 403) {
           console.log('Access denied, showing subscription modal')
-          setShowSubscriptionModal(true)
+          const errorData = await response.json()
+          if (errorData.needsSubscription) {
+            toast.error(getTranslation(params.locale, 'subscription_required'))
+            setShowSubscriptionModal(true)
+          } else {
+            toast.error(errorData.reason || getTranslation(params.locale, 'accessDenied'))
+          }
           return
         }
         throw new Error(errorData.error || getTranslation(params.locale, 'apiError'))
@@ -152,10 +167,12 @@ export default function HomePage({ params }: PageProps) {
 
       const data = await response.json()
       setReportData(data)
+      setShowGenerationModal(false)
       toast.success(getTranslation(params.locale, 'reportGenerated'))
       loadUser() // Refresh user data to update usage
     } catch (error) {
       console.error('Report generation error:', error)
+      setShowGenerationModal(false)
       toast.error(error instanceof Error ? error.message : getTranslation(params.locale, 'apiError'))
     } finally {
       setIsGeneratingReport(false)
@@ -164,14 +181,15 @@ export default function HomePage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header 
-        locale={params.locale} 
-        user={user}
-        onLogout={handleLogout}
-        onRefresh={loadUser}
-        onLogin={handleLogin}
-        onOpenSubscription={handleOpenSubscription}
-      />
+              <Header
+          locale={params.locale}
+          user={user}
+          onLogout={handleLogout}
+          onRefresh={loadUser}
+          onLogin={handleLogin}
+          onOpenSubscription={handleOpenSubscription}
+          onOpenReportHistory={handleOpenReportHistory}
+        />
       
       <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
         <div className="space-y-6 sm:space-y-8">
@@ -201,7 +219,7 @@ export default function HomePage({ params }: PageProps) {
                     <p className="text-xs sm:text-sm text-blue-200 mb-1 font-inter">Price</p>
                     <p className="text-lg sm:text-2xl font-bold text-white font-inter">${stockData.price}</p>
                     <p className={`text-xs sm:text-sm ${stockData.change >= 0 ? 'text-green-400' : 'text-red-400'} font-inter`}>
-                      {stockData.change >= 0 ? '+' : ''}{stockData.change} ({stockData.changePercent >= 0 ? '+' : ''}{stockData.changePercent}%)
+                      {stockData.change >= 0 ? '+' : ''}{stockData.change.toFixed(2)} ({stockData.changePercent >= 0 ? '+' : ''}{stockData.changePercent.toFixed(2)}%)
                     </p>
                   </div>
                   
@@ -280,6 +298,17 @@ export default function HomePage({ params }: PageProps) {
         isOpen={showSubscriptionModal}
         onClose={() => setShowSubscriptionModal(false)}
         userId={user?.id || ''}
+        locale={params.locale}
+      />
+
+      <ReportHistory
+        isOpen={showReportHistory}
+        onClose={() => setShowReportHistory(false)}
+        locale={params.locale}
+      />
+
+      <GenerationModal
+        isOpen={showGenerationModal}
         locale={params.locale}
       />
       

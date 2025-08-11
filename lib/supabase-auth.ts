@@ -149,7 +149,7 @@ export async function getUserProfile(userId: string) {
   return data
 }
 
-export async function canGenerateReport(userId: string): Promise<{ canGenerate: boolean; reason?: string; remainingReports?: number }> {
+export async function canGenerateReport(userId: string): Promise<{ canGenerate: boolean; reason?: string; remainingReports?: number; needsSubscription?: boolean }> {
   try {
     // 获取用户信息
     const { data: userProfile, error: profileError } = await supabase
@@ -206,14 +206,16 @@ export async function canGenerateReport(userId: string): Promise<{ canGenerate: 
         return { 
           canGenerate: true, 
           reason: '白名单用户', 
-          remainingReports: whitelistUser.daily_free_credits 
+          remainingReports: whitelistUser.daily_free_credits,
+          needsSubscription: false
         }
       } else {
         console.log('白名单用户，今日积分已用完')
         return { 
           canGenerate: false, 
-          reason: '今日白名单积分已用完', 
-          remainingReports: 0 
+          reason: '今日白名单积分已用完，请明天再试', 
+          remainingReports: 0,
+          needsSubscription: false
         }
       }
     } else {
@@ -229,7 +231,12 @@ export async function canGenerateReport(userId: string): Promise<{ canGenerate: 
 
     // Check if user has free reports available
     if (profile.free_reports_used === 0) {
-      return { canGenerate: true, reason: '免费报告可用' }
+      return { 
+        canGenerate: true, 
+        reason: '免费报告可用',
+        remainingReports: 1,
+        needsSubscription: false
+      }
     }
 
     // Check subscription status
@@ -238,14 +245,29 @@ export async function canGenerateReport(userId: string): Promise<{ canGenerate: 
       if (endDate > new Date()) {
         const reportsUsedThisMonth = profile.paid_reports_used
         if (reportsUsedThisMonth < profile.monthly_report_limit) {
-          return { canGenerate: true, reason: '订阅报告可用' }
+          return { 
+          canGenerate: true, 
+          reason: '订阅报告可用',
+          remainingReports: profile.monthly_report_limit - reportsUsedThisMonth,
+          needsSubscription: false
+        }
         } else {
-          return { canGenerate: false, reason: 'Monthly report limit reached' }
+          return { 
+          canGenerate: false, 
+          reason: '月度报告限额已用完，请等待下月重置或升级订阅',
+          remainingReports: 0,
+          needsSubscription: true
+        }
         }
       }
     }
 
-    return { canGenerate: false, reason: 'No free reports or active subscription' }
+    return { 
+      canGenerate: false, 
+      reason: '免费报告已用完，请订阅获取更多报告',
+      remainingReports: 0,
+      needsSubscription: true
+    }
   } catch (error) {
     console.error('检查报告权限失败:', error)
     return { canGenerate: false, reason: '检查权限时出错' }

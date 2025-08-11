@@ -97,8 +97,8 @@ export const fetchOtherMarketStockData = async (ticker: string): Promise<StockDa
       peRatio: Math.random() * 30 + 10,
       amount: Math.random() * 5000000 + 1000000,
       volume: Math.random() * 1000000 + 100000,
-      change: (Math.random() - 0.5) * 10,
-      changePercent: (Math.random() - 0.5) * 10
+      change: Number(((Math.random() - 0.5) * 10).toFixed(2)),
+      changePercent: Number(((Math.random() - 0.5) * 10).toFixed(2))
     }
   }
 } 

@@ -107,7 +107,10 @@ export const fetchStockData = async (ticker: string): Promise<StockData> => {
     marketCap: Math.random() * 10000000000 + 1000000000,
     peRatio: Math.random() * 30 + 10,
     amount: Math.random() * 5000000 + 1000000,
-    change: (Math.random() - 0.5) * 10,
-    changePercent: (Math.random() - 0.5) * 10
+    volume: Math.random() * 10000000 + 1000000,
+    change: Number(((Math.random() - 0.5) * 10).toFixed(2)),
+    changePercent: Number(((Math.random() - 0.5) * 10).toFixed(2)),
+    // Data source: Generated mock data
+    // Last updated: ${new Date().toISOString().split('T')[0]}
   }
 } 

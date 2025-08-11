@@ -5,6 +5,7 @@ import { DollarSign, TrendingUp, BarChart3, TrendingDown, Download } from 'lucid
 import { StockData, ValuationReportData } from '../types'
 import { type Locale } from '../lib/i18n'
 import { getTranslation } from '../lib/translations'
+import toast from 'react-hot-toast'
 
 interface ValuationReportProps {
   stockData: StockData | null
@@ -50,21 +51,33 @@ export default function ValuationReport({ stockData, reportData, isLoading, loca
       })
 
       if (!response.ok) {
-        throw new Error('Failed to generate PDF')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to generate PDF')
       }
 
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `${stockData.symbol}_valuation_report.pdf`
+      a.download = `${stockData.symbol}_valuation_report_${new Date().toISOString().split('T')[0]}.pdf`
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
+      
+      // Show success message
+      toast.success('PDF downloaded successfully!')
     } catch (error) {
       console.error('Download error:', error)
-      alert(getTranslation(locale, 'downloadError'))
+      const errorMessage = error instanceof Error ? error.message : 'Download failed'
+      toast.error(errorMessage)
+      
+      // Retry logic for certain errors
+      if (errorMessage.includes('timeout') || errorMessage.includes('memory')) {
+        if (confirm('PDF generation failed. Would you like to try again?')) {
+          setTimeout(() => handleDownloadPDF(), 2000)
+        }
+      }
     } finally {
       setIsDownloading(false)
     }

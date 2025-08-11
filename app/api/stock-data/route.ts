@@ -11,8 +11,13 @@ const mockStockData: Record<string, StockData> = {
     marketCap: 2750000000000,
     peRatio: 28.5,
     amount: 45000000,
+    volume: 250000000,
     change: 2.15,
-    changePercent: 1.24
+    changePercent: 1.24,
+    // Data source: Mock data for demonstration
+    // Last updated: 2025-08-11,
+    // Data source: Mock data for demonstration
+    // Last updated: 2025-08-11
   },
   'MSFT': {
     symbol: 'MSFT',
@@ -21,8 +26,13 @@ const mockStockData: Record<string, StockData> = {
     marketCap: 2510000000000,
     peRatio: 32.1,
     amount: 22000000,
+    volume: 65000000,
     change: -1.23,
-    changePercent: -0.36
+    changePercent: -0.36,
+    // Data source: Mock data for demonstration
+    // Last updated: 2025-08-11,
+    // Data source: Mock data for demonstration
+    // Last updated: 2025-08-11
   },
   'GOOGL': {
     symbol: 'GOOGL',
@@ -31,8 +41,11 @@ const mockStockData: Record<string, StockData> = {
     marketCap: 1790000000000,
     peRatio: 25.8,
     amount: 18000000,
+    volume: 18000000,
     change: 0.87,
-    changePercent: 0.61
+    changePercent: 0.61,
+    // Data source: Mock data for demonstration
+    // Last updated: 2025-08-11
   },
   'AMZN': {
     symbol: 'AMZN',
@@ -41,8 +54,11 @@ const mockStockData: Record<string, StockData> = {
     marketCap: 1510000000000,
     peRatio: 45.2,
     amount: 35000000,
+    volume: 35000000,
     change: 3.45,
-    changePercent: 2.43
+    changePercent: 2.43,
+    // Data source: Mock data for demonstration
+    // Last updated: 2025-08-11
   },
   'TSLA': {
     symbol: 'TSLA',
@@ -51,8 +67,11 @@ const mockStockData: Record<string, StockData> = {
     marketCap: 789000000000,
     peRatio: 78.9,
     amount: 55000000,
+    volume: 55000000,
     change: -5.20,
-    changePercent: -2.05
+    changePercent: -2.05,
+    // Data source: Mock data for demonstration
+    // Last updated: 2025-08-11
   },
   // A股
   '000001': {
@@ -62,8 +81,11 @@ const mockStockData: Record<string, StockData> = {
     marketCap: 248000000000,
     peRatio: 8.5,
     amount: 125000000,
+    volume: 125000000,
     change: 0.15,
-    changePercent: 1.18
+    changePercent: 1.18,
+    // Data source: Mock data for demonstration
+    // Last updated: 2025-08-11
   },
   '000002': {
     symbol: '000002',
@@ -72,8 +94,11 @@ const mockStockData: Record<string, StockData> = {
     marketCap: 203000000000,
     peRatio: 12.3,
     amount: 89000000,
+    volume: 89000000,
     change: -0.28,
-    changePercent: -1.51
+    changePercent: -1.51,
+    // Data source: Mock data for demonstration
+    // Last updated: 2025-08-11
   },
   '600036': {
     symbol: '600036',
@@ -82,8 +107,11 @@ const mockStockData: Record<string, StockData> = {
     marketCap: 901000000000,
     peRatio: 9.8,
     amount: 45000000,
+    volume: 45000000,
     change: 0.67,
-    changePercent: 1.91
+    changePercent: 1.91,
+    // Data source: Mock data for demonstration
+    // Last updated: 2025-08-11
   },
   '600519': {
     symbol: '600519',
@@ -92,8 +120,11 @@ const mockStockData: Record<string, StockData> = {
     marketCap: 2120000000000,
     peRatio: 32.5,
     amount: 2800000,
+    volume: 2800000,
     change: 25.00,
-    changePercent: 1.50
+    changePercent: 1.50,
+    // Data source: Mock data for demonstration
+    // Last updated: 2025-08-11
   },
   '000858': {
     symbol: '000858',
@@ -102,8 +133,11 @@ const mockStockData: Record<string, StockData> = {
     marketCap: 609000000000,
     peRatio: 28.7,
     amount: 8500000,
+    volume: 8500000,
     change: 2.80,
-    changePercent: 1.82
+    changePercent: 1.82,
+    // Data source: Mock data for demonstration
+    // Last updated: 2025-08-11
   },
   '002415': {
     symbol: '002415',
@@ -112,8 +146,11 @@ const mockStockData: Record<string, StockData> = {
     marketCap: 304000000000,
     peRatio: 18.9,
     amount: 15000000,
+    volume: 15000000,
     change: -0.55,
-    changePercent: -1.67
+    changePercent: -1.67,
+    // Data source: Mock data for demonstration
+    // Last updated: 2025-08-11
   },
   '300059': {
     symbol: '300059',
@@ -122,8 +159,11 @@ const mockStockData: Record<string, StockData> = {
     marketCap: 285000000000,
     peRatio: 25.3,
     amount: 35000000,
+    volume: 35000000,
     change: 0.45,
-    changePercent: 2.50
+    changePercent: 2.50,
+    // Data source: Mock data for demonstration
+    // Last updated: 2025-08-11
   },
   '300366': {
     symbol: '300366',
@@ -132,8 +172,11 @@ const mockStockData: Record<string, StockData> = {
     marketCap: 45000000000,
     peRatio: 35.2,
     amount: 25000000,
+    volume: 25000000,
     change: 0.15,
-    changePercent: 1.81
+    changePercent: 1.81,
+    // Data source: Mock data for demonstration
+    // Last updated: 2025-08-11
   },
   '688133': {
     symbol: '688133',
@@ -142,8 +185,11 @@ const mockStockData: Record<string, StockData> = {
     marketCap: 18500000000,
     peRatio: 45.2,
     amount: 850000,
+    volume: 850000,
     change: 1.67,
-    changePercent: 3.80
+    changePercent: 3.80,
+    // Data source: Mock data for demonstration
+    // Last updated: 2025-08-11
   }
 }
 
@@ -164,19 +210,44 @@ export async function GET(request: NextRequest) {
   try {
     if (isAStock) {
       // 使用Tushare API获取A股数据
-      const { fetchAStockData } = await import('@/lib/tushare-api')
-      const aStockData = await fetchAStockData(ticker)
-      return NextResponse.json(aStockData)
+      try {
+        const { fetchAStockData } = await import('@/lib/tushare-api')
+        const aStockData = await fetchAStockData(ticker)
+        return NextResponse.json(aStockData)
+      } catch (aStockError) {
+        console.error(`Tushare API failed for ${ticker}:`, aStockError)
+        return NextResponse.json(
+          { error: `A股 ${ticker} 数据获取失败，可能是停牌或数据源暂时不可用。请稍后重试。` },
+          { status: 500 }
+        )
+      }
     } else {
       // 使用Alpha Vantage API获取美股数据
-      const { fetchAlphaVantageStockData } = await import('@/lib/alpha-vantage-api')
-      const alphaVantageData = await fetchAlphaVantageStockData(ticker)
-      return NextResponse.json(alphaVantageData)
+      try {
+        const { fetchAlphaVantageStockData } = await import('@/lib/alpha-vantage-api')
+        const alphaVantageData = await fetchAlphaVantageStockData(ticker)
+        return NextResponse.json(alphaVantageData)
+      } catch (alphaVantageError) {
+        console.error(`Alpha Vantage API failed for ${ticker}:`, alphaVantageError)
+        
+        // 尝试使用Opus4 API作为备选
+        try {
+          const { fetchOtherMarketStockData } = await import('@/lib/opus4-stock-api')
+          const opus4Data = await fetchOtherMarketStockData(ticker)
+          return NextResponse.json(opus4Data)
+        } catch (opus4Error) {
+          console.error(`Opus4 API also failed for ${ticker}:`, opus4Error)
+          return NextResponse.json(
+            { error: `美股 ${ticker} 数据获取失败。可能原因：1) 股票代码不存在 2) 股票已退市 3) 数据源暂时不可用。请检查股票代码或稍后重试。` },
+            { status: 500 }
+          )
+        }
+      }
     }
   } catch (error) {
-    console.error('Error fetching real-time data:', error)
+    console.error('Unexpected error in stock data API:', error)
     return NextResponse.json(
-      { error: `Failed to fetch data for ${ticker}. Please try again later.` },
+      { error: `获取 ${ticker} 数据时发生未知错误，请稍后重试。` },
       { status: 500 }
     )
   }

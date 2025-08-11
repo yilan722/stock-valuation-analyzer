@@ -18,6 +18,7 @@ interface ReportDemoProps {
 
 export default function ReportDemo({ locale }: ReportDemoProps) {
   const [activeSection, setActiveSection] = useState(0)
+  const [autoScrollInterval, setAutoScrollInterval] = useState<NodeJS.Timeout | null>(null)
 
   // Complete Coinbase Report Data - Based on the actual report
   const demoReport = {
@@ -390,20 +391,78 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
     { id: 'valuation', label: 'Valuation Analysis', icon: Target }
   ]
 
-  // Auto-scroll through sections every 2 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveSection((prev) => (prev + 1) % sections.length)
-    }, 2000)
+  // Start auto-scroll from overview (index 0) - 6 second interval
+  const startAutoScroll = () => {
+    if (autoScrollInterval) clearInterval(autoScrollInterval)
     
-    return () => clearInterval(interval)
+    const interval = setInterval(() => {
+      setActiveSection((prev) => {
+        const next = prev + 1
+        return next >= sections.length ? 0 : next // Loop back to overview
+      })
+    }, 6000) // 6 second interval
+    
+    setAutoScrollInterval(interval)
+  }
+
+  // Stop auto-scroll
+  const stopAutoScroll = () => {
+    if (autoScrollInterval) {
+      clearInterval(autoScrollInterval)
+      setAutoScrollInterval(null)
+    }
+  }
+
+  // Handle section click - jump to specific section
+  const handleSectionClick = (index: number) => {
+    setActiveSection(index)
+  }
+
+  // Auto-scroll through sections every 2 seconds, starting from overview
+  useEffect(() => {
+    setActiveSection(0) // Start from overview
+    startAutoScroll()
+    
+    return () => {
+      if (autoScrollInterval) {
+        clearInterval(autoScrollInterval)
+      }
+    }
   }, [])
+
+  // Auto-scroll effect
+  useEffect(() => {
+    if (!autoScrollInterval) {
+      startAutoScroll()
+    }
+  }, [autoScrollInterval])
 
   return (
     <div className="min-h-screen bg-slate-900">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-slate-800/30"></div>
+        
+        {/* DEMO Banner */}
+        <div className="relative z-20 w-full bg-gradient-to-r from-slate-800 via-blue-900 to-slate-800 py-3 sm:py-4 border-b border-blue-500/30">
+          <div className="max-w-4xl mx-auto px-3 sm:px-6">
+            <div className="flex items-center justify-center space-x-2 sm:space-x-3">
+              <div className="animate-pulse">
+                <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-blue-300" />
+              </div>
+              <span className="text-lg sm:text-xl font-bold text-blue-100">
+                🤖 AI-GENERATED RESEARCH REPORT DEMO
+              </span>
+              <div className="animate-pulse">
+                <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-blue-300" />
+              </div>
+            </div>
+            <div className="text-sm sm:text-base text-blue-200 mt-1 opacity-80">
+              Interactive demonstration of our AI-powered stock analysis platform
+            </div>
+          </div>
+        </div>
+        
         <div className="relative z-10 text-center max-w-4xl mx-auto px-3 sm:px-6">
           <div className="mb-6 sm:mb-8">
             <div className="inline-flex items-center space-x-1 sm:space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-3 sm:px-6 py-1.5 sm:py-2 mb-4 sm:mb-6">
@@ -456,28 +515,29 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
       <div className="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-8">
         <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-8 sm:mb-12">
           {sections.map((section, index) => (
-            <button
-              key={section.id}
-              onClick={() => setActiveSection(index)}
-              className={`flex items-center space-x-1 sm:space-x-2 px-3 sm:px-6 py-2 sm:py-3 rounded-full transition-all duration-300 text-sm sm:text-base ${
-                activeSection === index
-                  ? 'bg-blue-600 text-white shadow-lg'
-                  : 'bg-white/10 text-gray-300 hover:bg-white/20'
-              }`}
-            >
+                      <button
+            key={section.id}
+            onClick={() => handleSectionClick(index)}
+            className={`flex items-center space-x-1 sm:space-x-2 px-3 sm:px-6 py-2 sm:py-3 rounded-full transition-all duration-300 text-sm sm:text-base ${
+              activeSection === index
+                ? 'bg-blue-600 text-white shadow-lg'
+                : 'bg-white/10 text-gray-300 hover:bg-white/20'
+            }`}
+            title={`Click to view ${section.label}`}
+          >
               <section.icon className="h-4 w-4 sm:h-5 sm:w-5" />
               <span>{section.label}</span>
             </button>
           ))}
         </div>
 
-
-
         {/* Content Sections */}
         <div className="space-y-8 sm:space-y-12">
           {/* Overview Section */}
           {activeSection === 0 && (
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-white/10">
+            <div 
+              className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-white/10"
+            >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-2 sm:space-y-0">
                 <h2 className="text-2xl sm:text-3xl font-bold text-white">Company Overview</h2>
                 <a href="https://investor.coinbase.com/company-profile/default.aspx" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">
@@ -518,7 +578,9 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
 
           {/* Fundamental Analysis Section */}
           {activeSection === 1 && (
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-white/10">
+            <div 
+              className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-white/10"
+            >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-2 sm:space-y-0">
                 <h2 className="text-2xl sm:text-3xl font-bold text-white">Fundamental Analysis</h2>
                 <a href="https://investor.coinbase.com/financials/default.aspx" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">
@@ -647,7 +709,12 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
 
           {/* Business Segments Section */}
           {activeSection === 2 && (
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-white/10">
+            <div 
+              className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-white/10"
+              
+              
+              
+            >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-2 sm:space-y-0">
                 <h2 className="text-2xl sm:text-3xl font-bold text-white">Business Segments Analysis</h2>
                 <a href="https://investor.coinbase.com/business/default.aspx" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">
@@ -876,7 +943,12 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
 
           {/* Growth Catalysts Section */}
           {activeSection === 3 && (
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-white/10">
+            <div 
+              className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-white/10"
+              
+              
+              
+            >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-2 sm:space-y-0">
                 <h2 className="text-2xl sm:text-3xl font-bold text-white">Growth Catalysts</h2>
                 <a href="https://investor.coinbase.com/events-and-presentations/default.aspx" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">
@@ -924,7 +996,12 @@ export default function ReportDemo({ locale }: ReportDemoProps) {
 
           {/* Valuation Analysis Section */}
           {activeSection === 4 && (
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-white/10">
+            <div 
+              className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-white/10"
+              
+              
+              
+            >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-2 sm:space-y-0">
                 <h2 className="text-2xl sm:text-3xl font-bold text-white">Valuation Analysis</h2>
                 <a href="https://www.bloomberg.com/quote/COIN:US" target="_blank" rel="noopener noreferrer" className="text-xs text-amber-400 hover:text-amber-300 underline">

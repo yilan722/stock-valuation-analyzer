@@ -15,47 +15,94 @@ REPORT STRUCTURE (return as valid JSON with these exact keys):
 
 1. fundamentalAnalysis: 
    - Company overview and business model
-   - Key financial metrics (P/E, P/B, ROE, ROA, debt ratios)
-   - Latest quarterly/annual performance with year-over-year comparisons
-   - Revenue growth, profit margins, cash flow analysis
-   - Industry position and competitive advantages
+   - Key financial metrics (P/E, P/B, ROE, ROA, debt ratios) **with dates and sources**
+   - Latest quarterly/annual performance with year-over-year comparisons **with exact dates**
+   - Revenue growth, profit margins, cash flow analysis **with filing dates**
+   - Industry position and competitive advantages **with latest data timestamps**
 
 2. businessSegments: 
-   - Detailed revenue breakdown by business segments
-   - Segment performance analysis with growth rates
-   - Geographic revenue distribution
-   - Market share analysis by segment
-   - Segment profitability and margins
-   - Future segment growth projections
+   - Detailed revenue breakdown by business segments **with reporting periods**
+   - Segment performance analysis with growth rates **with data dates**
+   - Geographic revenue distribution **with latest available data**
+   - Market share analysis by segment **with source and date**
+   - Segment profitability and margins **with financial period**
+   - Future segment growth projections **with projection date**
 
 3. growthCatalysts: 
-   - Primary growth drivers and market opportunities
-   - Strategic initiatives and expansion plans
-   - New product/service launches
-   - Market expansion opportunities
-   - Technology investments and R&D
-   - Regulatory tailwinds or headwinds
-   - Competitive advantages and moats
+   - Primary growth drivers and market opportunities **with latest announcement dates**
+   - Strategic initiatives and expansion plans **with announcement dates**
+   - New product/service launches **with launch dates**
+   - Market expansion opportunities **with latest data**
+   - Technology investments and R&D **with investment dates**
+   - Regulatory tailwinds or headwinds **with regulation dates**
+   - Competitive advantages and moats **with latest assessment**
+   - **CRITICAL: Recent stock price catalysts and volatility drivers** **with exact dates**
+   - **CRITICAL: Latest news, events, or announcements causing price movements** **with publication dates**
+   - **CRITICAL: For crypto/blockchain related stocks: ETH holdings, crypto strategy, mNAV (modified Net Asset Value) analysis** **with latest data**
+   - **CRITICAL: Recent market sentiment changes and their impact on valuation** **with dates**
+   - **CRITICAL: Short-term catalysts (next 30-90 days) that could affect stock price** **with timeline**
+   - **CRITICAL: Comparable company analysis including SBET and other crypto-related stocks** **with latest data**
+   - **CRITICAL: mNAV calculation and analysis for crypto companies** **with calculation date**
+   - **CRITICAL: Latest cryptocurrency reserve strategies and their market impact** **with announcement dates**
+   - **CRITICAL: Analysis of crypto reserve announcements from multiple companies (HYPE, ENA, SBET, etc.)** **with dates**
+   - **CRITICAL: How crypto reserve strategies affect stock price movements and investor sentiment** **with latest data**
+   - **CRITICAL: Market trends in corporate cryptocurrency adoption and their implications** **with trend dates**
+   - **CRITICAL: IMPORTANT CLARIFICATION: HYPE and ENA are cryptocurrencies, SBET is a publicly traded company accumulating ETH**
+   - **CRITICAL: For SBET analysis, MUST include ETH accumulation strategy and mNAV calculation**
+   - **CRITICAL: BMNR is a more comparable company to SBET than others mentioned**
+   - **CRITICAL: Include this information even if not in training data - use logical analysis and market knowledge**
 
 4. valuationAnalysis: 
-   - DCF analysis with detailed assumptions
-   - Comparable company analysis (P/E, EV/EBITDA, P/S ratios)
-   - Sum-of-parts valuation if applicable
-   - Target price calculation with multiple methodologies
-   - Risk-adjusted return analysis
-   - Investment recommendation (BUY/HOLD/SELL) with rationale
-   - Key risks and mitigating factors
+   - DCF analysis with detailed assumptions **with assumption dates**
+   - Comparable company analysis (P/E, EV/EBITDA, P/S ratios) **with latest data**
+   - Sum-of-parts valuation if applicable **with valuation date**
+   - **CRITICAL: For crypto companies, include mNAV (modified Net Asset Value) analysis** **with calculation date**
+   - **CRITICAL: mNAV calculation: (Cash + Crypto Holdings + Other Assets - Total Liabilities) / Shares Outstanding** **with data as of date**
+   - **CRITICAL: Compare current stock price to mNAV to assess premium/discount** **with current date**
+   - Target price calculation with multiple methodologies **with calculation date**
+   - Risk-adjusted return analysis **with latest data**
+   - Investment recommendation (BUY/HOLD/SELL) with rationale **with recommendation date**
+   - Key risks and mitigating factors **with latest assessment**
 
 REQUIREMENTS:
 - Use latest 2024 annual and 2025 quarterly financial data
 - Display "Trading Amount" instead of "Volume"
 - Include specific numbers, percentages, and data points
 - Provide detailed analysis with supporting evidence
+- **CRITICAL: ALL data points MUST include timestamps and sources**
+- **CRITICAL: Financial data must show exact dates (e.g., "As of Q3 2024", "Latest filing date: March 15, 2025")**
+- **CRITICAL: News and announcements must include publication dates and sources**
+- **CRITICAL: Market data must show when it was last updated**
+- **CRITICAL: Research and include the most recent news, events, and catalysts affecting stock price**
+- **CRITICAL: For crypto-related stocks, analyze ETH holdings strategy and mNAV valuation impact**
+- **CRITICAL: Identify recent price volatility drivers and market sentiment changes**
+- **CRITICAL: Research latest cryptocurrency reserve strategies across multiple companies (ETH, BTC, etc.)**
+- **CRITICAL: Analyze how crypto reserve announcements affect stock prices and market sentiment**
+- **CRITICAL: Compare crypto strategies between different companies (HYPE, ENA, SBET, etc.)**
+- **CRITICAL: Include recent market developments and their impact on crypto-related stocks**
 - Use professional HTML styling with classes: 'metric-table', 'highlight-box', 'positive', 'negative', 'neutral', 'recommendation-buy', 'recommendation-sell', 'recommendation-hold'
 - Ensure JSON is properly formatted and valid
 - Each section should be comprehensive and detailed (minimum 500 words per section)
 
 Return ONLY a valid JSON object with these four sections as HTML strings.
+
+IMPORTANT: After each section, add a clear data source and timestamp footer:
+
+**Data Source Footer Format:**
+```html
+<div class="data-source-footer" style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-left: 4px solid #007bff; border-radius: 4px;">
+  <h5 style="margin: 0 0 10px 0; color: #495057; font-size: 14px;">📊 Data Sources & Timestamps</h5>
+  <ul style="margin: 0; padding-left: 20px; color: #6c757d; font-size: 13px;">
+    <li><strong>Financial Data:</strong> Latest SEC filings, company reports, and financial databases</li>
+    <li><strong>Market Data:</strong> Real-time market feeds and exchange data</li>
+    <li><strong>News & Events:</strong> Financial news sources, company announcements, and regulatory filings</li>
+    <li><strong>Analysis Date:</strong> {current_date}</li>
+    <li><strong>Data Currency:</strong> All data is current as of the latest available information</li>
+  </ul>
+</div>
+```
+
+Add this footer to the end of each section (fundamentalAnalysis, businessSegments, growthCatalysts, valuationAnalysis).
 ```
 
 ## 用户提示词 (User Prompt)
@@ -75,6 +122,23 @@ REQUIREMENTS:
 - Analyze growth catalysts with specific market opportunities
 - Provide detailed valuation analysis with multiple methodologies
 - Use the latest 2024 annual and 2025 quarterly financial data
+- **CRITICAL: ALL data points MUST include timestamps and sources**
+- **CRITICAL: Financial data must show exact dates (e.g., "As of Q3 2024", "Latest filing date: March 15, 2025")**
+- **CRITICAL: News and announcements must include publication dates and sources**
+- **CRITICAL: Market data must show when it was last updated**
+- **CRITICAL: Research and include the most recent news, events, and catalysts affecting stock price**
+- **CRITICAL: For crypto-related stocks, analyze ETH holdings strategy and mNAV valuation impact**
+- **CRITICAL: Identify recent price volatility drivers and market sentiment changes**
+- **CRITICAL: For crypto companies, MUST include mNAV analysis and comparable company analysis (e.g., SBET)**
+- **CRITICAL: Search for recent ETH strategy announcements and their impact on stock price**
+- **CRITICAL: Research and analyze cryptocurrency reserve strategies from multiple companies (HYPE, ENA, SBET, etc.)**
+- **CRITICAL: Analyze how crypto reserve announcements affect stock prices across the sector**
+- **CRITICAL: Include latest market developments and trends in corporate crypto adoption**
+- **CRITICAL: Compare different companies' crypto strategies and their market performance**
+- **CRITICAL: IMPORTANT: HYPE and ENA are cryptocurrencies, SBET is a company accumulating ETH**
+- **CRITICAL: For SBET analysis, MUST include ETH accumulation strategy and mNAV calculation**
+- **CRITICAL: BMNR is more comparable to SBET than other companies**
+- **CRITICAL: Include this information even if not in training data - use logical analysis**
 - Ensure each section is comprehensive and detailed
 - Format as professional HTML with proper styling
 
@@ -111,6 +175,12 @@ let cleanedJson = jsonString
 - `recommendation-sell`: 卖出建议
 - `recommendation-hold`: 持有建议
 
+### 数据要求
+- **所有数据点必须包含时间戳和来源**
+- **财务数据必须显示具体日期** (如"截至2024年第三季度"，"最新申报日期：2025年3月15日")
+- **新闻和公告必须包含发布日期和来源**
+- **市场数据必须显示最后更新时间**
+
 ### 报告结构
 1. **基本面分析** (fundamentalAnalysis)
    - 公司概况和商业模式
@@ -129,6 +199,15 @@ let cleanedJson = jsonString
    - 战略举措
    - 新产品/服务
    - 市场扩张机会
+   - **关键要求: 最新股价催化剂和波动驱动因素**
+   - **关键要求: 导致股价变动的最新新闻、事件或公告**
+   - **关键要求: 对于加密货币/区块链相关股票: ETH持仓、加密策略、mNAV(修正净资产价值)分析**
+   - **关键要求: 近期市场情绪变化及其对估值的影响**
+   - **关键要求: 可能影响股价的短期催化剂(未来30-90天)**
+   - **关键要求: 最新加密货币储备策略及其市场影响**
+   - **关键要求: 分析多个公司的加密货币储备公告(HYPE、ENA、SBET等)**
+   - **关键要求: 加密货币储备策略如何影响股价变动和投资者情绪**
+   - **关键要求: 企业加密货币采用的市场趋势及其影响**
 
 4. **估值分析** (valuationAnalysis)
    - DCF分析

@@ -171,15 +171,31 @@ export async function POST(request: NextRequest) {
       </html>
     `
 
-    // Launch browser and generate PDF
+    // Launch browser with optimized settings
     const browser = await puppeteer.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process',
+        '--disable-gpu'
+      ]
     })
 
     const page = await browser.newPage()
+    
+    // Set viewport and wait for content to load
+    await page.setViewport({ width: 1200, height: 800 })
     await page.setContent(htmlContent, { waitUntil: 'networkidle0' })
+    
+    // Wait a bit more for any dynamic content
+    await new Promise(resolve => setTimeout(resolve, 1000))
 
+    // Generate PDF with optimized settings
     const pdf = await page.pdf({
       format: 'A4',
       margin: {
@@ -191,23 +207,44 @@ export async function POST(request: NextRequest) {
       printBackground: true,
       displayHeaderFooter: true,
       headerTemplate: '<div></div>',
-      footerTemplate: '<div style="font-size: 10px; text-align: center; width: 100%; color: #7f8c8d;">第 <span class="pageNumber"></span> 页，共 <span class="totalPages"></span> 页</div>'
+      footerTemplate: '<div style="font-size: 10px; text-align: center; width: 100%; color: #7f8c8d;">第 <span class="pageNumber"></span> 页，共 <span class="totalPages"></span> 页</div>',
+      preferCSSPageSize: true
     })
 
     await browser.close()
 
-    // Return PDF as response
+    // Return PDF as response with proper headers
     return new NextResponse(Buffer.from(pdf), {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="${stockSymbol}_valuation_report.pdf"`
+        'Content-Disposition': `attachment; filename="${stockSymbol}_valuation_report_${new Date().toISOString().split('T')[0]}.pdf"`,
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
       }
     })
 
   } catch (error) {
     console.error('PDF generation error:', error)
+    
+    // Return more specific error messages
+    if (error instanceof Error) {
+      if (error.message.includes('timeout')) {
+        return NextResponse.json(
+          { error: 'PDF generation timed out. Please try again.' },
+          { status: 408 }
+        )
+      }
+      if (error.message.includes('memory')) {
+        return NextResponse.json(
+          { error: 'Insufficient memory for PDF generation. Please try again.' },
+          { status: 507 }
+        )
+      }
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to generate PDF' },
+      { error: 'Failed to generate PDF. Please try again later.' },
       { status: 500 }
     )
   }
