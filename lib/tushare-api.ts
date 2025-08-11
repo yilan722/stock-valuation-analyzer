@@ -47,13 +47,13 @@ export const fetchAStockData = async (ticker: string): Promise<StockData> => {
     
     const currentPrice = parseFloat(latestData[closeIndex])
     const openPrice = parseFloat(latestData[openIndex])
-    const volume = parseInt(latestData[volIndex]) || 0
-    const amount = parseFloat(latestData[amountIndex]) || 0
+    const volume = parseInt(latestData[volIndex]) || 0  // 成交量（股数）
+    const amount = parseFloat(latestData[amountIndex]) || 0  // 成交额（万元）
     const tradeDate = latestData[tradeDateIndex]
     const change = currentPrice - openPrice
     const changePercent = (change / openPrice) * 100
 
-    console.log(`Processing ${ticker}: price=${currentPrice}, amount=${amount}, trade_date=${tradeDate}`)
+    console.log(`Processing ${ticker}: price=${currentPrice}, volume=${volume}, amount=${amount}, trade_date=${tradeDate}`)
 
     // 获取基本面数据（市值、P/E等）
     let marketCap = 0
@@ -129,8 +129,13 @@ export const fetchAStockData = async (ticker: string): Promise<StockData> => {
       peRatio = 15.0 // 使用行业平均P/E作为默认值
     }
 
+    // 检查成交量和成交额数据
+    if (!volume || volume === 0) {
+      console.log(`Warning: Volume data is 0 for ${ticker}, this might indicate a holiday or trading suspension`)
+    }
+
     if (!amount || amount === 0) {
-      throw new Error('Amount data not available from Tushare API')
+      console.log(`Warning: Amount data is 0 for ${ticker}, this might indicate a holiday or trading suspension`)
     }
 
     return {
@@ -139,7 +144,8 @@ export const fetchAStockData = async (ticker: string): Promise<StockData> => {
       price: currentPrice,
       marketCap: marketCap * 10000, // Tushare返回的是万元，转换为元
       peRatio: peRatio,
-      amount: amount, // 成交额（万元）
+      amount: amount * 10000, // 成交额：Tushare返回的是万元，转换为元
+      volume: volume, // 成交量（股数）
       change: change,
       changePercent: changePercent
     }

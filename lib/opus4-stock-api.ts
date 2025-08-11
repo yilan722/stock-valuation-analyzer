@@ -2,7 +2,7 @@ import axios from 'axios'
 import { StockData } from '@/types'
 
 const OPUS4_API_URL = 'https://api.nuwaapi.com'
-const OPUS4_API_KEY = 'sk-GNBf5QFmnepeBZddwH612o5vEJQFMq6z8gUAyre7tAIrGeA8'
+const OPUS4_API_KEY = 'sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR'
 
 export const fetchOtherMarketStockData = async (ticker: string): Promise<StockData> => {
   try {
@@ -33,7 +33,7 @@ export const fetchOtherMarketStockData = async (ticker: string): Promise<StockDa
     
     Return as JSON only.`
 
-    const models = ['claude-opus-4-20250514', 'opus4', 'gpt-4', 'gpt-3.5-turbo']
+    const models = ['claude-opus-4-1-20250805', 'opus4', 'gpt-4', 'gpt-3.5-turbo']
     let response: any = null
 
     for (const model of models) {
@@ -96,6 +96,7 @@ export const fetchOtherMarketStockData = async (ticker: string): Promise<StockDa
       marketCap: Math.random() * 10000000000 + 1000000000,
       peRatio: Math.random() * 30 + 10,
       amount: Math.random() * 5000000 + 1000000,
+      volume: Math.random() * 1000000 + 100000,
       change: (Math.random() - 0.5) * 10,
       changePercent: (Math.random() - 0.5) * 10
     }

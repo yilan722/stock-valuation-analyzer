@@ -84,7 +84,7 @@ Please provide a comprehensive, detailed analysis in {locale === 'zh' ? 'Chinese
 ## 技术配置
 
 ### API 设置
-- **模型列表**: `['claude-opus-4-20250514', 'opus4', 'gpt-4', 'gpt-3.5-turbo']`
+- **模型列表**: `['claude-opus-4-1-20250805', 'opus4', 'gpt-4', 'gpt-3.5-turbo']`
 - **温度**: 0.7
 - **最大Token**: 8000
 - **API端点**: `https://api.nuwaapi.com/v1/chat/completions`

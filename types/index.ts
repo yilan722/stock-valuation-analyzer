@@ -5,6 +5,7 @@ export interface StockData {
   marketCap: number
   peRatio: number
   amount: number  // 成交额（万元）
+  volume: number  // 成交量（股数）
   change: number
   changePercent: number
 }

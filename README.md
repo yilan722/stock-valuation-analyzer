@@ -57,7 +57,7 @@ npm run dev
 The application uses the Opus4 API for generating valuation reports. The API key is configured in `lib/api.ts`:
 
 ```typescript
-const OPUS4_API_KEY = 'sk-GNBf5QFmnepeBZddwH612o5vEJQFMq6z8gUAyre7tAIrGeA8'
+const OPUS4_API_KEY = 'sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR'
 ```
 
 ## Project Structure

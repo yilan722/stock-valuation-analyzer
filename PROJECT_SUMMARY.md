@@ -15,7 +15,7 @@
   - A股: 000001(平安银行), 600519(贵州茅台), 300366(创意信息)等
 
 ### 2. 智能报告生成
-- **Opus4 AI分析**: 使用claude-opus-4-20250514模型
+- **Opus4 AI分析**: 使用claude-opus-4-1-20250805模型
 - **多模型回退**: 支持opus4, gpt-4, gpt-3.5-turbo作为备选
 - **报告结构**:
   - 基本面介绍（市值、价格、公司简介）
@@ -89,7 +89,7 @@ companyName = basicInfo.name // 如: "创意信息", "贵州茅台"
 
 ### 3. 多模型AI回退
 ```typescript
-const models = ['claude-opus-4-20250514', 'opus4', 'gpt-4', 'gpt-3.5-turbo']
+const models = ['claude-opus-4-1-20250805', 'opus4', 'gpt-4', 'gpt-3.5-turbo']
 // 自动尝试不同模型确保报告生成成功
 ```
 

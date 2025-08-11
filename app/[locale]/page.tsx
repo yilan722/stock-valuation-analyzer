@@ -238,7 +238,13 @@ export default function HomePage({ params }: PageProps) {
                     </div>
                     </div>
                     <p className="text-xs sm:text-sm text-blue-200 mb-1 font-inter">Trading Volume($)</p>
-                    <p className="text-lg sm:text-2xl font-bold text-white font-inter">{(stockData.amount / 1e9).toFixed(2)}B</p>
+                    <p className="text-lg sm:text-2xl font-bold text-white font-inter">
+                      {/* 判断是A股还是美股，A股显示成交量，美股显示成交额 */}
+                      {/^[0-9]{6}$/.test(stockData.symbol) || stockData.symbol.startsWith('688') || stockData.symbol.startsWith('300') 
+                        ? `${(stockData.volume / 10000).toFixed(2)}万` // A股显示成交量（万股）
+                        : `$${(stockData.amount / 1e9).toFixed(2)}B` // 美股显示成交额（十亿美元）
+                      }
+                    </p>
                   </div>
                 </div>
               </div>

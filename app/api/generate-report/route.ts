@@ -106,25 +106,24 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate report using Opus4 API - Prioritize claude-opus-4-20250514
-    const models = ['claude-opus-4-20250514', 'opus4', 'gpt-4', 'gpt-3.5-turbo']
-    let reportData = null
-    let lastError: Error | null = null
-    let preferredModelUsed = false
+    // Generate report using Opus4 API - Prioritize claude-opus-4-1-20250805
+    const models = ['claude-opus-4-1-20250805', 'opus4', 'gpt-4', 'gpt-3.5-turbo']
+    
+    let reportData = null;
+    let lastError: Error | null = null;
 
-    // First, try claude-opus-4-20250514 with multiple retries
+    // First, try claude-opus-4-1-20250805 with multiple retries
     for (let retry = 0; retry < 3; retry++) {
       try {
-        console.log(`Trying preferred model claude-opus-4-20250514 (attempt ${retry + 1}/3)`)
-        
+        console.log(`Trying preferred model claude-opus-4-1-20250805 (attempt ${retry + 1}/3)`);
         const response = await fetch('https://api.nuwaapi.com/v1/chat/completions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer sk-GNBf5QFmnepeBZddwH612o5vEJQFMq6z8gUAyre7tAIrGeA8`
+            'Authorization': `Bearer sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR`
           },
           body: JSON.stringify({
-            model: 'claude-opus-4-20250514',
+            model: 'claude-opus-4-1-20250805',
             messages: [
               {
                 role: 'system',
@@ -208,7 +207,7 @@ Please provide a comprehensive, detailed analysis in ${locale === 'zh' ? 'Chines
 
         if (!response.ok) {
           const errorText = await response.text()
-          console.error(`API Error for claude-opus-4-20250514 (attempt ${retry + 1}/3):`, errorText)
+          console.error(`API Error for claude-opus-4-1-20250805 (attempt ${retry + 1}/3):`, errorText)
           lastError = new Error(`API Error: ${response.status} ${response.statusText}`)
           continue
         }
@@ -232,7 +231,7 @@ Please provide a comprehensive, detailed analysis in ${locale === 'zh' ? 'Chines
               .replace(/,\s*]/g, ']') // Remove trailing commas in arrays
             
             reportData = JSON.parse(cleanedJson)
-            console.log(`Successfully generated report using claude-opus-4-20250514`)
+            console.log(`Successfully generated report using claude-opus-4-1-20250805`)
             break
           } catch (parseError) {
             console.error(`Error parsing AI response:`, parseError)
@@ -245,7 +244,7 @@ Please provide a comprehensive, detailed analysis in ${locale === 'zh' ? 'Chines
           continue
         }
       } catch (error) {
-        console.error(`Error with claude-opus-4-20250514 (attempt ${retry + 1}/3):`, error)
+        console.error(`Error with claude-opus-4-1-20250805 (attempt ${retry + 1}/3):`, error)
         lastError = error instanceof Error ? error : new Error('Unknown error')
         continue
       }
