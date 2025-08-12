@@ -62,6 +62,12 @@ export async function middleware(request: NextRequest) {
     return response
   }
 
+  // 特殊路径不需要语言重定向
+  const specialPaths = ['/sitemap.xml', '/robots.txt', '/manifest.json']
+  if (specialPaths.includes(pathname)) {
+    return response
+  }
+
   // 重定向到默认语言
   const locale = defaultLocale
   request.nextUrl.pathname = `/${locale}${pathname}`
