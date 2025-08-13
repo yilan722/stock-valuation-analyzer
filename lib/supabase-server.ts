@@ -41,6 +41,7 @@ export function createServerSupabaseClient() {
 // 专门用于API路由的Supabase客户端
 export function createApiSupabaseClient(request: Request) {
   const cookieHeader = request.headers.get('cookie') || ''
+  console.log('Raw cookie header for API:', cookieHeader) // Added for debugging
   
   // 更准确的cookie解析
   const cookies = cookieHeader.split(';').reduce((acc, cookie) => {
@@ -57,6 +58,12 @@ export function createApiSupabaseClient(request: Request) {
   }, {} as Record<string, string>)
 
   console.log('Parsed cookies for API:', Object.keys(cookies))
+  
+  // 检查是否有Supabase相关的cookies
+  const supabaseCookies = Object.keys(cookies).filter(key => 
+    key.includes('supabase') || key.includes('sb-') || key.includes('auth')
+  )
+  console.log('Supabase-related cookies found:', supabaseCookies)
 
   return createServerClient(
     supabaseUrl,

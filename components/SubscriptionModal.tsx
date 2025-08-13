@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { X, Check, CreditCard, Zap, Crown, Star, TrendingUp, Shield, Headphones, BarChart3 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import UserAgreementModal from './UserAgreementModal'
+import PayPalPayment from './PayPalPayment'
 import { getTranslation } from '../lib/translations'
 import { Locale } from '../lib/i18n'
 
@@ -37,6 +38,8 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
   const [isLoading, setIsLoading] = useState(false)
   const [showAgreement, setShowAgreement] = useState(false)
   const [pendingPlanId, setPendingPlanId] = useState<string | null>(null)
+  const [showPayPalPayment, setShowPayPalPayment] = useState(false)
+  const [paymentPlan, setPaymentPlan] = useState<SubscriptionPlan | null>(null)
 
   const plans: SubscriptionPlan[] = [
     {
@@ -156,47 +159,62 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
   const handleAgreementConfirm = async () => {
     if (!pendingPlanId) return
 
-    setIsLoading(true)
-    try {
-      const plan = plans.find(p => p.id === pendingPlanId)
-      if (!plan) {
-        toast.error(getTranslation(locale, 'invalidPlan'))
-        return
-      }
+    const plan = plans.find(p => p.id === pendingPlanId)
+    if (!plan) {
+      toast.error(getTranslation(locale, 'invalidPlan'))
+      return
+    }
 
-      const response = await fetch('/api/payment/create', {
+    // Show PayPal payment interface
+    setPaymentPlan(plan)
+    setShowPayPalPayment(true)
+    setShowAgreement(false)
+    setPendingPlanId(null)
+  }
+
+  const handlePayPalSuccess = async (paymentData: any) => {
+    try {
+      setIsLoading(true)
+      
+      // Update user subscription in database
+      const response = await fetch('/api/payment/paypal/update-subscription', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          amount: plan.monthlyFee,
-          type: pendingPlanId === 'single_report' ? 'single_report' : 'subscription',
-          subscriptionType: pendingPlanId,
-          reportLimit: plan.totalMonthlyCredits
+          userId,
+          planId: paymentData.planId,
+          orderID: paymentData.orderID,
+          amount: paymentData.amount
         })
       })
 
       if (!response.ok) {
-        throw new Error('Payment creation failed')
+        throw new Error('Failed to update subscription')
       }
 
-      const data = await response.json()
-      
-      if (data.success && data.paymentUrl) {
-        // 跳转到支付宝支付页面
-        window.location.href = data.paymentUrl
-      } else {
-        toast.error(getTranslation(locale, 'paymentCreationFailed'))
-      }
+      toast.success('Payment successful! Your subscription has been activated.')
+      onClose()
     } catch (error) {
-      console.error('Payment error:', error)
-      toast.error(getTranslation(locale, 'paymentCreationFailed'))
+      console.error('Subscription update error:', error)
+      toast.error('Payment successful but subscription update failed. Please contact support.')
     } finally {
       setIsLoading(false)
-      setShowAgreement(false)
-      setPendingPlanId(null)
+      setShowPayPalPayment(false)
+      setPaymentPlan(null)
     }
+  }
+
+  const handlePayPalError = (error: string) => {
+    toast.error(error)
+    setShowPayPalPayment(false)
+    setPaymentPlan(null)
+  }
+
+  const handlePayPalCancel = () => {
+    setShowPayPalPayment(false)
+    setPaymentPlan(null)
   }
 
   if (!isOpen) return null
@@ -325,6 +343,37 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
           onConfirm={handleAgreementConfirm}
           locale={locale}
         />
+
+        {/* PayPal Payment Modal */}
+        {showPayPalPayment && paymentPlan && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-60 p-2 sm:p-4">
+            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center p-4 border-b">
+                <h3 className="text-lg font-bold text-gray-900">
+                  Complete Payment
+                </h3>
+                <button
+                  onClick={handlePayPalCancel}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="p-6">
+                <PayPalPayment
+                  amount={paymentPlan.monthlyFee}
+                  planName={paymentPlan.name}
+                  planId={paymentPlan.id}
+                  userId={userId}
+                  locale={locale}
+                  onSuccess={handlePayPalSuccess}
+                  onError={handlePayPalError}
+                  onCancel={handlePayPalCancel}
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

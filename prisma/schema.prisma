@@ -48,6 +48,9 @@ model Payment {
   alipayTradeNo String?
   alipayOrderId String?
   
+  // PayPal specific fields
+  paypalOrderId String?
+  
   // Subscription details for subscription payments
   subscriptionType String?
   reportLimit      Int?
