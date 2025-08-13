@@ -55,7 +55,9 @@ export default function HomePage({ params }: PageProps) {
 
   // Load user data on mount
   useEffect(() => {
-    console.log('Component mounted, loading user...')
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Component mounted, loading user...')
+    }
     loadUser()
   }, [])
 

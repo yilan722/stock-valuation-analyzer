@@ -25,26 +25,35 @@ export default function AuthModal({ isOpen, onClose, onSuccess, locale }: AuthMo
     setIsLoading(true)
 
     try {
+      // 添加超时处理
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Request timeout')), 30000)
+      )
+
       if (isLogin) {
-        await signIn(email, password)
+        const signInPromise = signIn(email, password)
+        await Promise.race([signInPromise, timeoutPromise])
+        
         toast.success('Login successful!')
-        // Wait a bit after successful login before closing modal
-        setTimeout(() => {
-          onSuccess()
-          onClose()
-          resetForm()
-        }, 500)
+        console.log('Login successful, closing modal...')
+        
+        // 立即关闭模态框
+        onSuccess()
+        onClose()
+        resetForm()
       } else {
-        await signUp(email, password, name)
+        const signUpPromise = signUp(email, password, name)
+        await Promise.race([signUpPromise, timeoutPromise])
+        
         toast.success('Registration successful! Please check your email for verification.')
         onSuccess()
         onClose()
         resetForm()
       }
     } catch (error) {
+      console.error('Auth error:', error)
       toast.error(error instanceof Error ? error.message : 'Operation failed')
-    } finally {
-      setIsLoading(false)
+      setIsLoading(false) // 确保在错误时重置状态
     }
   }
 

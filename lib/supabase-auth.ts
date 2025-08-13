@@ -49,17 +49,25 @@ export async function signUp(email: string, password: string, name?: string) {
 }
 
 export async function signIn(email: string, password: string) {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  })
+  console.log('🔐 Starting sign in process for:', email)
+  
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    })
 
-  if (error) {
-    console.error('Sign in error:', error)
-    throw new Error(error.message)
+    if (error) {
+      console.error('❌ Sign in error:', error)
+      throw new Error(error.message)
+    }
+
+    console.log('✅ Sign in successful:', data.user?.id)
+    return data
+  } catch (error) {
+    console.error('💥 Sign in exception:', error)
+    throw error
   }
-
-  return data
 }
 
 export async function signOut() {
