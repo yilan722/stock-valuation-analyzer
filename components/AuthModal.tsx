@@ -25,22 +25,43 @@ export default function AuthModal({ isOpen, onClose, onSuccess, locale }: AuthMo
     setIsLoading(true)
 
     try {
+      // 检查网络连接
+      if (!navigator.onLine) {
+        throw new Error('No internet connection. Please check your network and try again.')
+      }
+
       // 添加超时处理
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Request timeout')), 30000)
+        setTimeout(() => reject(new Error('Request timeout - please check your internet connection and try again')), 60000)
       )
 
       if (isLogin) {
-        const signInPromise = signIn(email, password)
-        await Promise.race([signInPromise, timeoutPromise])
+        let retryCount = 0
+        const maxRetries = 2
         
-        toast.success('Login successful!')
-        console.log('Login successful, closing modal...')
-        
-        // 立即关闭模态框
-        onSuccess()
-        onClose()
-        resetForm()
+        while (retryCount <= maxRetries) {
+          try {
+            console.log(`🔐 Login attempt ${retryCount + 1}/${maxRetries + 1}`)
+            const signInPromise = signIn(email, password)
+            await Promise.race([signInPromise, timeoutPromise])
+            
+            toast.success('Login successful!')
+            console.log('Login successful, closing modal...')
+            
+            // 立即关闭模态框
+            onSuccess()
+            onClose()
+            resetForm()
+            return
+          } catch (error) {
+            retryCount++
+            if (retryCount > maxRetries) {
+              throw error
+            }
+            console.log(`⚠️ Login attempt ${retryCount} failed, retrying...`)
+            await new Promise(resolve => setTimeout(resolve, 2000)) // 等待2秒后重试
+          }
+        }
       } else {
         const signUpPromise = signUp(email, password, name)
         await Promise.race([signUpPromise, timeoutPromise])
