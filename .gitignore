@@ -19,6 +19,9 @@ dist/
 .env.test.local
 .env.production.local
 
+# Internal development documentation (contains sensitive information)
+DEVELOPMENT_FULL.md
+
 # Vercel
 .vercel
 

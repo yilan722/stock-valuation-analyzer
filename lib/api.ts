@@ -2,7 +2,7 @@ import axios from 'axios'
 import { Opus4Request, Opus4Response, StockData, ValuationReportData } from '@/types'
 
 const OPUS4_API_URL = 'https://api.nuwaapi.com'
-const OPUS4_API_KEY = 'sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR'
+const OPUS4_API_KEY = process.env.OPUS4_API_KEY!
 
 // 创建axios实例
 const opus4Api = axios.create({

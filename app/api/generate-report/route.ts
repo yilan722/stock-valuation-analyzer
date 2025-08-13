@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR`
+            'Authorization': `Bearer ${process.env.OPUS4_API_KEY}`
           },
           body: JSON.stringify({
             model: 'claude-opus-4-1-20250805',

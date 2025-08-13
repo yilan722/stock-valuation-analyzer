@@ -2,7 +2,7 @@ import axios from 'axios'
 import { StockData } from '@/types'
 
 const OPUS4_API_URL = 'https://api.nuwaapi.com'
-const OPUS4_API_KEY = 'sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR'
+const OPUS4_API_KEY = process.env.OPUS4_API_KEY!
 
 export const fetchOtherMarketStockData = async (ticker: string): Promise<StockData> => {
   try {
