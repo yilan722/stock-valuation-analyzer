@@ -24,8 +24,12 @@ function sign(params: any, privateKey: string): string {
 
 export async function createAlipayOrder(payment: PaymentRequest) {
   try {
-    const appId = process.env.ALIPAY_APP_ID || '2021005183622078'
-    const privateKey = process.env.ALIPAY_PRIVATE_KEY || 'mock-key'
+    const appId = process.env.ALIPAY_APP_ID
+    const privateKey = process.env.ALIPAY_PRIVATE_KEY
+    
+    if (!appId || !privateKey) {
+      throw new Error('Missing Alipay configuration. Please set ALIPAY_APP_ID and ALIPAY_PRIVATE_KEY environment variables.')
+    }
     const gateway = 'https://openapi.alipaydev.com/gateway.do'
     
     console.log('创建支付宝订单:', {

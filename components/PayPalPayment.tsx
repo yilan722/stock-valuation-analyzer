@@ -41,9 +41,11 @@ export default function PayPalPayment({
       return
     }
 
-    console.log('🔧 Loading PayPal SDK...')
-    console.log('🔧 Client ID:', process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID)
-    console.log('🔧 NODE_ENV:', process.env.NODE_ENV)
+    // Only log in development environment
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔧 Loading PayPal SDK...')
+      console.log('🔧 NODE_ENV:', process.env.NODE_ENV)
+    }
 
     // Load PayPal SDK with subscriptions support (sandbox for development)
     const script = document.createElement('script')
@@ -52,7 +54,10 @@ export default function PayPalPayment({
           ? `https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}&currency=USD&components=buttons&vault=true&intent=subscription`
           : `https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}&currency=USD&components=buttons&vault=true&intent=subscription`
     
-    console.log('🔧 PayPal SDK URL:', paypalUrl)
+    // Only log in development environment
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔧 PayPal SDK URL:', paypalUrl)
+    }
     script.src = paypalUrl
     script.async = true
     script.onload = () => {
@@ -79,7 +84,10 @@ export default function PayPalPayment({
     window.paypal.Buttons({
       createSubscription: async () => {
         try {
-          console.log('🔐 Creating subscription for plan:', { planId, planName, amount, userId })
+          // Only log in development environment
+          if (process.env.NODE_ENV === 'development') {
+            console.log('🔐 Creating subscription for plan:', { planId, planName, amount, userId })
+          }
           
           // 确保用户已认证
           if (!userId) {
@@ -101,7 +109,10 @@ export default function PayPalPayment({
             })
           })
 
-          console.log('📡 API Response status:', response.status)
+          // Only log in development environment
+          if (process.env.NODE_ENV === 'development') {
+            console.log('📡 API Response status:', response.status)
+          }
           
           if (!response.ok) {
             const errorData = await response.json()
@@ -117,7 +128,10 @@ export default function PayPalPayment({
           }
 
           const data = await response.json()
-          console.log('✅ Subscription created successfully:', data)
+          // Only log in development environment
+          if (process.env.NODE_ENV === 'development') {
+            console.log('✅ Subscription created successfully:', data)
+          }
           return data.subscriptionID
         } catch (error) {
           console.error('❌ Create subscription error:', error)

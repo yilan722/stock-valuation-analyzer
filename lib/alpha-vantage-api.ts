@@ -1,9 +1,13 @@
 import axios from 'axios'
 import { StockData } from '../types'
 
-// Alpha Vantage API (免费版本)
-const ALPHA_VANTAGE_API_KEY = 'XOLA7URKC0XQJQK2' // 免费API key
+// Alpha Vantage API
+const ALPHA_VANTAGE_API_KEY = process.env.ALPHA_VANTAGE_API_KEY
 const ALPHA_VANTAGE_BASE_URL = 'https://www.alphavantage.co/query'
+
+if (!ALPHA_VANTAGE_API_KEY) {
+  throw new Error('Missing Alpha Vantage API key. Please set ALPHA_VANTAGE_API_KEY environment variable.')
+}
 
 export const fetchAlphaVantageStockData = async (ticker: string): Promise<StockData> => {
   try {
