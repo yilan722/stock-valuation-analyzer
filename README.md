@@ -166,6 +166,9 @@ PAYPAL_WEBHOOK_ID=your_webhook_id
 # App Configuration
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 NODE_ENV=development
+
+# Google Analytics (Optional)
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-HS935K4G8C
 ```
 
 **⚠️ Security Note**: Never commit API keys or sensitive credentials to version control. All sensitive information should be stored in environment variables.
