@@ -84,13 +84,15 @@ export default function AuthModal({ isOpen, onClose, onSuccess, locale }: AuthMo
         <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           {!isLogin && (
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-amber-300 mb-1.5 sm:mb-2 font-inter">
+              <label htmlFor="name" className="block text-xs sm:text-sm font-medium text-amber-300 mb-1.5 sm:mb-2 font-inter">
                 Name
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amber-400 h-4 w-4 sm:h-5 sm:w-5" />
                 <input
                   type="text"
+                  id="name"
+                  name="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-slate-800 border border-amber-500/30 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white placeholder-gray-400 font-inter text-sm"
@@ -101,37 +103,41 @@ export default function AuthModal({ isOpen, onClose, onSuccess, locale }: AuthMo
             </div>
           )}
 
-          <div>
-            <label className="block text-xs sm:text-sm font-medium text-amber-300 mb-1.5 sm:mb-2 font-inter">
-              Email
-            </label>
+                      <div>
+              <label htmlFor="email" className="block text-xs sm:text-sm font-medium text-amber-300 mb-1.5 sm:mb-2 font-inter">
+                Email
+              </label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amber-400 h-4 w-4 sm:h-5 sm:w-5" />
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-slate-800 border border-amber-500/30 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white placeholder-gray-400 font-inter text-sm"
-                placeholder="Enter your email"
-                required
-              />
+                              <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-slate-800 border border-amber-500/30 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white placeholder-gray-400 font-inter text-sm"
+                  placeholder="Enter your email"
+                  required
+                />
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs sm:text-sm font-medium text-amber-300 mb-1.5 sm:mb-2 font-inter">
-              Password
-            </label>
+                      <div>
+              <label htmlFor="password" className="block text-xs sm:text-sm font-medium text-amber-300 mb-1.5 sm:mb-2 font-inter">
+                Password
+              </label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amber-400 h-4 w-4 sm:h-5 sm:w-5" />
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-9 sm:pl-10 pr-12 py-2.5 sm:py-3 bg-slate-800 border border-amber-500/30 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white placeholder-gray-400 font-inter text-sm"
-                placeholder="Enter your password"
-                required
-              />
+                              <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  name="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-9 sm:pl-10 pr-12 py-2.5 sm:py-3 bg-slate-800 border border-amber-500/30 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white placeholder-gray-400 font-inter text-sm"
+                  placeholder="Enter your password"
+                  required
+                />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
