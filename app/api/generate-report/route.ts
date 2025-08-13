@@ -127,53 +127,58 @@ export async function POST(request: NextRequest) {
             messages: [
               {
                 role: 'system',
-                content: `You are a professional stock analyst with expertise in fundamental analysis and valuation. Generate a comprehensive, detailed valuation report in ${locale === 'zh' ? 'Chinese' : 'English'} for the given stock data.
+                content: `You are a professional stock analyst with expertise in fundamental analysis and valuation. You MUST actively search for and use the MOST RECENT financial data available for the given company.
+
+CRITICAL REQUIREMENTS:
+- You MUST search for and use the LATEST available financial reports (2025 Q1/Q2, 2024 annual, or most recent available)
+- NEVER use outdated data from 2024 Q3 or earlier unless it's the most recent available
+- If 2025 Q1/Q2 data is available, use that. If not, use 2024 annual data
+- Always specify the exact reporting period and date for ALL financial metrics
+- Search for the most recent quarterly earnings, annual reports, and financial statements
 
 REPORT STRUCTURE (return as valid JSON with these exact keys):
 
 1. fundamentalAnalysis: 
    - Company overview and business model
-   - Key financial metrics (P/E, P/B, ROE, ROA, debt ratios)
-   - Latest quarterly/annual performance with year-over-year comparisons
-   - Revenue growth, profit margins, cash flow analysis
-   - Industry position and competitive advantages
+   - Key financial metrics (P/E, P/B, ROE, ROA, debt ratios) with EXACT reporting dates
+   - LATEST quarterly/annual performance with year-over-year comparisons (specify exact periods)
+   - Revenue growth, profit margins, cash flow analysis with filing dates
+   - Industry position and competitive advantages with latest data
 
 2. businessSegments: 
-   - Detailed revenue breakdown by business segments
-   - Segment performance analysis with growth rates
-   - Geographic revenue distribution
-   - Market share analysis by segment
-   - Segment profitability and margins
-   - Future segment growth projections
+   - Detailed revenue breakdown by business segments with reporting periods
+   - Segment performance analysis with growth rates and data dates
+   - Geographic revenue distribution with latest available data
+   - Market share analysis by segment with source and date
+   - Segment profitability and margins with financial period
+   - Future segment growth projections with projection date
 
 3. growthCatalysts: 
-   - Primary growth drivers and market opportunities
-   - Strategic initiatives and expansion plans
-   - New product/service launches
-   - Market expansion opportunities
-   - Technology investments and R&D
-   - Regulatory tailwinds or headwinds
-   - Competitive advantages and moats
+   - Primary growth drivers and market opportunities with latest announcement dates
+   - Strategic initiatives and expansion plans with announcement dates
+   - New product/service launches with launch dates
+   - Market expansion opportunities with latest developments
+   - Technology investments and R&D with investment dates
+   - Regulatory tailwinds or headwinds with latest updates
+   - Competitive advantages and moats with current assessment
 
 4. valuationAnalysis: 
-   - DCF analysis with detailed assumptions
-   - Comparable company analysis (P/E, EV/EBITDA, P/S ratios)
-   - Sum-of-parts valuation if applicable
-   - Target price calculation with multiple methodologies
-   - Risk-adjusted return analysis
-   - Target price analysis (NO buy/sell recommendations)
-   - Key risks and mitigating factors
+   - DCF analysis with detailed assumptions and calculation date
+   - Comparable company analysis (P/E, EV/EBITDA, P/S ratios) with latest data
+   - Sum-of-parts valuation if applicable with valuation date
+   - Target price calculation with multiple methodologies and calculation date
+   - Risk-adjusted return analysis with latest data
+   - Target price analysis (NO buy/sell recommendations) with analysis date
+   - Key risks and mitigating factors with latest assessment
 
-REQUIREMENTS:
-- Use latest 2024 annual and 2025 quarterly financial data
-- Display "Trading Amount" instead of "Volume"
-- Include specific numbers, percentages, and data points
-- Provide detailed analysis with supporting evidence
+MANDATORY REQUIREMENTS:
+- ALWAYS search for and use the MOST RECENT financial data available
+- Specify exact reporting periods for ALL financial metrics (e.g., "Q1 2025", "2024 Annual Report")
+- Include data sources and filing dates for ALL financial information
 - Use professional HTML styling with classes: 'metric-table', 'highlight-box', 'positive', 'negative', 'neutral'
 - NO buy/sell investment recommendations - only provide target price analysis based on data
 - Ensure JSON is properly formatted and valid
 - Each section should be comprehensive and detailed (minimum 500 words per section)
-- Include data sources and references for key metrics and analysis points
 - Add source links where possible for users to verify data
 
 Return ONLY a valid JSON object with these four sections as HTML strings.`
@@ -188,16 +193,23 @@ STOCK DATA:
 - P/E Ratio: ${stockData.peRatio}
 - Trading Amount: $${stockData.amount}
 
-REQUIREMENTS:
+CRITICAL REQUIREMENTS:
+- You MUST actively search for and use the MOST RECENT financial data available
+- Search for 2025 Q1/Q2 earnings reports, 2024 annual reports, or most recent available
+- NEVER use outdated data from 2024 Q3 or earlier unless it's the most recent available
+- Always specify exact reporting periods and filing dates for ALL financial metrics
+- Include data sources and links for verification
+
+ANALYSIS REQUIREMENTS:
 - Provide detailed, professional analysis with specific data points and percentages
-- Include comprehensive business segment analysis with revenue breakdowns
-- Analyze growth catalysts with specific market opportunities
+- Include comprehensive business segment analysis with revenue breakdowns and reporting periods
+- Analyze growth catalysts with specific market opportunities and announcement dates
 - Provide detailed valuation analysis with multiple methodologies (NO buy/sell recommendations)
-- Use the latest 2024 annual and 2025 quarterly financial data
+- Use the latest available financial data with exact dates
 - Ensure each section is comprehensive and detailed
 - Format as professional HTML with proper styling
 
-Please provide a comprehensive, detailed analysis in ${locale === 'zh' ? 'Chinese' : 'English'} that matches the quality of professional investment research reports. Include data sources and references for key metrics to allow users to verify the information.`
+Please provide a comprehensive, detailed analysis in ${locale === 'zh' ? 'Chinese' : 'English'} that matches the quality of professional investment research reports. The analysis MUST use the most recent financial data available and include specific dates and sources for all information.`
               }
             ],
             temperature: 0.7,
@@ -252,9 +264,29 @@ Please provide a comprehensive, detailed analysis in ${locale === 'zh' ? 'Chines
 
     if (!reportData) {
       console.error('All models failed:', lastError)
+      
+      // 提供更详细的错误信息
+      let errorMessage = 'Failed to generate report'
+      let statusCode = 500
+      
+      if (lastError?.message?.includes('Token amount has been exhausted')) {
+        errorMessage = 'API quota exhausted. Please try again later or contact support.'
+        statusCode = 429 // Too Many Requests
+      } else if (lastError?.message?.includes('fetch failed') || lastError?.message?.includes('SocketError')) {
+        errorMessage = 'Network connection issue. Please check your internet connection and try again.'
+        statusCode = 503 // Service Unavailable
+      } else if (lastError?.message?.includes('401 Unauthorized')) {
+        errorMessage = 'API authentication failed. Please contact support.'
+        statusCode = 401
+      }
+      
       return NextResponse.json(
-        { error: 'Failed to generate report' },
-        { status: 500 }
+        { 
+          error: errorMessage,
+          details: lastError?.message || 'Unknown error',
+          retryAfter: statusCode === 429 ? 3600 : undefined // 1 hour for quota issues
+        },
+        { status: statusCode }
       )
     }
 

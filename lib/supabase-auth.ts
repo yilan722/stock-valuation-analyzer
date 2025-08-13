@@ -52,10 +52,17 @@ export async function signIn(email: string, password: string) {
   console.log('🔐 Starting sign in process for:', email)
   
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    // 增加超时设置
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Request timeout - please check your internet connection and try again')), 15000) // 15秒超时
+    })
+    
+    const signInPromise = supabase.auth.signInWithPassword({
       email,
       password
     })
+    
+    const { data, error } = await Promise.race([signInPromise, timeoutPromise]) as any
 
     if (error) {
       console.error('❌ Sign in error:', error)

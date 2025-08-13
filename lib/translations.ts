@@ -214,7 +214,7 @@ export const translations: Record<Locale, TranslationKeys> = {
     subtitle: 'AI-driven Professional Stock Analysis Platform',
     
     // Search Form
-    searchPlaceholder: 'Currently supports US stocks and A-shares (e.g., AAPL, 002915)',
+    searchPlaceholder: 'Currently supports US stocks, A-shares and HK stocks (e.g., AAPL, 002915, 1347.HK)',
     searchButton: 'Search',
     generateReport: 'Generate Report',
     
@@ -439,7 +439,7 @@ export const translations: Record<Locale, TranslationKeys> = {
     subtitle: 'AI驱动的专业股票分析平台',
     
     // Search Form
-    searchPlaceholder: '目前支持美股和A股 (例如: AAPL, 002915)',
+    searchPlaceholder: '目前支持美股、A股和港股 (例如: AAPL, 002915, 1347.HK)',
     searchButton: '搜索',
     generateReport: '生成报告',
     

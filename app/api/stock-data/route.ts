@@ -190,6 +190,46 @@ const mockStockData: Record<string, StockData> = {
     changePercent: 3.80,
     // Data source: Mock data for demonstration
     // Last updated: 2025-08-11
+  },
+  // 港股示例
+  '1347': {
+    symbol: '1347',
+    name: '华虹半导体',
+    price: 18.82,
+    marketCap: 24500000000,
+    peRatio: 12.4,
+    amount: 1250000000,
+    volume: 66400000,
+    change: -0.32,
+    changePercent: -1.67,
+    // Data source: Mock data for demonstration
+    // Last updated: 2025-08-11
+  },
+  '0700': {
+    symbol: '0700',
+    name: '腾讯控股',
+    price: 285.60,
+    marketCap: 2680000000000,
+    peRatio: 18.5,
+    amount: 8500000000,
+    volume: 29800000,
+    change: 2.40,
+    changePercent: 0.85,
+    // Data source: Mock data for demonstration
+    // Last updated: 2025-08-11
+  },
+  '9988': {
+    symbol: '9988',
+    name: '阿里巴巴-SW',
+    price: 78.90,
+    marketCap: 789000000000,
+    peRatio: 22.3,
+    amount: 3200000000,
+    volume: 40500000,
+    change: -1.10,
+    changePercent: -1.37,
+    // Data source: Mock data for demonstration
+    // Last updated: 2025-08-11
   }
 }
 
@@ -204,8 +244,10 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  // 判断是A股还是其他市场
+  // 判断股票类型
   const isAStock = /^[0-9]{6}$/.test(ticker) || ticker.startsWith('688') || ticker.startsWith('300')
+  // 港股识别：支持 1347, 01347, 1347.HK, 01347.HK 等格式
+  const isHKStock = ticker.includes('.HK') || ticker.includes('.hk') || /^[0-9]{4,5}$/.test(ticker)
   
   try {
     if (isAStock) {
@@ -218,6 +260,19 @@ export async function GET(request: NextRequest) {
         console.error(`Tushare API failed for ${ticker}:`, aStockError)
         return NextResponse.json(
           { error: `A股 ${ticker} 数据获取失败，可能是停牌或数据源暂时不可用。请稍后重试。` },
+          { status: 500 }
+        )
+      }
+    } else if (isHKStock) {
+      // 使用港股API获取港股数据
+      try {
+        const { fetchHKStockData } = await import('@/lib/hk-stock-api')
+        const hkStockData = await fetchHKStockData(ticker)
+        return NextResponse.json(hkStockData)
+      } catch (hkStockError) {
+        console.error(`HK Stock API failed for ${ticker}:`, hkStockError)
+        return NextResponse.json(
+          { error: `港股 ${ticker} 数据获取失败，可能是停牌或数据源暂时不可用。请稍后重试。` },
           { status: 500 }
         )
       }

@@ -64,19 +64,22 @@ REPORT STRUCTURE (return as valid JSON with these exact keys):
    - Investment recommendation (BUY/HOLD/SELL) with rationale **with recommendation date**
    - Key risks and mitigating factors **with latest assessment**
 
-REQUIREMENTS:
-- Use latest 2024 annual and 2025 quarterly financial data
-- Display "Trading Amount" instead of "Volume"
-- Include specific numbers, percentages, and data points
-- Provide detailed analysis with supporting evidence
+CRITICAL REQUIREMENTS:
+- **CRITICAL: You MUST actively search for and use the MOST RECENT financial data available**
+- **CRITICAL: Search for 2025 Q1/Q2 earnings reports, 2024 annual reports, or most recent available**
+- **CRITICAL: NEVER use outdated data from 2024 Q3 or earlier unless it's the most recent available**
+- **CRITICAL: Always specify exact reporting periods and filing dates for ALL financial metrics**
 - **CRITICAL: ALL data points MUST include timestamps and sources**
-- **CRITICAL: Financial data must show exact dates (e.g., "As of Q3 2024", "Latest filing date: March 15, 2025")**
+- **CRITICAL: Financial data must show exact dates (e.g., "Q1 2025", "2024 Annual Report", "Latest filing date: March 15, 2025")**
 - **CRITICAL: News and announcements must include publication dates and sources**
 - **CRITICAL: Market data must show when it was last updated**
 - **CRITICAL: Research and include the most recent news, events, and catalysts affecting stock price**
 - **CRITICAL: For crypto-related stocks, analyze ETH holdings strategy and mNAV valuation impact**
 - **CRITICAL: Identify recent price volatility drivers and market sentiment changes**
 - **CRITICAL: Research latest cryptocurrency reserve strategies across multiple companies (ETH, BTC, etc.)**
+- Display "Trading Amount" instead of "Volume"
+- Include specific numbers, percentages, and data points
+- Provide detailed analysis with supporting evidence
 - **CRITICAL: Analyze how crypto reserve announcements affect stock prices and market sentiment**
 - **CRITICAL: Compare crypto strategies between different companies (HYPE, ENA, SBET, etc.)**
 - **CRITICAL: Include recent market developments and their impact on crypto-related stocks**

@@ -23,31 +23,63 @@ export default function ReportHistory({ locale, isOpen, onClose }: ReportHistory
   const [reports, setReports] = useState<Report[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [selectedReport, setSelectedReport] = useState<Report | null>(null)
+  const [lastLoadTime, setLastLoadTime] = useState<number>(0)
   const { user } = useAuth()
 
   useEffect(() => {
     if (isOpen && user) {
+      // 如果距离上次加载不到30秒，直接使用缓存数据
+      const now = Date.now()
+      if (now - lastLoadTime < 30000 && reports.length > 0) {
+        console.log('Using cached reports data')
+        return
+      }
       loadReports()
     }
   }, [isOpen, user])
 
-  const loadReports = async () => {
+  const loadReports = async (retryCount = 0) => {
     if (!user) return
     
     setIsLoading(true)
+    
+    // 添加超时机制
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Request timeout')), 5000) // 减少到5秒超时
+    })
+    
     try {
-      const { data, error } = await supabase
+      const reportsPromise = supabase
         .from('reports')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
+      const { data, error } = await Promise.race([reportsPromise, timeoutPromise]) as any
+
       if (error) throw error
       setReports(data || [])
+      setLastLoadTime(Date.now()) // 更新最后加载时间
+      console.log(`✅ Successfully loaded ${data?.length || 0} reports`)
     } catch (error) {
-      console.error('Error loading reports:', error)
+      console.error(`Error loading reports (attempt ${retryCount + 1}):`, error)
+      
+      // 重试机制（最多重试1次，减少重试次数）
+      if (retryCount < 1 && (error instanceof Error && error.message === 'Request timeout')) {
+        console.log(`Retrying reports loading (attempt ${retryCount + 2})...`)
+        setTimeout(() => loadReports(retryCount + 1), 2000) // 2秒后重试
+        return
+      }
+      
+      // 最终失败，显示空状态
+      if (error instanceof Error && error.message === 'Request timeout') {
+        console.log('Reports loading failed after retries, showing empty state')
+        setReports([])
+      }
     } finally {
-      setIsLoading(false)
+      if (retryCount === 0) { // 只在第一次尝试时设置loading为false
+        setIsLoading(false)
+      }
     }
   }
 
@@ -141,14 +173,24 @@ export default function ReportHistory({ locale, isOpen, onClose }: ReportHistory
           <h2 className="text-xl font-semibold text-gray-900">
             {getTranslation(locale, 'reportHistory')}
           </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => loadReports()}
+              disabled={isLoading}
+              className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              title="Refresh reports"
+            >
+              {isLoading ? 'Refreshing...' : 'Refresh'}
+            </button>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Content */}
@@ -160,6 +202,7 @@ export default function ReportHistory({ locale, isOpen, onClose }: ReportHistory
                 <div className="text-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
                   <p className="mt-2 text-gray-500">{getTranslation(locale, 'loading')}</p>
+                  <p className="text-xs text-gray-400 mt-1">Loading reports from database...</p>
                 </div>
               ) : reports.length === 0 ? (
                 <div className="text-center py-8">
