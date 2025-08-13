@@ -1,6 +1,6 @@
-# Stock Valuation Analyzer
+# SuperAnalystPro
 
-A professional stock valuation analysis platform powered by Opus4 AI. This application provides comprehensive stock analysis including fundamental data, business segment breakdown, growth catalysts, and detailed valuation metrics.
+A professional AI-powered stock analysis platform (SuperAnalystPro) powered by Opus4 AI. This application provides comprehensive stock analysis including fundamental data, business segment breakdown, growth catalysts, and detailed valuation metrics.
 
 ## Features
 
@@ -37,7 +37,7 @@ A professional stock valuation analysis platform powered by Opus4 AI. This appli
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd stock-valuation-analyzer
+cd superanalystpro
 ```
 
 2. Install dependencies:

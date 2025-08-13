@@ -6,7 +6,7 @@ import { locales, type Locale } from '../../lib/i18n'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Stock Valuation Analyzer',
+  title: 'SuperAnalystPro',
   description: 'Professional AI-powered stock analysis platform',
 }
 

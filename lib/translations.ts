@@ -210,7 +210,7 @@ export type TranslationKeys = {
 export const translations: Record<Locale, TranslationKeys> = {
   en: {
     // Header
-    title: 'Stock Valuation Analyzer',
+    title: 'SuperAnalystPro',
     subtitle: 'AI-driven Professional Stock Analysis Platform',
     
     // Search Form
@@ -435,7 +435,7 @@ export const translations: Record<Locale, TranslationKeys> = {
   },
   zh: {
     // Header
-    title: '股票估值分析器',
+    title: 'SuperAnalystPro',
     subtitle: 'AI驱动的专业股票分析平台',
     
     // Search Form

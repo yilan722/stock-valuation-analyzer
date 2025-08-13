@@ -1,7 +1,7 @@
 {
-  "name": "stock-valuation-analyzer",
+  "name": "superanalystpro",
   "version": "1.0.0",
-  "description": "Professional stock valuation analysis platform",
+  "description": "Professional AI-powered stock analysis platform - SuperAnalystPro",
   "private": true,
   "scripts": {
     "dev": "next dev",
