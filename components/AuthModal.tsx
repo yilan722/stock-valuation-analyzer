@@ -25,35 +25,51 @@ export default function AuthModal({ isOpen, onClose, onSuccess, locale }: AuthMo
     setIsLoading(true)
 
     try {
-      // 添加超时处理
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Request timeout')), 30000)
-      )
-
+      console.log('🚀 开始认证流程...')
+      
       if (isLogin) {
-        const signInPromise = signIn(email, password)
-        await Promise.race([signInPromise, timeoutPromise])
+        console.log('🔐 登录模式')
+        const result = await signIn(email, password)
+        console.log('✅ 登录成功:', result.user?.id)
         
-        toast.success('Login successful!')
-        console.log('Login successful, closing modal...')
+        toast.success('登录成功！')
         
-        // 立即关闭模态框
-        onSuccess()
-        onClose()
+        // 立即关闭模态框和重置表单
         resetForm()
+        onClose()
+        onSuccess()
       } else {
-        const signUpPromise = signUp(email, password, name)
-        await Promise.race([signUpPromise, timeoutPromise])
+        console.log('📝 注册模式')
+        const result = await signUp(email, password, name)
+        console.log('✅ 注册成功:', result.user?.id)
         
-        toast.success('Registration successful! Please check your email for verification.')
-        onSuccess()
-        onClose()
+        toast.success('注册成功！请检查您的邮箱进行验证。')
+        
+        // 立即关闭模态框和重置表单
         resetForm()
+        onClose()
+        onSuccess()
       }
     } catch (error) {
-      console.error('Auth error:', error)
-      toast.error(error instanceof Error ? error.message : 'Operation failed')
-      setIsLoading(false) // 确保在错误时重置状态
+      console.error('❌ 认证错误:', error)
+      
+      let errorMessage = '操作失败'
+      if (error instanceof Error) {
+        errorMessage = error.message
+      }
+      
+      // 提供更友好的错误信息
+      if (errorMessage.includes('Invalid login credentials')) {
+        errorMessage = '邮箱或密码错误'
+      } else if (errorMessage.includes('User already registered')) {
+        errorMessage = '该邮箱已被注册，请直接登录'
+      } else if (errorMessage.includes('Email not confirmed')) {
+        errorMessage = '请先验证您的邮箱'
+      }
+      
+      toast.error(errorMessage)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -117,6 +133,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, locale }: AuthMo
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-slate-800 border border-amber-500/30 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white placeholder-gray-400 font-inter text-sm"
                   placeholder="Enter your email"
+                  autoComplete="email"
                   required
                 />
             </div>
@@ -136,6 +153,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, locale }: AuthMo
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-9 sm:pl-10 pr-12 py-2.5 sm:py-3 bg-slate-800 border border-amber-500/30 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white placeholder-gray-400 font-inter text-sm"
                   placeholder="Enter your password"
+                  autoComplete="current-password"
                   required
                 />
               <button

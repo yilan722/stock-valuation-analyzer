@@ -10,11 +10,14 @@ import AuthModal from '../../components/AuthModal'
 import SubscriptionModal from '../../components/SubscriptionModal'
 import ReportHistory from '../../components/ReportHistory'
 import GenerationModal from '../../components/GenerationModal'
+import DebugPanel from '../../components/DebugPanel'
 import Footer from '../../components/Footer'
 import { StockData, ValuationReportData } from '../../types'
 import { type Locale } from '../../lib/i18n'
 import { getTranslation } from '../../lib/translations'
-import { getCurrentUser, canGenerateReport } from '../../lib/supabase-auth'
+import { useAuth } from '../../lib/useAuth'
+import { canGenerateReport } from '../../lib/supabase-auth'
+import { supabase } from '../../lib/supabase'
 import toast from 'react-hot-toast'
 
 interface PageProps {
@@ -27,13 +30,60 @@ export default function HomePage({ params }: PageProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [isGeneratingReport, setIsGeneratingReport] = useState(false)
   
-  // User state
-  const [user, setUser] = useState<any>(null)
+  // 使用useAuth hook管理用户状态
+  const { user: useAuthUser, loading: userLoading, forceUpdate: useAuthForceUpdate, resetLoading: useAuthResetLoading, forceSetUser: useAuthForceSetUser } = useAuth()
+  
+  // 添加调试信息
+  console.log('🔍 主页面用户状态:', { 
+    useAuthUser, 
+    userLoading,
+    useAuthUserId: useAuthUser?.id
+  })
+  
+  // 强制更新状态
+  const [, forceUpdate] = useState({})
+  
+  // 移除重复的认证监听，只使用useAuth hook
+  // useEffect(() => {
+  //   // 这个监听器已被移除，避免与useAuth hook冲突
+  // }, [])
+  
+  // 只使用useAuth hook的用户状态
+  const currentUser = useAuthUser
+  
+  // 检查是否还在加载中 - 修复逻辑
+  // 如果用户已认证但loading仍为true，强制设置为false
+  const isUserLoading = userLoading && !useAuthUser
+  
+  console.log('🔍 当前用户状态:', { 
+    currentUser: currentUser?.id, 
+    isUserLoading, 
+    userLoading,
+    useAuthUser: useAuthUser?.id
+  })
+  
+  // UI state
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false)
   const [showReportHistory, setShowReportHistory] = useState(false)
   const [showGenerationModal, setShowGenerationModal] = useState(false)
-  const [isLoadingUser, setIsLoadingUser] = useState(true)
+  const [showDebugPanel, setShowDebugPanel] = useState(false)
+
+  // 如果检测到loading状态异常，强制重置
+  useEffect(() => {
+    if (useAuthUser && userLoading) {
+      console.log('⚠️ 检测到loading状态异常，强制重置')
+      useAuthResetLoading()
+    }
+  }, [useAuthUser, userLoading, useAuthResetLoading])
+
+  // 监听用户状态变化，自动关闭登录模态框
+  useEffect(() => {
+    if (useAuthUser && showAuthModal) {
+      console.log('🔒 用户已认证，自动关闭登录模态框')
+      setShowAuthModal(false)
+    }
+  }, [useAuthUser, showAuthModal])
 
   const handleSearch = async (symbol: string) => {
     setIsLoading(true)
@@ -53,54 +103,48 @@ export default function HomePage({ params }: PageProps) {
     }
   }
 
-  // Load user data on mount
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Component mounted, loading user...')
-    }
-    loadUser()
-  }, [])
-
-  const loadUser = async () => {
-    try {
-      console.log('Loading user...')
-      const userData = await getCurrentUser()
-      console.log('User data loaded:', userData)
-      
-      if (userData) {
-        // 🔥 新增：获取白名单状态
-        try {
-          const whitelistStatus = await canGenerateReport(userData.id)
-          const userWithWhitelist = {
-            ...userData,
-            whitelistStatus
+  const handleAuthSuccess = () => {
+    console.log('✅ 认证成功，用户状态将自动更新')
+    
+    // 立即关闭登录模态框
+    setShowAuthModal(false)
+    console.log('🔒 登录模态框已关闭')
+    
+    // 从URL或localStorage获取用户ID
+    const getUserIdFromAuth = () => {
+      // 尝试从Supabase获取当前会话
+      return new Promise<string | null>((resolve) => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (session?.user?.id) {
+            resolve(session.user.id)
+          } else {
+            resolve(null)
           }
-          setUser(userWithWhitelist)
-          console.log('User with whitelist status:', userWithWhitelist)
-        } catch (whitelistError) {
-          console.error('获取白名单状态失败:', whitelistError)
-          setUser(userData)
-        }
-      } else {
-        setUser(null)
-      }
-    } catch (error) {
-      console.error('Failed to load user:', error)
-      setUser(null)
-    } finally {
-      setIsLoadingUser(false)
+        })
+      })
     }
-  }
-
-  const handleAuthSuccess = async () => {
-    // 等待一下让 Supabase 会话更新
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    console.log('Auth success, reloading user...')
-    await loadUser()
+    
+    // 强制设置用户状态
+    getUserIdFromAuth().then(userId => {
+      if (userId) {
+        console.log('🔄 强制设置用户状态:', userId)
+        useAuthForceSetUser(userId)
+      } else {
+        console.log('⚠️ 无法获取用户ID，使用resetLoading')
+        useAuthResetLoading()
+      }
+    })
+    
+    // 强制更新组件状态
+    setTimeout(() => {
+      useAuthForceUpdate()
+      forceUpdate({})
+    }, 100)
   }
 
   const handleLogout = () => {
-    setUser(null)
+    // useAuth hook会自动处理登出状态
+    console.log('👋 User logged out')
   }
 
   const handleLogin = () => {
@@ -121,13 +165,13 @@ export default function HomePage({ params }: PageProps) {
       return
     }
 
-    if (!user) {
+    if (!currentUser) {
       console.log('No user found, showing auth modal')
       setShowAuthModal(true)
       return
     }
 
-    console.log('Generating report for user:', user.id)
+    console.log('Generating report for user:', currentUser.id)
     setShowGenerationModal(true)
     setIsGeneratingReport(true)
     try {
@@ -137,7 +181,7 @@ export default function HomePage({ params }: PageProps) {
         headers: {
           'Content-Type': 'application/json',
           // 添加认证头 - 使用用户ID作为备选方案
-          'Authorization': `Bearer ${user.id}`,
+          'Authorization': `Bearer ${currentUser.id}`,
         },
         credentials: 'include', // 确保包含cookies
         body: JSON.stringify({
@@ -171,7 +215,7 @@ export default function HomePage({ params }: PageProps) {
       setReportData(data)
       setShowGenerationModal(false)
       toast.success(getTranslation(params.locale, 'reportGenerated'))
-      loadUser() // Refresh user data to update usage
+      // loadUser() // Refresh user data to update usage - useAuth hook handles this
     } catch (error) {
       console.error('Report generation error:', error)
       setShowGenerationModal(false)
@@ -185,12 +229,13 @@ export default function HomePage({ params }: PageProps) {
     <div className="min-h-screen bg-gray-50">
               <Header
           locale={params.locale}
-          user={user}
+          user={currentUser}
           onLogout={handleLogout}
-          onRefresh={loadUser}
+          onRefresh={() => {}} // No need to reload user here, useAuth handles it
           onLogin={handleLogin}
           onOpenSubscription={handleOpenSubscription}
           onOpenReportHistory={handleOpenReportHistory}
+          onOpenDebugPanel={() => setShowDebugPanel(true)}
         />
       
       <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
@@ -200,7 +245,7 @@ export default function HomePage({ params }: PageProps) {
             <SearchForm
               onSearch={handleSearch}
               onGenerateReport={handleGenerateReport}
-              isLoading={isLoading || isGeneratingReport}
+              isLoading={isUserLoading || isGeneratingReport}
               locale={params.locale}
               isGeneratingReport={isGeneratingReport}
             />
@@ -299,7 +344,7 @@ export default function HomePage({ params }: PageProps) {
       <SubscriptionModal
         isOpen={showSubscriptionModal}
         onClose={() => setShowSubscriptionModal(false)}
-        userId={user?.id || ''}
+        userId={currentUser?.id || ''}
         locale={params.locale}
       />
 
@@ -312,6 +357,12 @@ export default function HomePage({ params }: PageProps) {
       <GenerationModal
         isOpen={showGenerationModal}
         locale={params.locale}
+      />
+      
+      {/* 调试面板 */}
+      <DebugPanel 
+        isOpen={showDebugPanel} 
+        onClose={() => setShowDebugPanel(false)} 
       />
       
       <Footer />

@@ -19,37 +19,15 @@ export async function signUp(email: string, password: string, name?: string) {
     throw new Error(error.message)
   }
 
-  // Create user profile directly
-  if (data.user) {
-    console.log('Creating user profile for:', data.user.id)
-    try {
-      const { data: profile, error: profileError } = await supabase
-        .from('users')
-        .insert({
-          id: data.user.id,
-          email: data.user.email!,
-          name: name || null,
-          free_reports_used: 0,
-          paid_reports_used: 0,
-          monthly_report_limit: 0
-        })
-        .select()
-        .single()
-
-      if (profileError) {
-        console.error('Error creating user profile:', profileError)
-      } else {
-        console.log('User profile created successfully')
-      }
-    } catch (error) {
-      console.error('Error creating profile:', error)
-    }
-  }
+  // 数据库触发器会自动创建用户profile，不需要手动创建
+  console.log('✅ User registered successfully:', data.user?.id)
+  console.log('📋 User profile will be created automatically by database trigger')
+  
   return data
 }
 
 export async function signIn(email: string, password: string) {
-  console.log('🔐 Starting sign in process for:', email)
+  console.log('🔐 开始登录:', email)
   
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -58,14 +36,14 @@ export async function signIn(email: string, password: string) {
     })
 
     if (error) {
-      console.error('❌ Sign in error:', error)
+      console.error('❌ 登录失败:', error.message)
       throw new Error(error.message)
     }
 
-    console.log('✅ Sign in successful:', data.user?.id)
+    console.log('✅ 登录成功:', data.user?.id)
     return data
   } catch (error) {
-    console.error('💥 Sign in exception:', error)
+    console.error('💥 登录异常:', error)
     throw error
   }
 }
@@ -79,67 +57,25 @@ export async function signOut() {
 }
 
 export async function getCurrentUser() {
-  console.log('Getting current user...')
-  const { data: { user }, error } = await supabase.auth.getUser()
-
-  if (error) {
-    console.error('Error getting auth user:', error)
-    throw new Error(error.message)
-  }
-
-  if (!user) {
-    console.log('No authenticated user found')
-    return null
-  }
-
-  console.log('Auth user found:', user.id)
-
-  // Try to get user profile directly from client
   try {
-    const { data: profile, error: profileError } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', user.id)
-      .single()
+    console.log('Getting current user...')
+    const { data: { user }, error } = await supabase.auth.getUser()
 
-    if (profileError) {
-      console.error('Error fetching user profile:', profileError)
-      
-      // If profile doesn't exist, create it
-      if (profileError.code === 'PGRST116') {
-        console.log('Creating missing user profile...')
-        const { data: newProfile, error: createError } = await supabase
-          .from('users')
-          .insert({
-            id: user.id,
-            email: user.email!,
-            name: user.user_metadata?.name || null,
-            free_reports_used: 0,
-            paid_reports_used: 0,
-            monthly_report_limit: 0
-          })
-          .select()
-          .single()
-
-        if (createError) {
-          console.error('Error creating missing profile:', createError)
-          // Return user without profile for now
-          return user
-        }
-
-        console.log('User profile created successfully')
-        return { ...user, ...newProfile }
-      }
-      
-      // Return user without profile for now
-      return user
+    if (error) {
+      console.error('Error getting auth user:', error)
+      return null
     }
 
-    console.log('User profile found:', profile)
-    return { ...user, ...profile }
+    if (!user) {
+      console.log('No authenticated user found')
+      return null
+    }
+
+    console.log('Auth user found:', user.id)
+    return user
   } catch (error) {
     console.error('Error in getCurrentUser:', error)
-    return user
+    return null
   }
 }
 

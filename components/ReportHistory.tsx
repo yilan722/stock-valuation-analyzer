@@ -26,8 +26,12 @@ export default function ReportHistory({ locale, isOpen, onClose }: ReportHistory
   const { user } = useAuth()
 
   useEffect(() => {
+    console.log('🔍 ReportHistory useEffect:', { isOpen, userId: user?.id })
     if (isOpen && user) {
+      console.log('🔄 开始加载报告...')
       loadReports()
+    } else if (isOpen && !user) {
+      console.log('⚠️ 用户未登录，无法加载报告')
     }
   }, [isOpen, user])
 
@@ -36,16 +40,25 @@ export default function ReportHistory({ locale, isOpen, onClose }: ReportHistory
     
     setIsLoading(true)
     try {
+      console.log('🔄 开始加载报告，用户ID:', user.id)
+      
       const { data, error } = await supabase
         .from('reports')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
-      if (error) throw error
+      if (error) {
+        console.error('❌ 加载报告时出错:', error)
+        throw error
+      }
+      
+      console.log('✅ 成功加载报告，数量:', data?.length || 0)
       setReports(data || [])
     } catch (error) {
-      console.error('Error loading reports:', error)
+      console.error('❌ 加载报告失败:', error)
+      // 显示用户友好的错误信息
+      alert(`加载报告失败: ${error instanceof Error ? error.message : '未知错误'}`)
     } finally {
       setIsLoading(false)
     }
@@ -154,7 +167,7 @@ export default function ReportHistory({ locale, isOpen, onClose }: ReportHistory
         {/* Content */}
         <div className="flex h-[calc(90vh-120px)]">
           {/* Reports List */}
-          <div className="w-1/2 border-r overflow-y-auto">
+          <div className="w-1/3 border-r overflow-y-auto">
             <div className="p-4">
               {isLoading ? (
                 <div className="text-center py-8">
@@ -217,14 +230,14 @@ export default function ReportHistory({ locale, isOpen, onClose }: ReportHistory
           </div>
 
           {/* Report Preview */}
-          <div className="w-1/2 p-4 overflow-y-auto">
+          <div className="w-2/3 p-4 overflow-y-auto">
             {selectedReport ? (
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   {selectedReport.stock_symbol} - {selectedReport.stock_name}
                 </h3>
                 <div 
-                  className="prose max-w-none"
+                  className="prose max-w-none report-content"
                   dangerouslySetInnerHTML={{
                     __html: JSON.parse(selectedReport.report_data).fundamentalAnalysis || 'No content available'
                   }}

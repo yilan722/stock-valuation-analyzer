@@ -222,25 +222,34 @@ export async function GET(request: NextRequest) {
         )
       }
     } else {
-      // 使用Alpha Vantage API获取美股数据
+      // 使用实时股票数据API获取美股数据
       try {
-        const { fetchAlphaVantageStockData } = await import('@/lib/alpha-vantage-api')
-        const alphaVantageData = await fetchAlphaVantageStockData(ticker)
-        return NextResponse.json(alphaVantageData)
-      } catch (alphaVantageError) {
-        console.error(`Alpha Vantage API failed for ${ticker}:`, alphaVantageError)
+        const { fetchRealTimeStockData } = await import('@/lib/real-time-stock-data')
+        const realTimeData = await fetchRealTimeStockData(ticker)
+        return NextResponse.json(realTimeData)
+      } catch (realTimeError) {
+        console.error(`实时数据API失败 for ${ticker}:`, realTimeError)
         
-        // 尝试使用Opus4 API作为备选
+        // 如果实时API失败，尝试使用备用方案
         try {
-          const { fetchOtherMarketStockData } = await import('@/lib/opus4-stock-api')
-          const opus4Data = await fetchOtherMarketStockData(ticker)
-          return NextResponse.json(opus4Data)
-        } catch (opus4Error) {
-          console.error(`Opus4 API also failed for ${ticker}:`, opus4Error)
-          return NextResponse.json(
-            { error: `美股 ${ticker} 数据获取失败。可能原因：1) 股票代码不存在 2) 股票已退市 3) 数据源暂时不可用。请检查股票代码或稍后重试。` },
-            { status: 500 }
-          )
+          const { fetchYahooFinanceFallback } = await import('@/lib/yahoo-finance-html-api')
+          const fallbackData = await fetchYahooFinanceFallback(ticker)
+          return NextResponse.json(fallbackData)
+        } catch (fallbackError) {
+          console.error(`备用方案也失败 for ${ticker}:`, fallbackError)
+          
+          // 最后尝试使用Opus4 API
+          try {
+            const { fetchOtherMarketStockData } = await import('@/lib/opus4-stock-api')
+            const opus4Data = await fetchOtherMarketStockData(ticker)
+            return NextResponse.json(opus4Data)
+          } catch (opus4Error) {
+            console.error(`Opus4 API也失败 for ${ticker}:`, opus4Error)
+            return NextResponse.json(
+              { error: `美股 ${ticker} 数据获取失败。可能原因：1) 股票代码不存在 2) 股票已退市 3) 数据源暂时不可用。请检查股票代码或稍后重试。` },
+              { status: 500 }
+            )
+          }
         }
       }
     }

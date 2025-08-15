@@ -39,9 +39,10 @@ interface HeaderProps {
   onLogin: () => void
   onOpenSubscription: () => void
   onOpenReportHistory: () => void
+  onOpenDebugPanel: () => void
 }
 
-export default function Header({ locale, user, onLogout, onRefresh, onLogin, onOpenSubscription, onOpenReportHistory }: HeaderProps) {
+export default function Header({ locale, user, onLogout, onRefresh, onLogin, onOpenSubscription, onOpenReportHistory, onOpenDebugPanel }: HeaderProps) {
   return (
     <header className="bg-slate-800 shadow-lg border-b border-amber-500/30">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
@@ -67,6 +68,7 @@ export default function Header({ locale, user, onLogout, onRefresh, onLogin, onO
               onLogin={onLogin}
               onOpenSubscription={onOpenSubscription}
               onOpenReportHistory={onOpenReportHistory}
+              onOpenDebugPanel={onOpenDebugPanel}
               locale={locale}
               isCompact={true}
             />
