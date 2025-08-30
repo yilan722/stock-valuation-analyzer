@@ -1,6 +1,10 @@
 # SuperAnalystPro
 
-A professional AI-powered stock analysis platform (SuperAnalystPro) powered by Opus4 AI. This application provides comprehensive stock analysis including fundamental data, business segment breakdown, growth catalysts, and detailed valuation metrics.
+A professional AI-powered stock analysis platform (SuperAnalystPro) powered by Perplexity Sonar Pro Deep Research. This application provides comprehensive stock analysis including fundamental data, business segment breakdown, growth catalysts, and detailed valuation metrics.
+
+## 🚀 Quick Deploy
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyilan722%2Fstock-valuation-analyzer&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,SUPABASE_SERVICE_ROLE_KEY,PERPLEXITY_API_KEY,TUSHARE_TOKEN&envDescription=Required%20API%20keys%20for%20full%20functionality&envLink=https%3A%2F%2Fgithub.com%2Fyilan722%2Fstock-valuation-analyzer%2Fblob%2Fmain%2FVERCEL_DEPLOYMENT_GUIDE.md)
 
 ## Features
 
