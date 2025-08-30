@@ -220,7 +220,22 @@ export default function HomePage({ params }: PageProps) {
     } catch (error) {
       console.error('❌ 报告生成失败:', error)
       setShowGenerationModal(false)
-      toast.error(error instanceof Error ? error.message : getTranslation(params.locale, 'apiError'))
+      
+      // 提供更友好的错误信息
+      let errorMessage = getTranslation(params.locale, 'apiError')
+      if (error instanceof Error) {
+        if (error.message.includes('API quota exhausted')) {
+          errorMessage = 'API quota exhausted. Please try again later or contact support.'
+        } else if (error.message.includes('Network connection issue')) {
+          errorMessage = 'Network connection issue. Please check your internet connection and try again.'
+        } else if (error.message.includes('API authentication failed')) {
+          errorMessage = 'API authentication failed. Please contact support.'
+        } else {
+          errorMessage = error.message
+        }
+      }
+      
+      toast.error(errorMessage)
     } finally {
       setIsGeneratingReport(false)
     }

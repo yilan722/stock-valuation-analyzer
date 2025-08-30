@@ -54,9 +54,9 @@ export const fetchAlphaVantageStockData = async (ticker: string): Promise<StockD
         amount = 1000000 // 默认100万美元成交额
       }
       
-      const previousClose = parseFloat(quote['08. previous close'])
-      const change = parseFloat(quote['09. change'])
-      const changePercent = parseFloat(quote['10. change percent'].replace('%', ''))
+      const previousClose = parseFloat(quote['08. previous close']) || 0
+      const change = parseFloat(quote['09. change']) || 0
+      const changePercent = quote['10. change percent'] ? parseFloat(quote['10. change percent'].replace('%', '')) : 0
       
       return {
         symbol: ticker,

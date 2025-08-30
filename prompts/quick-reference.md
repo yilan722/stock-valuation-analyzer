@@ -39,8 +39,13 @@ REPORT STRUCTURE (return as valid JSON with these exact keys):
    - Investment recommendation (BUY/HOLD/SELL) with rationale
    - Key risks and mitigating factors
 
-REQUIREMENTS:
-- Use latest 2024 annual and 2025 quarterly financial data
+CRITICAL REQUIREMENTS:
+- **CRITICAL: You MUST actively search for and use the MOST RECENT financial data available**
+- **CRITICAL: Search for 2025 Q1/Q2 earnings reports, 2024 annual reports, or most recent available**
+- **CRITICAL: NEVER use outdated data from 2024 Q3 or earlier unless it's the most recent available**
+- **CRITICAL: Always specify exact reporting periods and filing dates for ALL financial metrics**
+
+ANALYSIS REQUIREMENTS:
 - Display "Trading Amount" instead of "Volume"
 - Include specific numbers, percentages, and data points
 - Provide detailed analysis with supporting evidence
@@ -61,12 +66,18 @@ STOCK DATA:
 - P/E Ratio: ${stockData.peRatio}
 - Trading Amount: ${stockData.amount}
 
-REQUIREMENTS:
+CRITICAL REQUIREMENTS:
+- **CRITICAL: You MUST actively search for and use the MOST RECENT financial data available**
+- **CRITICAL: Search for 2025 Q1/Q2 earnings reports, 2024 annual reports, or most recent available**
+- **CRITICAL: NEVER use outdated data from 2024 Q3 or earlier unless it's the most recent available**
+- **CRITICAL: Always specify exact reporting periods and filing dates for ALL financial metrics**
+
+ANALYSIS REQUIREMENTS:
 - Provide detailed, professional analysis with specific data points and percentages
-- Include comprehensive business segment analysis with revenue breakdowns
-- Analyze growth catalysts with specific market opportunities
+- Include comprehensive business segment analysis with revenue breakdowns and reporting periods
+- Analyze growth catalysts with specific market opportunities and announcement dates
 - Provide detailed valuation analysis with multiple methodologies
-- Use the latest 2024 annual and 2025 quarterly financial data
+- Use the latest available financial data with exact dates
 - Ensure each section is comprehensive and detailed
 - Format as professional HTML with proper styling
 
