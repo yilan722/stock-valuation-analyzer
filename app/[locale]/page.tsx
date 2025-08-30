@@ -144,7 +144,7 @@ export default function HomePage({ params }: PageProps) {
     
     if (!stockData) {
       console.log('❌ 没有选择股票')
-      toast.error(getTranslation(params.locale, 'noStockSelected'))
+      toast.error(params.locale === 'zh' ? '请先搜索并选择股票' : 'Please search and select a stock first')
       return
     }
 
