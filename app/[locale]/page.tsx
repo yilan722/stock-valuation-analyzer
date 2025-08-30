@@ -12,13 +12,21 @@ import ReportHistory from '../../components/ReportHistory'
 import GenerationModal from '../../components/GenerationModal'
 import DebugPanel from '../../components/DebugPanel'
 import Footer from '../../components/Footer'
-import { StockData, ValuationReportData } from '../../types'
+import { StockData, ValuationReportData, MultiCompanyAnalysis } from '../../types'
 import { type Locale } from '../../lib/i18n'
 import { getTranslation } from '../../lib/translations'
-import { useAuth } from '../../lib/useAuth'
+import useAuth from '../../lib/useAuth'
 import { canGenerateReport } from '../../lib/supabase-auth'
 import { supabase } from '../../lib/supabase'
 import toast from 'react-hot-toast'
+
+// 导入新功能组件
+import UserInputModal from '../../src/features/personal-research-center/user-input-modal'
+import DisplayVersionedReport from '../../src/features/personal-research-center/display-versioned-report'
+import MultiCompanyModal from '../../src/features/multi-company-analysis/multi-company-modal'
+import MultiCompanyResults from '../../src/features/multi-company-analysis/multi-company-results'
+import { ReportGenerationAgent } from '../../src/features/personal-research-center/generate-report-agent'
+import { getFeatureFlags } from '../../lib/env'
 
 interface PageProps {
   params: { locale: Locale }
@@ -33,12 +41,16 @@ export default function HomePage({ params }: PageProps) {
   // 使用useAuth hook管理用户状态
   const { user: useAuthUser, loading: userLoading, forceUpdate: useAuthForceUpdate, resetLoading: useAuthResetLoading, forceSetUser: useAuthForceSetUser } = useAuth()
   
-  // 添加调试信息
-  console.log('🔍 主页面用户状态:', { 
-    useAuthUser, 
-    userLoading,
-    useAuthUserId: useAuthUser?.id
-  })
+  // 添加调试信息 - 只在开发环境和状态变化时打印
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 主页面用户状态:', { 
+        useAuthUser: useAuthUser?.id, 
+        userLoading,
+        useAuthUserId: useAuthUser?.id
+      })
+    }
+  }, [useAuthUser?.id, userLoading]) // 只在关键状态变化时触发
   
   // 强制更新状态
   const [, forceUpdate] = useState({})
@@ -55,12 +67,17 @@ export default function HomePage({ params }: PageProps) {
   // 如果用户已认证但loading仍为true，强制设置为false
   const isUserLoading = userLoading && !useAuthUser
   
-  console.log('🔍 当前用户状态:', { 
-    currentUser: currentUser?.id, 
-    isUserLoading, 
-    userLoading,
-    useAuthUser: useAuthUser?.id
-  })
+  // 减少重复日志，只在真正的状态变化时打印
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 当前用户状态:', { 
+        currentUser: currentUser?.id, 
+        isUserLoading, 
+        userLoading,
+        useAuthUser: useAuthUser?.id
+      })
+    }
+  }, [currentUser?.id, isUserLoading]) // 只在关键状态变化时触发
   
   // UI state
   const [showAuthModal, setShowAuthModal] = useState(false)
@@ -68,6 +85,18 @@ export default function HomePage({ params }: PageProps) {
   const [showReportHistory, setShowReportHistory] = useState(false)
   const [showGenerationModal, setShowGenerationModal] = useState(false)
   const [showDebugPanel, setShowDebugPanel] = useState(false)
+
+  // 新功能状态
+  const [showPersonalResearchModal, setShowPersonalResearchModal] = useState(false)
+  const [showMultiCompanyModal, setShowMultiCompanyModal] = useState(false)
+  const [showMultiCompanyResults, setShowMultiCompanyResults] = useState(false)
+  const [multiCompanyAnalysis, setMultiCompanyAnalysis] = useState<MultiCompanyAnalysis | null>(null)
+  const [isGeneratingPersonalReport, setIsGeneratingPersonalReport] = useState(false)
+  const [versionedReport, setVersionedReport] = useState<any>(null)
+  const [showVersionedReport, setShowVersionedReport] = useState(false)
+
+  // 功能开关
+  const featureFlags = getFeatureFlags()
 
   // 如果检测到loading状态异常，强制重置
   useEffect(() => {
@@ -103,103 +132,75 @@ export default function HomePage({ params }: PageProps) {
     }
   }
 
-  const handleAuthSuccess = () => {
-    console.log('✅ 认证成功，用户状态将自动更新')
-    
-    // 立即关闭登录模态框
-    setShowAuthModal(false)
-    console.log('🔒 登录模态框已关闭')
-    
-    // 从URL或localStorage获取用户ID
-    const getUserIdFromAuth = () => {
-      // 尝试从Supabase获取当前会话
-      return new Promise<string | null>((resolve) => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-          if (session?.user?.id) {
-            resolve(session.user.id)
-          } else {
-            resolve(null)
-          }
-        })
-      })
-    }
-    
-    // 强制设置用户状态
-    getUserIdFromAuth().then(userId => {
-      if (userId) {
-        console.log('🔄 强制设置用户状态:', userId)
-        useAuthForceSetUser(userId)
-      } else {
-        console.log('⚠️ 无法获取用户ID，使用resetLoading')
-        useAuthResetLoading()
-      }
+  const handleGenerateReport = async () => {
+    console.log('🚀 开始生成报告流程...')
+    console.log('📊 当前状态:', {
+      stockData: stockData?.symbol,
+      currentUser: currentUser?.id,
+      currentUserEmail: currentUser?.email,
+      isUserLoading,
+      userLoading
     })
     
-    // 强制更新组件状态
-    setTimeout(() => {
-      useAuthForceUpdate()
-      forceUpdate({})
-    }, 100)
-  }
-
-  const handleLogout = () => {
-    // useAuth hook会自动处理登出状态
-    console.log('👋 User logged out')
-  }
-
-  const handleLogin = () => {
-    setShowAuthModal(true)
-  }
-
-  const handleOpenSubscription = () => {
-    setShowSubscriptionModal(true)
-  }
-
-  const handleOpenReportHistory = () => {
-    setShowReportHistory(true)
-  }
-
-  const handleGenerateReport = async () => {
     if (!stockData) {
-      toast.error(getTranslation(params.locale, 'stockNotFound'))
+      console.log('❌ 没有选择股票')
+      toast.error(getTranslation(params.locale, 'noStockSelected'))
       return
     }
 
     if (!currentUser) {
-      console.log('No user found, showing auth modal')
+      console.log('❌ 用户未登录，显示登录模态框')
       setShowAuthModal(true)
       return
     }
 
-    console.log('Generating report for user:', currentUser.id)
+    console.log('✅ 用户已登录，开始权限检查...')
+
+    // 检查用户权限
+    try {
+      console.log('🔍 调用canGenerateReport...')
+      const canGenerate = await canGenerateReport(currentUser.id)
+      console.log('📋 权限检查结果:', canGenerate)
+      
+      if (!canGenerate.canGenerate) {
+        console.log('❌ 用户无权限，显示订阅模态框')
+        setShowSubscriptionModal(true)
+        return
+      }
+      
+      console.log('✅ 用户有权限，继续生成报告...')
+    } catch (error) {
+      console.error('❌ 权限检查失败:', error)
+      toast.error(getTranslation(params.locale, 'permissionCheckFailed'))
+      return
+    }
+
     setShowGenerationModal(true)
     setIsGeneratingReport(true)
+
     try {
-      // 确保请求包含认证信息
-      const response = await fetch('/api/generate-report', {
+      console.log('📡 发送生成报告请求...')
+      const response = await fetch('/api/generate-report-perplexity', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // 添加认证头 - 使用用户ID作为备选方案
-          'Authorization': `Bearer ${currentUser.id}`,
+          'Authorization': `Bearer ${currentUser.id}`, // 添加认证头
         },
-        credentials: 'include', // 确保包含cookies
         body: JSON.stringify({
-          stockData,
-          locale: params.locale
+          stockData: stockData, // 发送完整的股票数据对象
+          userId: currentUser.id,
+          locale: params.locale, // 传递语言参数
         }),
       })
 
+      console.log('📥 收到响应:', response.status, response.statusText)
+
       if (!response.ok) {
         const errorData = await response.json()
-        if (response.status === 401) {
-          console.log('Authentication failed, showing auth modal')
-          setShowAuthModal(true)
-          return
-        }
+        console.log('❌ 响应错误:', errorData)
+        
         if (response.status === 403) {
-          console.log('Access denied, showing subscription modal')
-          const errorData = await response.json()
+          console.log('🚫 访问被拒绝，显示订阅模态框')
           if (errorData.needsSubscription) {
             toast.error(getTranslation(params.locale, 'subscription_required'))
             setShowSubscriptionModal(true)
@@ -212,12 +213,12 @@ export default function HomePage({ params }: PageProps) {
       }
 
       const data = await response.json()
+      console.log('✅ 报告生成成功:', data)
       setReportData(data)
       setShowGenerationModal(false)
       toast.success(getTranslation(params.locale, 'reportGenerated'))
-      // loadUser() // Refresh user data to update usage - useAuth hook handles this
     } catch (error) {
-      console.error('Report generation error:', error)
+      console.error('❌ 报告生成失败:', error)
       setShowGenerationModal(false)
       toast.error(error instanceof Error ? error.message : getTranslation(params.locale, 'apiError'))
     } finally {
@@ -225,18 +226,99 @@ export default function HomePage({ params }: PageProps) {
     }
   }
 
+  // 新功能处理函数
+  const handlePersonalResearch = () => {
+    if (!currentUser) {
+      setShowAuthModal(true)
+      return
+    }
+    if (!reportData) {
+      toast.error('请先生成股票分析报告')
+      return
+    }
+    setShowPersonalResearchModal(true)
+  }
+
+  const handlePersonalResearchSubmit = async (customInsights: string) => {
+    if (!stockData || !reportData || !currentUser) return
+
+    setIsGeneratingPersonalReport(true)
+    try {
+      const agent = new ReportGenerationAgent()
+      const response = await agent.generatePersonalizedReport({
+        stockSymbol: stockData.symbol,
+        originalReport: reportData,
+        userInsights: customInsights,
+        userId: currentUser.id
+      })
+
+      if (response.success && response.versionedReport) {
+        setVersionedReport(response.versionedReport)
+        setShowPersonalResearchModal(false)
+        setShowVersionedReport(true)
+        toast.success('个性化报告生成成功！')
+      } else {
+        throw new Error(response.error || '生成失败')
+      }
+    } catch (error) {
+      console.error('Personal research failed:', error)
+      toast.error(error instanceof Error ? error.message : '生成失败')
+    } finally {
+      setIsGeneratingPersonalReport(false)
+    }
+  }
+
+  const handleMultiCompanyAnalysis = () => {
+    if (!currentUser) {
+      setShowAuthModal(true)
+      return
+    }
+    setShowMultiCompanyModal(true)
+  }
+
+  const handleMultiCompanyAnalysisComplete = (analysis: MultiCompanyAnalysis) => {
+    setMultiCompanyAnalysis(analysis)
+    setShowMultiCompanyResults(true)
+  }
+
+  const handleLogin = () => {
+    setShowAuthModal(true)
+  }
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut()
+      // useAuth hook will handle the user state update
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
+  }
+
+  const handleAuthSuccess = () => {
+    setShowAuthModal(false)
+    // useAuth hook will handle the user state update
+  }
+
+  const handleOpenSubscription = () => {
+    setShowSubscriptionModal(true)
+  }
+
+  const handleOpenReportHistory = () => {
+    setShowReportHistory(true)
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-              <Header
-          locale={params.locale}
-          user={currentUser}
-          onLogout={handleLogout}
-          onRefresh={() => {}} // No need to reload user here, useAuth handles it
-          onLogin={handleLogin}
-          onOpenSubscription={handleOpenSubscription}
-          onOpenReportHistory={handleOpenReportHistory}
-          onOpenDebugPanel={() => setShowDebugPanel(true)}
-        />
+      <Header
+        locale={params.locale}
+        user={currentUser}
+        onLogout={handleLogout}
+        onRefresh={() => {}} // No need to reload user here, useAuth handles it
+        onLogin={handleLogin}
+        onOpenSubscription={handleOpenSubscription}
+        onOpenReportHistory={handleOpenReportHistory}
+        onOpenDebugPanel={() => setShowDebugPanel(true)}
+      />
       
       <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
         <div className="space-y-6 sm:space-y-8">
@@ -274,7 +356,7 @@ export default function HomePage({ params }: PageProps) {
                     <div className="flex items-center justify-center mb-2">
                       <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center">
                         <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
                       </div>
                     </div>
@@ -286,7 +368,7 @@ export default function HomePage({ params }: PageProps) {
                     <div className="flex items-center justify-center mb-2">
                       <div className="w-8 h-8 bg-amber-500/20 rounded-full flex items-center justify-center">
                         <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
                       </div>
                     </div>
@@ -311,6 +393,46 @@ export default function HomePage({ params }: PageProps) {
                       }
                     </p>
                   </div>
+                </div>
+
+                {/* 新功能按钮区域 */}
+                {featureFlags.ENABLE_PERSONAL_RESEARCH && reportData && (
+                  <div className="mt-6 pt-6 border-t border-amber-500/30">
+                    <div className="flex flex-wrap gap-3 justify-center">
+                      <button
+                        onClick={handlePersonalResearch}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+                      >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                        个性化研究中心
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 多公司对比功能入口 */}
+            {featureFlags.ENABLE_MULTI_COMPANY_ANALYSIS && currentUser && (
+              <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-6">
+                <div className="text-center">
+                  <h3 className="text-lg font-semibold text-purple-900 mb-2">
+                    我的研究决策中心
+                  </h3>
+                  <p className="text-sm text-purple-700 mb-4">
+                    多股对标分析，AI智能推荐，助您做出最佳投资决策
+                  </p>
+                  <button
+                    onClick={handleMultiCompanyAnalysis}
+                    className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center mx-auto"
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    开始多股对标分析
+                  </button>
                 </div>
               </div>
             )}
@@ -364,6 +486,45 @@ export default function HomePage({ params }: PageProps) {
         isOpen={showDebugPanel} 
         onClose={() => setShowDebugPanel(false)} 
       />
+
+      {/* 新功能模态框 */}
+      {featureFlags.ENABLE_PERSONAL_RESEARCH && (
+        <>
+          <UserInputModal
+            isOpen={showPersonalResearchModal}
+            onClose={() => setShowPersonalResearchModal(false)}
+            stockSymbol={stockData?.symbol || ''}
+            stockName={stockData?.name || ''}
+            onSubmit={handlePersonalResearchSubmit}
+            isLoading={isGeneratingPersonalReport}
+          />
+
+          {versionedReport && (
+            <DisplayVersionedReport
+              originalReport={reportData!}
+              versionedReport={versionedReport}
+              onClose={() => setShowVersionedReport(false)}
+            />
+          )}
+        </>
+      )}
+
+      {featureFlags.ENABLE_MULTI_COMPANY_ANALYSIS && (
+        <>
+          <MultiCompanyModal
+            isOpen={showMultiCompanyModal}
+            onClose={() => setShowMultiCompanyModal(false)}
+            onAnalysisComplete={handleMultiCompanyAnalysisComplete}
+          />
+
+          {multiCompanyAnalysis && (
+            <MultiCompanyResults
+              analysis={multiCompanyAnalysis}
+              onClose={() => setShowMultiCompanyResults(false)}
+            />
+          )}
+        </>
+      )}
       
       <Footer />
       <Toaster position="top-right" />

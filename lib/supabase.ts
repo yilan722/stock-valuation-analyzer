@@ -22,6 +22,31 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     headers: {
       'X-Client-Info': 'supabase-js/2.x'
     }
+  },
+  // 添加超时配置
+  db: {
+    schema: 'public'
+  },
+  // 设置请求超时
+  realtime: {
+    timeout: 30000 // 30秒超时
+  }
+})
+
+// 创建专门用于权限检查的客户端，使用更长的超时时间
+export const authSupabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false
+  },
+  global: {
+    headers: {
+      'X-Client-Info': 'supabase-js/2.x'
+    }
+  },
+  // 设置更长的超时时间
+  realtime: {
+    timeout: 60000 // 60秒超时
   }
 })
 

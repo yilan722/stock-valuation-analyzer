@@ -67,4 +67,89 @@ export interface Opus4Response {
       content: string
     }
   }>
+}
+
+// 个性化研究中心相关类型
+export interface UserInput {
+  id: string
+  userId: string
+  stockSymbol: string
+  originalReportId: string
+  customInsights: string
+  createdAt: Date
+  status: 'pending' | 'processing' | 'completed' | 'failed'
+}
+
+export interface VersionedReport {
+  id: string
+  originalReportId: string
+  userInputId: string
+  version: string
+  reportData: ValuationReportData
+  changes: {
+    fundamentalChanges: string[]
+    valuationImpact: {
+      dcfChange: number
+      peChange: number
+      pbChange: number
+      targetPriceChange: number
+      reasoning: string
+    }
+  }
+  createdAt: Date
+}
+
+// 多公司对比分析相关类型
+export interface CompanyAnalysis {
+  symbol: string
+  name: string
+  customInsights?: string
+  analysisData?: ValuationReportData
+  scores: {
+    profitability: number
+    financialHealth: number
+    growth: number
+    valuation: number
+    policyBenefit: number
+  }
+  keyMetrics: {
+    targetPrice: number
+    upsidePotential: number
+    peRatio: number
+    pbRatio: number
+    debtToEquity: number
+    roe: number
+  }
+}
+
+export interface MultiCompanyAnalysis {
+  id: string
+  userId: string
+  companies: CompanyAnalysis[]
+  aiRecommendation: {
+    topPick: string
+    reasoning: string
+    riskFactors: string[]
+  }
+  createdAt: Date
+  templateName?: string
+  isPublic?: boolean
+  shareLink?: string
+  geminiAnalysis?: {
+    overview: string
+    radarData: any
+    comparisonTable: string
+    aiRecommendation: string
+  }
+}
+
+export interface RadarChartData {
+  labels: string[]
+  datasets: Array<{
+    label: string
+    data: number[]
+    backgroundColor: string
+    borderColor: string
+    borderWidth: number
+  }>
 } 

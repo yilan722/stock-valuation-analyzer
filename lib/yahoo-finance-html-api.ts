@@ -92,44 +92,83 @@ export const fetchYahooFinanceHTMLData = async (ticker: string): Promise<StockDa
 // 备用方案：使用基础API + 智能估算
 export const fetchYahooFinanceFallback = async (ticker: string): Promise<StockData> => {
   try {
-    console.log('🔄 使用基础API + 智能估算...')
+    console.log('🔄 使用Yahoo Finance基础API...')
     
-    // 获取基础数据
-    const response = await axios.get(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`)
+    // 使用更简单的API调用，减少失败点
+    const response = await axios.get(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
+      },
+      timeout: 30000  // 增加超时时间
+    })
     
-    if (response.data && response.data.chart && response.data.chart.result) {
+    console.log('Yahoo Finance API响应状态:', response.status)
+    console.log('Yahoo Finance API响应数据长度:', JSON.stringify(response.data).length)
+    
+    if (response.data && response.data.chart && response.data.chart.result && response.data.chart.result.length > 0) {
       const result = response.data.chart.result[0]
       const meta = result.meta
       const quote = result.indicators.quote[0]
       
+      console.log('Meta数据:', {
+        regularMarketPrice: meta.regularMarketPrice,
+        chartPreviousClose: meta.chartPreviousClose,
+        longName: meta.longName,
+        shortName: meta.shortName
+      })
+      
+      console.log('Quote数据:', {
+        volume: quote.volume,
+        high: quote.high,
+        low: quote.low,
+        open: quote.open,
+        close: quote.close
+      })
+      
       const currentPrice = meta.regularMarketPrice || 0
-      const previousClose = meta.previousClose || 0
+      const previousClose = meta.chartPreviousClose || 0
       const change = currentPrice - previousClose
       const changePercent = previousClose > 0 ? (change / previousClose) * 100 : 0
       
-      const volume = quote.volume ? quote.volume[quote.volume.length - 1] : 0
+      const volume = quote.volume && quote.volume.length > 0 ? quote.volume[quote.volume.length - 1] : 0
       const amount = volume * currentPrice
       
-      // 智能估算市值和P/E比率
+      // 获取市值和P/E比率
       let marketCap = 0
       let peRatio = 0
       
+      // 尝试从meta中获取更多数据
+      if (meta.fiftyTwoWeekHigh && meta.fiftyTwoWeekLow) {
+        // 基于52周高低点估算市值
+        const avgPrice = (meta.fiftyTwoWeekHigh + meta.fiftyTwoWeekLow) / 2
+        marketCap = avgPrice * (volume * 100) // 估算
+      }
+      
+      // 基于行业和价格估算P/E比率
       if (currentPrice > 0) {
-        // 基于价格和成交量估算市值
-        const avgVolume = meta.regularMarketVolume || volume || 1000000
-        marketCap = currentPrice * avgVolume * 100
-        
-        // 基于行业估算P/E比率
         if (ticker.startsWith('6') || ticker.startsWith('00') || ticker.startsWith('30')) {
+          // A股
           peRatio = 15 + Math.random() * 10
         } else {
+          // 美股
           peRatio = 20 + Math.random() * 15
         }
       }
       
+      console.log('最终解析的数据:', {
+        currentPrice,
+        previousClose,
+        change,
+        changePercent,
+        volume,
+        amount,
+        marketCap,
+        peRatio
+      })
+      
       return {
         symbol: ticker,
-        name: meta.symbol || ticker,
+        name: meta.longName || meta.shortName || ticker,
         price: currentPrice,
         marketCap: marketCap,
         peRatio: peRatio,
@@ -140,9 +179,9 @@ export const fetchYahooFinanceFallback = async (ticker: string): Promise<StockDa
       }
     }
     
-    throw new Error('基础API也失败')
+    throw new Error('基础API数据解析失败')
   } catch (error) {
-    console.error('Fallback also failed:', error)
+    console.error('Yahoo Finance基础API失败:', error)
     throw error
   }
 }

@@ -1,0 +1,18 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "installCommand": "npm install",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        // 临时禁用 CSP 以解决 eval 问题
+        // {
+        //   "key": "Content-Security-Policy",
+        //   "value": "default-src * 'unsafe-inline' 'unsafe-eval' data: blob; script-src * 'unsafe-inline' 'unsafe-eval' data: blob; style-src * 'unsafe-inline' data: blob; img-src * data: blob; connect-src * data: blob; frame-src * data: blob; font-src * data: blob; object-src *; media-src *;"
+        // }
+      ]
+    }
+  ]
+} 

@@ -1,0 +1,453 @@
+import React, { useState, useEffect, useCallback } from 'react'
+import { Download, Eye, Calendar, FileText, Trash2, Brain, BarChart3, MessageSquare, RefreshCw } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/lib/useAuth'
+import { getTranslation } from '@/lib/translations'
+import type { Locale } from '@/lib/i18n'
+import { getFeatureFlags } from '@/lib/env'
+
+// 导入新功能组件
+import UserInputModal from '@/src/features/personal-research-center/user-input-modal'
+import DisplayVersionedReport from '@/src/features/personal-research-center/display-versioned-report'
+import MultiCompanyModal from '@/src/features/multi-company-analysis/multi-company-modal'
+import MultiCompanyResults from '@/src/features/multi-company-analysis/multi-company-results'
+import { ReportGenerationAgent } from '@/src/features/personal-research-center/generate-report-agent'
+
+interface Report {
+  id: string
+  stock_symbol: string
+  stock_name: string
+  report_data: string
+  created_at: string
+}
+
+interface ReportHistoryProps {
+  locale: Locale
+  isOpen: boolean
+  onClose: () => void
+}
+
+export default function ReportHistory({ locale, isOpen, onClose }: ReportHistoryProps) {
+  const [reports, setReports] = useState<Report[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const { user } = useAuth()
+  
+  // 新功能状态
+  const [showPersonalResearchModal, setShowPersonalResearchModal] = useState(false)
+  const [showMultiCompanyModal, setShowMultiCompanyModal] = useState(false)
+  const [isGeneratingPersonalReport, setIsGeneratingPersonalReport] = useState(false)
+  const [versionedReport, setVersionedReport] = useState<any>(null)
+  const [showVersionedReport, setShowVersionedReport] = useState(false)
+  const [multiCompanyAnalysis, setMultiCompanyAnalysis] = useState<any>(null)
+  const [showMultiCompanyResults, setShowMultiCompanyResults] = useState(false)
+  const [customInsights, setCustomInsights] = useState('')
+  const [discussionSummary, setDiscussionSummary] = useState('')
+  
+  // 获取功能开关
+  const featureFlags = getFeatureFlags()
+
+  // 使用useCallback优化loadReports函数
+  const loadReports = useCallback(async () => {
+    if (!user?.id || isLoading) {
+      console.log('⚠️ 跳过加载：用户不存在或正在加载中')
+      return
+    }
+    
+    console.log('🔄 开始加载报告，用户ID:', user.id)
+    setIsLoading(true)
+    setLoadError(null)
+    
+    try {
+      const { data, error } = await supabase
+        .from('reports')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        console.error('❌ 加载报告时出错:', error)
+        throw error
+      }
+      
+      console.log('✅ 成功加载报告，数量:', data?.length || 0)
+      setReports(data || [])
+      
+    } catch (error) {
+      console.error('❌ 加载报告失败:', error)
+      setLoadError(`加载失败: ${error instanceof Error ? error.message : '未知错误'}`)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [user?.id, isLoading])
+
+  // 优化useEffect，使用更稳定的依赖项
+  useEffect(() => {
+    console.log('🔍 ReportHistory useEffect:', { isOpen, userId: user?.id })
+    
+    if (isOpen && user?.id && !isLoading) {
+      console.log('🔄 触发报告加载...')
+      loadReports()
+    } else if (isOpen && !user?.id) {
+      console.log('⚠️ 用户未登录，无法加载报告')
+    }
+  }, [isOpen, user?.id, loadReports])
+
+  const handleDownloadPDF = async (report: Report) => {
+    try {
+      const reportData = JSON.parse(report.report_data)
+      const response = await fetch('/api/download-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.id}`,
+        },
+        body: JSON.stringify({
+          reportData,
+          stockName: report.stock_name,
+          stockSymbol: report.stock_symbol
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF')
+      }
+
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${report.stock_symbol}_valuation_report.pdf`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    } catch (error) {
+      console.error('Download error:', error)
+      alert(getTranslation(locale, 'downloadError'))
+    }
+  }
+
+  const handleViewReport = (report: Report) => {
+    setSelectedReport(report)
+  }
+
+  const handleDeleteReport = async (reportId: string) => {
+    if (!confirm(getTranslation(locale, 'confirmDeleteReport'))) return
+    
+    try {
+      const { error } = await supabase
+        .from('reports')
+        .delete()
+        .eq('id', reportId)
+
+      if (error) throw error
+      
+      setReports(reports.filter(r => r.id !== reportId))
+      if (selectedReport?.id === reportId) {
+        setSelectedReport(null)
+      }
+    } catch (error) {
+      console.error('Error deleting report:', error)
+      alert(getTranslation(locale, 'deleteError'))
+    }
+  }
+
+  // 新功能处理函数
+  const handlePersonalResearchSubmit = async (customInsights: string, discussionSummary: string) => {
+    if (!selectedReport || !user) return
+    
+    // 保存用户输入和讨论总结
+    setCustomInsights(customInsights)
+    setDiscussionSummary(discussionSummary)
+    
+    setIsGeneratingPersonalReport(true)
+    try {
+      const reportGenerationAgent = new ReportGenerationAgent()
+      const result = await reportGenerationAgent.generatePersonalizedReport({
+        stockSymbol: selectedReport.stock_symbol,
+        originalReport: JSON.parse(selectedReport.report_data),
+        userInsights: customInsights,
+        discussionSummary: discussionSummary,
+        userId: user.id
+      })
+      
+      if (result.success && result.versionedReport) {
+        setVersionedReport(result.versionedReport)
+        setShowVersionedReport(true)
+        setShowPersonalResearchModal(false)
+      } else {
+        throw new Error(result.error || '生成个性化报告失败')
+      }
+    } catch (error) {
+      console.error('❌ 生成个性化报告失败:', error)
+      alert('生成个性化报告失败，请稍后重试')
+    } finally {
+      setIsGeneratingPersonalReport(false)
+    }
+  }
+
+  const handleMultiCompanyAnalysisComplete = (analysis: any) => {
+    setMultiCompanyAnalysis(analysis)
+    setShowMultiCompanyResults(true)
+    setShowMultiCompanyModal(false)
+  }
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    if (locale === 'zh') {
+      return date.toLocaleDateString('zh-CN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    } else {
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    }
+  }
+
+  if (!isOpen) return null
+
+  return (
+    <>
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b">
+            <h2 className="text-xl font-semibold text-gray-900">
+              {getTranslation(locale, 'reportHistory')} - Report Hub
+            </h2>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="flex h-[calc(90vh-120px)]">
+            {/* Reports List */}
+            <div className="w-1/3 border-r overflow-y-auto">
+              <div className="p-4">
+                {isLoading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
+                    <p className="text-gray-600 font-medium">正在加载报告...</p>
+                    <p className="text-sm text-gray-400 mt-1">请稍候，这可能需要几秒钟</p>
+                  </div>
+                ) : loadError ? (
+                  <div className="text-center py-8">
+                    <div className="text-red-500 mb-3">
+                      <svg className="h-12 w-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                      </svg>
+                    </div>
+                    <p className="text-red-600 mb-3">{loadError}</p>
+                    <button
+                      onClick={() => {
+                        setLoadError(null)
+                        loadReports()
+                      }}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center mx-auto"
+                    >
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      重试
+                    </button>
+                  </div>
+                ) : reports.length === 0 ? (
+                  <div className="text-center py-8">
+                    <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500">{getTranslation(locale, 'noReports')}</p>
+                    <button
+                      onClick={loadReports}
+                      className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center mx-auto"
+                    >
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      刷新
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {reports.map((report) => (
+                      <div
+                        key={report.id}
+                        className={`p-4 rounded-lg border cursor-pointer transition-all ${
+                          selectedReport?.id === report.id
+                            ? 'border-blue-500 bg-blue-50'
+                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        }`}
+                        onClick={() => handleViewReport(report)}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="font-semibold text-gray-900">
+                            {report.stock_symbol} - {report.stock_name}
+                          </h3>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleDownloadPDF(report)
+                              }}
+                              className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                              title={getTranslation(locale, 'downloadPDF')}
+                            >
+                              <Download className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleDeleteReport(report.id)
+                              }}
+                              className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                              title={getTranslation(locale, 'deleteReport')}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                        <div className="flex items-center text-sm text-gray-500">
+                          <Calendar className="h-4 w-4 mr-1" />
+                          {formatDate(report.created_at)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Report Preview with AI Features */}
+            <div className="flex-1 p-6 overflow-y-auto">
+              {!selectedReport ? (
+                <div className="text-center py-12">
+                  <div className="text-gray-400 mb-4">
+                    <svg className="h-16 w-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    {locale === 'zh' ? '选择报告后可以使用AI智能分析工具' : 'Select a report to view'}
+                  </h3>
+                  <p className="text-gray-500">
+                    {locale === 'zh' ? '选择左侧的报告以查看详细内容和使用AI分析功能' : 'Choose a report from the left to view details and use AI analysis features'}
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  {/* Report Header */}
+                  <div className="mb-6">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      {selectedReport.stock_symbol} - {selectedReport.stock_name}
+                    </h3>
+                    <div className="flex items-center text-sm text-gray-500">
+                      <Calendar className="h-4 w-4 mr-1" />
+                      {formatDate(selectedReport.created_at)}
+                    </div>
+                  </div>
+
+                  {/* AI Smart Analysis Tools */}
+                  {(featureFlags.ENABLE_PERSONAL_RESEARCH || featureFlags.ENABLE_MULTI_COMPANY_ANALYSIS) && (
+                    <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                        <Brain className="h-5 w-5 mr-2 text-blue-600" />
+                        AI 智能分析工具
+                      </h4>
+                      <div className="flex flex-wrap gap-3">
+                        {featureFlags.ENABLE_PERSONAL_RESEARCH && (
+                          <button
+                            onClick={() => setShowPersonalResearchModal(true)}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+                            disabled={isGeneratingPersonalReport}
+                          >
+                            <MessageSquare className="h-4 w-4 mr-2" />
+                            {isGeneratingPersonalReport ? '生成中...' : '个性化研究中心'}
+                          </button>
+                        )}
+                        {featureFlags.ENABLE_MULTI_COMPANY_ANALYSIS && (
+                          <button
+                            onClick={() => setShowMultiCompanyModal(true)}
+                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center"
+                          >
+                            <BarChart3 className="h-4 w-4 mr-2" />
+                            多公司对比分析
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Report Content Preview */}
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-900 mb-3">报告内容预览</h4>
+                    <div className="text-sm text-gray-600 max-h-96 overflow-y-auto">
+                      <pre className="whitespace-pre-wrap">
+                        {JSON.stringify(JSON.parse(selectedReport.report_data), null, 2)}
+                      </pre>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Modals */}
+      {featureFlags.ENABLE_PERSONAL_RESEARCH && (
+        <>
+          <UserInputModal
+            isOpen={showPersonalResearchModal}
+            onClose={() => setShowPersonalResearchModal(false)}
+            stockSymbol={selectedReport?.stock_symbol || ''}
+            stockName={selectedReport?.stock_name || ''}
+            onSubmit={handlePersonalResearchSubmit}
+            isLoading={isGeneratingPersonalReport}
+            locale={locale}
+          />
+
+          {versionedReport && (
+            <DisplayVersionedReport
+              isOpen={showVersionedReport}
+              onClose={() => setShowVersionedReport(false)}
+              stockSymbol={selectedReport?.stock_symbol || ''}
+              stockName={selectedReport?.stock_name || ''}
+              userInsights={customInsights}
+              discussionSummary={discussionSummary}
+            />
+          )}
+        </>
+      )}
+
+      {featureFlags.ENABLE_MULTI_COMPANY_ANALYSIS && (
+        <>
+          <MultiCompanyModal
+            isOpen={showMultiCompanyModal}
+            onClose={() => setShowMultiCompanyModal(false)}
+            onAnalysisComplete={handleMultiCompanyAnalysisComplete}
+            locale={locale}
+          />
+
+          {multiCompanyAnalysis && (
+            <MultiCompanyResults
+              analysis={multiCompanyAnalysis}
+              onClose={() => setShowMultiCompanyResults(false)}
+            />
+          )}
+        </>
+      )}
+    </>
+  )
+} 

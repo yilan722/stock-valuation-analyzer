@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { User, LogOut, CreditCard, BarChart3, LogIn } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { signOut } from '../lib/supabase-auth'
+import useAuth from '../lib/useAuth'
 import { getTranslation } from '../lib/translations'
 import { Locale } from '../lib/i18n'
 
@@ -42,15 +43,27 @@ interface UserInfoProps {
 
 export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSubscription, onOpenReportHistory, onOpenDebugPanel, locale, isCompact = false }: UserInfoProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const { forceSignOut } = useAuth()
 
   const handleLogout = async () => {
     setIsLoading(true)
+    toast.loading('Logging out...', { duration: 2000 })
+    
     try {
+      console.log('🚪 开始登出...')
       await signOut()
       toast.success('Logged out successfully')
       onLogout()
     } catch (error) {
-      toast.error('Logout failed')
+      console.error('❌ 登出失败:', error)
+      toast.error('Logout failed, forcing logout...')
+      
+      // 使用forceSignOut确保状态正确更新
+      forceSignOut()
+      
+      // 调用父组件的登出回调
+      onLogout()
+      toast.success('Logged out successfully (forced)')
     } finally {
       setIsLoading(false)
     }

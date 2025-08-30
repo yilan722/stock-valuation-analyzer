@@ -50,6 +50,28 @@ export interface EnvConfig {
   ALIPAY_PUBLIC_KEY: string
 }
 
+// 功能开关配置
+export interface FeatureFlags {
+  ENABLE_PERSONAL_RESEARCH: boolean
+  ENABLE_MULTI_COMPANY_ANALYSIS: boolean
+}
+
+export function getFeatureFlags(): FeatureFlags {
+  return {
+    ENABLE_PERSONAL_RESEARCH: process.env.NEXT_PUBLIC_ENABLE_PERSONAL_RESEARCH === 'true',
+    ENABLE_MULTI_COMPANY_ANALYSIS: process.env.NEXT_PUBLIC_ENABLE_MULTI_COMPANY_ANALYSIS === 'true',
+  }
+}
+
+export const AI_MODELS = {
+  REPORT_GENERATION_MODEL: process.env.REPORT_GENERATION_MODEL || 'claude-opus-4-1-20250805',
+  PERSONAL_RESEARCH_MODEL: process.env.PERSONAL_RESEARCH_MODEL || 'gemini-2.5-pro',
+  MULTI_COMPANY_ANALYSIS_MODEL: process.env.MULTI_COMPANY_ANALYSIS_MODEL || 'gemini-2.5-pro',
+  CHAT_ANALYSIS_MODEL: process.env.CHAT_ANALYSIS_MODEL || 'gemini-2.5-pro',
+  AI_DISCUSSION_MODEL: process.env.AI_DISCUSSION_MODEL || 'gemini-2.5-pro',
+  AI_SUMMARY_MODEL: process.env.AI_SUMMARY_MODEL || 'gemini-2.5-pro'
+}
+
 export function getEnvConfig(): EnvConfig {
   validateEnv()
   
@@ -60,7 +82,7 @@ export function getEnvConfig(): EnvConfig {
     TUSHARE_TOKEN: getEnvVar('TUSHARE_TOKEN'),
     ALPHA_VANTAGE_API_KEY: getEnvVar('ALPHA_VANTAGE_API_KEY'),
     ALIPAY_APP_ID: getEnvVar('ALIPAY_APP_ID'),
-    ALIPAY_PRIVATE_KEY: getEnvVar('ALIPAY_PRIVATE_KEY'),
+    ALIPAY_PRIVATE_KEY: getEnvVar('ALIPAY_APP_ID'),
     ALIPAY_PUBLIC_KEY: getEnvVar('ALIPAY_PUBLIC_KEY'),
   }
 } 

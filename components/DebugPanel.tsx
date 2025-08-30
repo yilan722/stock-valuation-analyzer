@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { Bug, Database, FileText, User, AlertCircle } from 'lucide-react'
-import { useAuth } from '@/lib/useAuth'
+import useAuth from '@/lib/useAuth'
 
 interface DebugPanelProps {
   isOpen: boolean

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { StockData } from '@/types'
+// 移除akshare-api引用，只使用tushare和yfinance
 
 // 模拟股票数据 - 包含美股和A股
 const mockStockData: Record<string, StockData> = {
@@ -193,6 +194,23 @@ const mockStockData: Record<string, StockData> = {
   }
 }
 
+// A股公司名称映射表 - 修复yfinance无法识别中文名称的问题
+const A_STOCK_NAME_MAP: Record<string, string> = {
+  '300080': '易成新能',
+  '001979': '招商蛇口',
+  '300777': '中简科技',
+  '002244': '滨江集团',
+  '000001': '平安银行',
+  '000002': '万科A',
+  '600036': '招商银行',
+  '600519': '贵州茅台',
+  '000858': '五粮液',
+  '002415': '海康威视',
+  '300059': '东方财富',
+  '300366': '创意信息',
+  '688133': '泰坦科技'
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const ticker = searchParams.get('ticker')?.toUpperCase()
@@ -209,48 +227,66 @@ export async function GET(request: NextRequest) {
   
   try {
     if (isAStock) {
-      // 使用Tushare API获取A股数据
+      // 使用tushare API获取A股数据（唯一稳定数据源）
       try {
-        const { fetchAStockData } = await import('@/lib/tushare-api')
-        const aStockData = await fetchAStockData(ticker)
-        return NextResponse.json(aStockData)
-      } catch (aStockError) {
-        console.error(`Tushare API failed for ${ticker}:`, aStockError)
+        console.log(`🔄 使用tushare获取A股 ${ticker} 数据...`)
+        const { fetchAStockData: fetchTushareData } = await import('@/lib/tushare-api')
+        const tushareData = await fetchTushareData(ticker)
+        
+        // tushare应该直接返回中文公司名称，不需要手动修复
+        console.log(`✅ tushare返回的公司名称: ${tushareData.name}`)
+        
+        console.log(`✅ tushare API成功获取A股 ${ticker} 数据`)
+        return NextResponse.json(tushareData)
+      } catch (tushareError) {
+        console.error(`tushare API failed for ${ticker}:`, tushareError)
         return NextResponse.json(
-          { error: `A股 ${ticker} 数据获取失败，可能是停牌或数据源暂时不可用。请稍后重试。` },
+          { error: `A股 ${ticker} 数据获取失败，tushare API暂时不可用。请稍后重试。` },
           { status: 500 }
         )
       }
     } else {
       // 使用实时股票数据API获取美股数据
       try {
-        const { fetchRealTimeStockData } = await import('@/lib/real-time-stock-data')
-        const realTimeData = await fetchRealTimeStockData(ticker)
-        return NextResponse.json(realTimeData)
-      } catch (realTimeError) {
-        console.error(`实时数据API失败 for ${ticker}:`, realTimeError)
-        
-        // 如果实时API失败，尝试使用备用方案
+        // 优先使用Yahoo Finance基础API（免费且现在正常工作）
         try {
           const { fetchYahooFinanceFallback } = await import('@/lib/yahoo-finance-html-api')
-          const fallbackData = await fetchYahooFinanceFallback(ticker)
-          return NextResponse.json(fallbackData)
-        } catch (fallbackError) {
-          console.error(`备用方案也失败 for ${ticker}:`, fallbackError)
+          const yahooData = await fetchYahooFinanceFallback(ticker)
+          console.log(`✅ Yahoo Finance基础API成功获取 ${ticker} 数据`)
+          return NextResponse.json(yahooData)
+        } catch (yahooError) {
+          console.log(`⚠️ Yahoo Finance基础API失败，尝试其他数据源:`, yahooError)
           
-          // 最后尝试使用Opus4 API
+          // 备用方案1：使用实时股票数据API
           try {
-            const { fetchOtherMarketStockData } = await import('@/lib/opus4-stock-api')
-            const opus4Data = await fetchOtherMarketStockData(ticker)
-            return NextResponse.json(opus4Data)
-          } catch (opus4Error) {
-            console.error(`Opus4 API也失败 for ${ticker}:`, opus4Error)
-            return NextResponse.json(
-              { error: `美股 ${ticker} 数据获取失败。可能原因：1) 股票代码不存在 2) 股票已退市 3) 数据源暂时不可用。请检查股票代码或稍后重试。` },
-              { status: 500 }
-            )
+            const { fetchRealTimeStockData } = await import('@/lib/real-time-stock-data')
+            const realTimeData = await fetchRealTimeStockData(ticker)
+            console.log(`✅ 实时数据API成功获取 ${ticker} 数据`)
+            return NextResponse.json(realTimeData)
+          } catch (realTimeError) {
+            console.error(`实时数据API失败 for ${ticker}:`, realTimeError)
+            
+            // 备用方案2：使用Opus4 API
+            try {
+              const { fetchOtherMarketStockData } = await import('@/lib/opus4-stock-api')
+              const opus4Data = await fetchOtherMarketStockData(ticker)
+              console.log(`✅ Opus4 API成功获取 ${ticker} 数据`)
+              return NextResponse.json(opus4Data)
+            } catch (opus4Error) {
+              console.error(`Opus4 API也失败 for ${ticker}:`, opus4Error)
+              return NextResponse.json(
+                { error: `美股 ${ticker} 数据获取失败。可能原因：1) 股票代码不存在 2) 股票已退市 3) 数据源暂时不可用。请检查股票代码或稍后重试。` },
+                { status: 500 }
+              )
+            }
           }
         }
+      } catch (error) {
+        console.error(`美股数据获取完全失败 for ${ticker}:`, error)
+        return NextResponse.json(
+          { error: `美股 ${ticker} 数据获取失败，请稍后重试。` },
+          { status: 500 }
+        )
       }
     }
   } catch (error) {

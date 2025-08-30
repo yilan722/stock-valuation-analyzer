@@ -54,21 +54,32 @@ npm run dev
 
 ## API Configuration
 
-The application uses the Opus4 API for generating valuation reports. **⚠️ Never commit API keys to version control!**
+The application uses multiple APIs for different purposes. **⚠️ Never commit API keys to version control!**
 
-Create a `.env.local` file and add your API key:
+Create a `.env.local` file and add your API keys:
 
 ```env
-OPUS4_API_KEY=your_api_key_here
+# Tushare API for A-share data
+TUSHARE_TOKEN=your_tushare_token_here
+
+# Nuwa API for AI models (Claude Opus 4.1 + Gemini Pro 2.5)
+OPUS4_API_KEY=your_nuwa_api_key_here
+
+# Supabase (optional)
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# PayPal (optional)
 PAYPAL_CLIENT_ID=your_paypal_client_id
 PAYPAL_CLIENT_SECRET=your_paypal_client_secret
 NEXT_PUBLIC_PAYPAL_CLIENT_ID=your_public_paypal_client_id
 ```
 
-**Important**: Replace `your_api_key_here` with your actual Opus4 API key. The API key is configured in `lib/api.ts` and loaded from environment variables.
+**Important**: 
+- `TUSHARE_TOKEN`: For A-share stock data retrieval
+- `OPUS4_API_KEY`: For AI analysis (reports, company comparison, personal research)
+- YFinance API: No API key required for US/HK stock data
 
 ## Project Structure
 
