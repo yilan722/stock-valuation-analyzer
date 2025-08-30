@@ -47,7 +47,7 @@ export class AIDiscussionService {
       messages: [
         ...session.messages,
         {
-          role: 'user',
+          role: 'user' as const,
           content: userMessage,
           timestamp: new Date()
         }
@@ -61,7 +61,7 @@ export class AIDiscussionService {
 
       // 添加AI回复
       updatedSession.messages.push({
-        role: 'assistant',
+        role: 'assistant' as const,
         content: aiResponse,
         timestamp: new Date()
       })
@@ -71,7 +71,7 @@ export class AIDiscussionService {
       console.error('AI discussion failed:', error)
       // 如果AI调用失败，提供默认回复
       updatedSession.messages.push({
-        role: 'assistant',
+        role: 'assistant' as const,
         content: '抱歉，我在处理您的消息时遇到了问题。让我们继续讨论您的投资见解，或者您可以重新描述一下您的观点。',
         timestamp: new Date()
       })

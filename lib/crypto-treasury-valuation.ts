@@ -255,12 +255,14 @@ export class CryptoTreasuryValuation {
     }
 
     // 找出最佳投资机会
-    const bestOpportunity = Object.entries(companies).reduce((best, [name, valuation]) => {
-      if (valuation.premiumPercentage < best.premiumPercentage) {
-        return { name, valuation };
+    const entries = Object.entries(companies);
+    let bestOpportunity = { name: entries[0][0], valuation: entries[0][1] };
+    
+    for (const [name, valuation] of entries) {
+      if (valuation.premiumPercentage < bestOpportunity.valuation.premiumPercentage) {
+        bestOpportunity = { name, valuation };
       }
-      return best;
-    });
+    }
 
     comparison += `**投资机会分析**\n`;
     comparison += `${bestOpportunity.name}相对mNAV折价最大(${Math.abs(bestOpportunity.valuation.premiumPercentage).toFixed(1)}%)，可能是最具吸引力的投资选择。\n\n`;

@@ -14,7 +14,7 @@ import DebugPanel from '../../components/DebugPanel'
 import Footer from '../../components/Footer'
 import { StockData, ValuationReportData, MultiCompanyAnalysis } from '../../types'
 import { type Locale } from '../../lib/i18n'
-import { getTranslation } from '../../lib/translations'
+
 import useAuth from '../../lib/useAuth'
 import { canGenerateReport } from '../../lib/supabase-auth'
 import { supabase } from '../../lib/supabase'
@@ -119,14 +119,14 @@ export default function HomePage({ params }: PageProps) {
     try {
       const response = await fetch(`/api/stock-data?ticker=${symbol}`)
       if (!response.ok) {
-        throw new Error(getTranslation(params.locale, 'stockNotFound'))
+        throw new Error(params.locale === 'zh' ? '未找到股票数据' : 'Stock not found')
       }
       const data = await response.json()
       setStockData(data)
-      toast.success(getTranslation(params.locale, 'dataUpdated'))
+      toast.success(params.locale === 'zh' ? '数据已更新' : 'Data updated')
     } catch (error) {
       console.error('Search error:', error)
-      toast.error(error instanceof Error ? error.message : getTranslation(params.locale, 'apiError'))
+      toast.error(error instanceof Error ? error.message : (params.locale === 'zh' ? 'API错误' : 'API error'))
     } finally {
       setIsLoading(false)
     }
@@ -172,7 +172,7 @@ export default function HomePage({ params }: PageProps) {
       console.log('✅ 用户有权限，继续生成报告...')
     } catch (error) {
       console.error('❌ 权限检查失败:', error)
-      toast.error(getTranslation(params.locale, 'permissionCheckFailed'))
+      toast.error(params.locale === 'zh' ? '权限检查失败' : 'Permission check failed')
       return
     }
 
@@ -203,27 +203,27 @@ export default function HomePage({ params }: PageProps) {
         if (response.status === 403) {
           console.log('🚫 访问被拒绝，显示订阅模态框')
           if (errorData.needsSubscription) {
-            toast.error(getTranslation(params.locale, 'subscription_required'))
+            toast.error(params.locale === 'zh' ? '需要订阅' : 'Subscription required')
             setShowSubscriptionModal(true)
           } else {
-            toast.error(errorData.reason || getTranslation(params.locale, 'accessDenied'))
+            toast.error(errorData.reason || (params.locale === 'zh' ? '访问被拒绝' : 'Access denied'))
           }
           return
         }
-        throw new Error(errorData.error || getTranslation(params.locale, 'apiError'))
+        throw new Error(errorData.error || (params.locale === 'zh' ? 'API错误' : 'API error'))
       }
 
       const data = await response.json()
       console.log('✅ 报告生成成功:', data)
       setReportData(data)
       setShowGenerationModal(false)
-      toast.success(getTranslation(params.locale, 'reportGenerated'))
+      toast.success(params.locale === 'zh' ? '报告生成成功' : 'Report generated successfully')
     } catch (error) {
       console.error('❌ 报告生成失败:', error)
       setShowGenerationModal(false)
       
       // 提供更友好的错误信息
-      let errorMessage = getTranslation(params.locale, 'apiError')
+      let errorMessage = params.locale === 'zh' ? 'API错误' : 'API error'
       if (error instanceof Error) {
         if (error.message.includes('API quota exhausted')) {
           errorMessage = 'API quota exhausted. Please try again later or contact support.'

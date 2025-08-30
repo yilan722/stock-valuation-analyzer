@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { Download, Eye, Calendar, FileText, Trash2, Brain, BarChart3, MessageSquare, RefreshCw } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import useAuth from '@/lib/useAuth'
-import { getTranslation } from '@/lib/translations'
+
 import type { Locale } from '@/lib/i18n'
 import { getFeatureFlags } from '@/lib/env'
 
@@ -126,7 +126,7 @@ export default function ReportHistory({ locale, isOpen, onClose }: ReportHistory
       document.body.removeChild(a)
     } catch (error) {
       console.error('Download error:', error)
-      alert(getTranslation(locale, 'downloadError'))
+      alert(locale === 'zh' ? '下载错误' : 'Download error')
     }
   }
 
@@ -152,7 +152,7 @@ export default function ReportHistory({ locale, isOpen, onClose }: ReportHistory
       }
     } catch (error) {
       console.error('Delete error:', error)
-      alert(getTranslation(locale, 'deleteError'))
+      alert(locale === 'zh' ? '删除错误' : 'Delete error')
     }
   }
 
@@ -165,11 +165,12 @@ export default function ReportHistory({ locale, isOpen, onClose }: ReportHistory
     
     try {
       const agent = new ReportGenerationAgent()
-      const result = await agent.generatePersonalizedReport(
-        JSON.parse(selectedReport.report_data),
-        insights,
-        selectedReport.stock_symbol
-      )
+      const result = await agent.generatePersonalizedReport({
+        stockSymbol: selectedReport.stock_symbol,
+        originalReport: JSON.parse(selectedReport.report_data),
+        userInsights: insights,
+        userId: user?.id || ''
+      })
       
       setVersionedReport(result)
       setShowVersionedReport(true)
@@ -197,7 +198,7 @@ export default function ReportHistory({ locale, isOpen, onClose }: ReportHistory
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <h2 className="text-2xl font-bold text-gray-900">
-              {getTranslation(locale, 'reportHistory')}
+              {locale === 'zh' ? '报告历史' : 'Report History'}
             </h2>
             <div className="flex items-center space-x-3">
               {/* 手动刷新按钮 */}
@@ -227,7 +228,7 @@ export default function ReportHistory({ locale, isOpen, onClose }: ReportHistory
             <div className="w-1/3 border-r border-gray-200 overflow-y-auto">
               <div className="p-4">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                  {getTranslation(locale, 'myReports')}
+                  {locale === 'zh' ? '我的报告' : 'My Reports'}
                 </h3>
                 
                 {isLoading ? (
@@ -248,7 +249,7 @@ export default function ReportHistory({ locale, isOpen, onClose }: ReportHistory
                 ) : reports.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p>{getTranslation(locale, 'noReportsYet')}</p>
+                    <p>{locale === 'zh' ? '暂无报告' : 'No reports yet'}</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -344,7 +345,7 @@ export default function ReportHistory({ locale, isOpen, onClose }: ReportHistory
               ) : (
                 <div className="text-center py-8 text-gray-500">
                   <Eye className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p>{getTranslation(locale, 'selectReportToView')}</p>
+                  <p>{locale === 'zh' ? '选择报告查看' : 'Select a report to view'}</p>
                 </div>
               )}
             </div>

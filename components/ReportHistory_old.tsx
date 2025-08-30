@@ -297,11 +297,10 @@ export default function ReportHistory({ locale, isOpen, onClose }: ReportHistory
   }
 
   // 新功能处理函数
-  const handlePersonalResearchSubmit = async (customInsights: string, discussionSummary: string) => {
+  const handlePersonalResearchSubmit = async (customInsights: string) => {
     if (!selectedReport || !user) return
     
     setCustomInsights(customInsights)
-    setDiscussionSummary(discussionSummary)
     
     setIsGeneratingPersonalReport(true)
     try {
@@ -310,7 +309,6 @@ export default function ReportHistory({ locale, isOpen, onClose }: ReportHistory
         stockSymbol: selectedReport.stock_symbol,
         originalReport: JSON.parse(selectedReport.report_data),
         userInsights: customInsights,
-        discussionSummary: discussionSummary,
         userId: user.id
       })
       
@@ -536,27 +534,33 @@ export default function ReportHistory({ locale, isOpen, onClose }: ReportHistory
         stockName={selectedReport?.stock_name || ''}
         onSubmit={handlePersonalResearchSubmit}
         isLoading={isGeneratingPersonalReport}
-        locale={locale}
       />
 
-      {versionedReport && (
-        <DisplayVersionedReport
-          isOpen={showVersionedReport}
-          onClose={() => setShowVersionedReport(false)}
-          originalReport={JSON.parse(selectedReport?.report_data || '{}')}
-          versionedReport={versionedReport}
-          stockSymbol={selectedReport?.stock_symbol || ''}
-          stockName={selectedReport?.stock_name || ''}
-          userInsights={customInsights}
-          discussionSummary={discussionSummary}
-        />
+      {versionedReport && showVersionedReport && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-4xl max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold">个性化报告</h2>
+              <button
+                onClick={() => setShowVersionedReport(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ✕
+              </button>
+            </div>
+            <div>
+              {versionedReport.personalizedReport && (
+                <div dangerouslySetInnerHTML={{ __html: versionedReport.personalizedReport }} />
+              )}
+            </div>
+          </div>
+        </div>
       )}
 
       <MultiCompanyModal
         isOpen={showMultiCompanyModal}
         onClose={() => setShowMultiCompanyModal(false)}
         onAnalysisComplete={handleMultiCompanyAnalysisComplete}
-        locale={locale}
       />
 
       {multiCompanyAnalysis && (

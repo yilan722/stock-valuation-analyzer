@@ -41,7 +41,7 @@ export class MNAVCalculator {
   }
 
   // 计算mNAV
-  static calculateMNAV(financials: CompanyFinancials): MNAVResult {
+  static calculateMNAV(financials: CompanyFinancials, currentPrice: number): MNAVResult {
     // 计算加密货币总价值
     const ethValue = financials.cryptoHoldings.eth * this.cryptoPrices.ETH;
     const btcValue = financials.cryptoHoldings.btc * this.cryptoPrices.BTC;
@@ -61,32 +61,33 @@ export class MNAVCalculator {
     const mnavPerShare = mnav / financials.sharesOutstanding;
     
     // 计算溢价/折价
-    const premiumToMNAV = financials.currentPrice - mnavPerShare;
+    const premiumToMNAV = currentPrice - mnavPerShare;
     const premiumPercentage = (premiumToMNAV / mnavPerShare) * 100;
     
     // 计算加密货币占比
     const cryptoPercentage = (totalCryptoValue / financials.totalAssets) * 100;
     
-    // 生成分析结果
-    const analysis = this.generateAnalysis({
+    // 创建基本结果对象
+    const result = {
       mnav,
       mnavPerShare,
-      currentPrice: financials.currentPrice,
+      currentPrice: currentPrice,
       premiumToMNAV,
       premiumPercentage,
       cryptoValue: totalCryptoValue,
       cryptoPercentage,
+      analysis: '' // 临时空值
+    };
+
+    // 生成分析结果
+    const analysis = this.generateAnalysis({
+      ...result,
       cryptoHoldings: financials.cryptoHoldings
     });
 
+    // 返回完整结果
     return {
-      mnav,
-      mnavPerShare,
-      currentPrice: financials.currentPrice,
-      premiumToMNAV,
-      premiumPercentage,
-      cryptoValue: totalCryptoValue,
-      cryptoPercentage,
+      ...result,
       analysis
     };
   }
@@ -142,13 +143,17 @@ export class MNAVCalculator {
       totalAssets: 25000000, // 2500万美元总资产
       totalLiabilities: 2000000, // 200万美元负债
       sharesOutstanding: 10000000, // 1000万股流通股
-      currentPrice: 2.5, // 当前股价2.5美元
       cryptoHoldings: {
         eth: 5000, // 5000 ETH
         btc: 0,
         otherCrypto: {}
       }
     };
+  }
+
+  // 获取SBET示例当前价格
+  static getSBETExamplePrice(): number {
+    return 2.5; // 当前股价2.5美元
   }
 
   // 获取MSTR的示例数据
@@ -158,7 +163,6 @@ export class MNAVCalculator {
       totalAssets: 2000000000, // 20亿美元总资产
       totalLiabilities: 500000000, // 5亿美元负债
       sharesOutstanding: 15000000, // 1500万股流通股
-      currentPrice: 800, // 当前股价800美元
       cryptoHoldings: {
         eth: 0,
         btc: 100000, // 10万 BTC
@@ -167,13 +171,18 @@ export class MNAVCalculator {
     };
   }
 
+  // 获取MSTR示例当前价格
+  static getMSTRExamplePrice(): number {
+    return 800; // 当前股价800美元
+  }
+
   // 比较多个公司的mNAV
-  static compareCompanies(companies: { [name: string]: CompanyFinancials }): string {
+  static compareCompanies(companies: { [name: string]: { financials: CompanyFinancials, currentPrice: number } }): string {
     const results: { [name: string]: MNAVResult } = {};
     
     // 计算每个公司的mNAV
-    for (const [name, financials] of Object.entries(companies)) {
-      results[name] = this.calculateMNAV(financials);
+    for (const [name, { financials, currentPrice }] of Object.entries(companies)) {
+      results[name] = this.calculateMNAV(financials, currentPrice);
     }
 
     // 生成比较分析
@@ -188,12 +197,14 @@ export class MNAVCalculator {
     }
 
     // 找出最佳投资机会
-    const bestOpportunity = Object.entries(results).reduce((best, [name, result]) => {
-      if (result.premiumPercentage < best.premiumPercentage) {
-        return { name, result };
+    const entries = Object.entries(results);
+    let bestOpportunity = { name: entries[0][0], result: entries[0][1] };
+    
+    for (const [name, result] of entries) {
+      if (result.premiumPercentage < bestOpportunity.result.premiumPercentage) {
+        bestOpportunity = { name, result };
       }
-      return best;
-    });
+    }
 
     comparison += `投资机会分析：\n`;
     comparison += `${bestOpportunity.name}相对mNAV折价最大(${Math.abs(bestOpportunity.result.premiumPercentage).toFixed(1)}%)，`;
@@ -209,6 +220,6 @@ export class MNAVCalculator {
 }
 
 // 导出便捷函数
-export const calculateMNAV = (financials: CompanyFinancials) => MNAVCalculator.calculateMNAV(financials);
-export const compareCompaniesMNAV = (companies: { [name: string]: CompanyFinancials }) => MNAVCalculator.compareCompanies(companies);
+export const calculateMNAV = (financials: CompanyFinancials, currentPrice: number) => MNAVCalculator.calculateMNAV(financials, currentPrice);
+export const compareCompaniesMNAV = (companies: { [name: string]: { financials: CompanyFinancials, currentPrice: number } }) => MNAVCalculator.compareCompanies(companies);
 export const updateCryptoPrices = (ethPrice: number, btcPrice: number) => MNAVCalculator.updateCryptoPrices(ethPrice, btcPrice);

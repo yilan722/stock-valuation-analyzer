@@ -10,6 +10,11 @@ export const PERPLEXITY_CONFIG = {
   
   // 模型配置 - 根据最新官方文档更新
   MODELS: {
+    // Sonar模型
+    SONAR_DEEP_RESEARCH: 'sonar', // Sonar Deep Research - 最强大的研究模型
+    SONAR_PRO: 'sonar-pro',
+    SONAR_MEDIUM: 'sonar-medium',
+    SONAR_LARGE: 'sonar-large',
     // 最新可用的模型
     LLAMA_3_1_8B: 'llama-3.1-8b-instruct',
     LLAMA_3_1_70B: 'llama-3.1-70b-instruct',
