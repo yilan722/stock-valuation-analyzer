@@ -6,6 +6,17 @@ const TUSHARE_API_URL = 'http://api.tushare.pro'
 
 // A股模拟数据作为备用方案
 const aStockMockData: Record<string, StockData> = {
+  '300080': {
+    symbol: '300080',
+    name: '易成新能',
+    price: 4.2,
+    marketCap: 15600000000,
+    peRatio: 18.5,
+    amount: 45000000,
+    volume: 107142857,
+    change: 0.12,
+    changePercent: 2.94,
+  },
   '688133': {
     symbol: '688133',
     name: '泰坦科技',
