@@ -6,7 +6,25 @@ export async function GET(request: NextRequest) {
   
   console.log(`🔍 开始测试 Tushare API for ${ticker}`)
   
-  const result = {
+  const result: {
+    timestamp: string
+    ticker: string
+    environment: {
+      hasToken: boolean
+      tokenLength: number
+      tokenPreview: string
+    }
+    testResults: any
+    summary?: {
+      allTestsPassed: boolean
+      totalTests: number
+      passedTests: number
+    }
+    error?: {
+      message: string
+      type: string
+    }
+  } = {
     timestamp: new Date().toISOString(),
     ticker,
     environment: {
@@ -14,7 +32,7 @@ export async function GET(request: NextRequest) {
       tokenLength: process.env.TUSHARE_TOKEN?.length || 0,
       tokenPreview: process.env.TUSHARE_TOKEN ? `${process.env.TUSHARE_TOKEN.substring(0, 12)}...` : 'undefined'
     },
-    testResults: {} as any
+    testResults: {}
   }
 
   try {
