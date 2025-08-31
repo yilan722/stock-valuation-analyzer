@@ -2,13 +2,6 @@ import axios from 'axios'
 import { StockData } from '../types'
 
 const TUSHARE_TOKEN = process.env.TUSHARE_TOKEN || '37255ab7622b653af54060333c28848e064585a8bf2ba3a85f8f3fe9'
-
-// 在函数开始时记录 token 状态
-console.log('🔑 Tushare Token 状态:', {
-  hasEnvToken: !!process.env.TUSHARE_TOKEN,
-  tokenPreview: TUSHARE_TOKEN ? `${TUSHARE_TOKEN.substring(0, 8)}...` : 'none',
-  tokenLength: TUSHARE_TOKEN?.length || 0
-})
 const TUSHARE_API_URL = 'https://api.tushare.pro'
 
 // A股模拟数据作为备用方案

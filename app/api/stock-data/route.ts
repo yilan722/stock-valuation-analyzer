@@ -294,17 +294,25 @@ export async function GET(request: NextRequest) {
         console.log(`✅ tushare API成功获取A股 ${ticker} 数据`)
         return NextResponse.json(tushareData)
       } catch (tushareError) {
-        console.error(`❌ Tushare API 完全失败 for ${ticker}:`, tushareError)
-        console.error('详细错误信息:', {
-          message: (tushareError as Error).message,
-          stack: (tushareError as Error).stack
+        const errorMessage = tushareError instanceof Error ? tushareError.message : String(tushareError)
+        
+        console.error(`❌ Tushare API 失败 for ${ticker}:`, {
+          error: errorMessage,
+          ticker: ticker,
+          timestamp: new Date().toISOString(),
+          hasToken: !!process.env.TUSHARE_TOKEN,
+          tokenLength: process.env.TUSHARE_TOKEN?.length || 0
         })
         
         return NextResponse.json(
           { 
             error: `A股 ${ticker} 数据获取失败`,
-            details: `Tushare API 错误: ${(tushareError as Error).message}`,
-            suggestion: '请检查股票代码是否正确，或稍后重试'
+            details: errorMessage,
+            debug: {
+              ticker,
+              hasToken: !!process.env.TUSHARE_TOKEN,
+              tokenLength: process.env.TUSHARE_TOKEN?.length || 0
+            }
           },
           { status: 500 }
         )
