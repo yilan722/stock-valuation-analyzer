@@ -8,25 +8,16 @@ export const PERPLEXITY_CONFIG = {
   API_KEY: 'sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR',
   
   MODELS: {
-    SONAR_DEEP_RESEARCH: 'o4-mini-deep-research',
-    SONAR_PRO: 'o4-mini-deep-research',
-    SONAR_MEDIUM: 'o4-mini-deep-research',
-    SONAR_LARGE: 'o4-mini-deep-research'
+    SONAR_DEEP_RESEARCH: 'gpt-4o-mini',  // 使用可用的gpt-4o-mini模型
+    SONAR_PRO: 'gpt-4o-mini',
+    SONAR_MEDIUM: 'gpt-4o-mini',
+    SONAR_LARGE: 'gpt-4o-mini'
   },
   
-  // o4-mini-deep-research模型使用v1/responses端点
+  // 使用标准的OpenAI聊天完成端点
   ENDPOINTS: {
-    RESPONSES: '/v1/responses',      // 用于o4-mini-deep-research模型
-    CHAT: '/v1/chat/completions',    // 用于其他标准模型
-    MODELS: '/v1/models'             // 获取模型列表
-  },
-  
-  // o4-mini-deep-research模型的特殊参数
-  RESPONSES_PARAMS: {
-    max_tokens: 18000,
-    temperature: 0.05,
-    top_p: 0.9,
-    presence_penalty: 0.15
+    CHAT: '/v1/chat/completions',  // 标准OpenAI格式
+    MODELS: '/v1/models'            // 获取模型列表
   },
   
   // 标准OpenAI模型的参数
