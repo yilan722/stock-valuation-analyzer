@@ -22,9 +22,9 @@ export async function GET(request: NextRequest) {
   } = {
     timestamp: new Date().toISOString(),
     apiConfig: {
-      baseUrl: 'https://api.ai190.com',
-      apiKey: 'sk-sX0Z3wACDSCYPO4dzUqXfwojhpOdP4LbnyD5D61bKZRCOzrm',
-      model: 'sonar-deep-research'
+      baseUrl: 'https://api.nuwaapi.com',
+      apiKey: 'sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR',
+      model: 'o4-mini-deep-research'
     },
     testType,
     results: {},
@@ -35,10 +35,10 @@ export async function GET(request: NextRequest) {
     if (testType === 'models') {
       // 测试1: 列出可用模型
       console.log('🔍 测试1: 获取可用模型列表...')
-      const modelsResponse = await fetch('https://api.ai190.com/v1/models', {
+      const modelsResponse = await fetch('https://api.nuwaapi.com/v1/models', {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer sk-sX0Z3wACDSCYPO4dzUqXfwojhpOdP4LbnyD5D61bKZRCOzrm`,
+          'Authorization': `Bearer sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR`,
           'Content-Type': 'application/json'
         }
       })
@@ -58,14 +58,14 @@ export async function GET(request: NextRequest) {
     } else if (testType === 'chat') {
       // 测试2: 测试聊天功能
       console.log('💬 测试2: 测试聊天功能...')
-      const chatResponse = await fetch('https://api.ai190.com/v1/chat/completions', {
+      const chatResponse = await fetch('https://api.nuwaapi.com/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer sk-sX0Z3wACDSCYPO4dzUqXfwojhpOdP4LbnyD5D61bKZRCOzrm`,
+          'Authorization': `Bearer sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'sonar-deep-research',
+          model: 'o4-mini-deep-research',
           messages: [
             {
               role: 'system',
@@ -99,10 +99,10 @@ export async function GET(request: NextRequest) {
       console.log('🚀 测试3: 完整测试...')
       
       // 先获取模型列表
-      const modelsResponse = await fetch('https://api.ai190.com/v1/models', {
+      const modelsResponse = await fetch('https://api.nuwaapi.com/v1/models', {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer sk-sX0Z3wACDSCYPO4dzUqXfwojhpOdP4LbnyD5D61bKZRCOzrm`,
+          'Authorization': `Bearer sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR`,
           'Content-Type': 'application/json'
         }
       })
@@ -115,14 +115,14 @@ export async function GET(request: NextRequest) {
       }
 
       // 再测试聊天
-      const chatResponse = await fetch('https://api.ai190.com/v1/chat/completions', {
+      const chatResponse = await fetch('https://api.nuwaapi.com/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer sk-sX0Z3wACDSCYPO4dzUqXfwojhpOdP4LbnyD5D61bKZRCOzrm`,
+          'Authorization': `Bearer sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'sonar-deep-research',
+          model: 'o4-mini-deep-research',
           messages: [
             {
               role: 'system',

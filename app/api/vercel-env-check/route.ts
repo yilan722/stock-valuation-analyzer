@@ -29,8 +29,8 @@ export async function GET() {
       
       PERPLEXITY_API: {
         status: 'CONFIGURED',
-        apiUrl: 'https://api.ai190.com/v1',
-        model: 'sonar-deep-research',
+        apiUrl: 'https://api.nuwaapi.com',
+        model: 'o4-mini-deep-research',
         note: 'API密钥已硬编码在配置文件中'
       }
     },

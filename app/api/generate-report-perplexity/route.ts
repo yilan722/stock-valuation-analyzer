@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
 
       // 构建API请求
       const perplexityRequest: PerplexityRequestBody = {
-        model: 'sonar-deep-research',
+        model: 'o4-mini-deep-research',
         messages: [
           {
             role: 'system',
@@ -125,10 +125,10 @@ export async function POST(request: NextRequest) {
 
       let response: Response
       try {
-        response = await fetch('https://api.ai190.com/v1/chat/completions', {
+        response = await fetch('https://api.nuwaapi.com/v1/chat/completions', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer sk-sX0Z3wACDSCYPO4dzUqXfwojhpOdP4LbnyD5D61bKZRCOzrm`,
+            'Authorization': `Bearer sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(perplexityRequest),

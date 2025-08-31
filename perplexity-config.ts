@@ -4,14 +4,14 @@
  */
 
 export const PERPLEXITY_CONFIG = {
-  API_BASE_URL: 'https://api.ai190.com/v1',
-  API_KEY: 'sk-sX0Z3wACDSCYPO4dzUqXfwojhpOdP4LbnyD5D61bKZRCOzrm',
+  API_BASE_URL: 'https://api.nuwaapi.com',
+  API_KEY: 'sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR',
   
   MODELS: {
-    SONAR_DEEP_RESEARCH: 'sonar-deep-research',
-    SONAR_PRO: 'sonar-pro',
-    SONAR_MEDIUM: 'sonar-medium',
-    SONAR_LARGE: 'sonar-large'
+    SONAR_DEEP_RESEARCH: 'o4-mini-deep-research',
+    SONAR_PRO: 'o4-mini-deep-research',
+    SONAR_MEDIUM: 'o4-mini-deep-research',
+    SONAR_LARGE: 'o4-mini-deep-research'
   },
   
   DEFAULT_PARAMS: {
