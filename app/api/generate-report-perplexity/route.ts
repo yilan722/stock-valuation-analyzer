@@ -40,274 +40,293 @@ interface PerplexityResponse {
 }
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now()
+  
   try {
-    console.log('🚀 开始生成报告...')
-    
-    // 用户认证
-    const authHeader = request.headers.get('Authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: 'Missing or invalid Authorization header' },
-        { status: 401 }
-      )
-    }
-
-    const userId = authHeader.replace('Bearer ', '')
-    console.log('🔍 用户ID:', userId)
-
-    // 验证用户
-    const supabase = createApiSupabaseClient(request)
-    const { data: user, error: userError } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', userId)
-      .single()
-
-    if (userError || !user) {
-      console.error('❌ 用户验证失败:', userError)
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      )
-    }
-
-    // 检查用户是否可以生成报告
-    const canGenerate = await canGenerateReport(user.id)
-    if (!canGenerate.canGenerate) {
-      return NextResponse.json(
-        { error: 'Report generation limit reached', details: canGenerate.reason },
-        { status: 403 }
-      )
-    }
-
-    // 获取请求数据
-    const { stockData, locale = 'zh' } = await request.json()
-    console.log('📊 股票数据:', stockData)
-    console.log('🌍 语言设置:', locale)
-
-    if (!stockData) {
-      return NextResponse.json(
-        { error: 'Missing stock data' },
-        { status: 400 }
-      )
-    }
-
-    // 构建API请求
-    const perplexityRequest: PerplexityRequestBody = {
-      model: 'sonar-deep-research',
-      messages: [
-        {
-          role: 'system',
-          content: buildSystemPrompt(locale)
-        },
-        {
-          role: 'user',
-          content: buildDetailedUserPrompt(stockData, locale)
-        }
-      ],
-      max_tokens: 18000,
-      temperature: 0.05,
-      search_queries: true,
-      search_recency_filter: 'month',
-      return_citations: true,
-      top_p: 0.9,
-      presence_penalty: 0.15
-    }
-
-    console.log('📤 发送Perplexity API请求...')
-
-    // 设置超时控制
+    // 增加超时时间到10分钟
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 5 * 60 * 1000) // 5分钟超时
-
-    let response: Response
-    try {
-      response = await fetch('https://api.perplexity.ai/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(perplexityRequest),
-        signal: controller.signal
-      })
-    } catch (fetchError: any) {
-      clearTimeout(timeoutId)
-      console.error('❌ Perplexity API请求失败:', fetchError)
-      
-      if (fetchError.name === 'AbortError') {
-        return NextResponse.json(
-          { error: 'Request timeout', details: '请求超时，请稍后重试' },
-          { status: 408 }
-        )
-      }
-      
-      if (fetchError.message.includes('fetch failed')) {
-        return NextResponse.json(
-          { error: 'Network error', details: '网络连接失败，请检查网络连接后重试' },
-          { status: 503 }
-        )
-      }
-      
-      throw fetchError
-    }
-
-    clearTimeout(timeoutId)
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('❌ Perplexity API错误:', response.status, errorText)
-      return NextResponse.json(
-        { error: 'Perplexity API error', details: errorText },
-        { status: response.status }
-      )
-    }
-
-    const data: PerplexityResponse = await response.json()
-    console.log('✅ 收到Perplexity响应')
-
-    // 监控token使用量
-    const tokensUsed = data.usage?.total_tokens || 0
-    const estimatedCost = (tokensUsed / 1000000) * 2.0 // $2.0 per 1M tokens
-    console.log(`💰 Token使用: ${tokensUsed}, 预估成本: $${estimatedCost.toFixed(4)}`)
+    const timeoutId = setTimeout(() => controller.abort(), 600000) // 10分钟超时
     
-    if (estimatedCost > 0.8) {
-      console.warn(`⚠️ 成本超出预期: $${estimatedCost.toFixed(4)} > $0.8`)
-    }
-
-    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-      console.error('❌ 无效的API响应结构')
-      return NextResponse.json(
-        { error: 'Invalid API response' },
-        { status: 500 }
-      )
-    }
-
-    const content = data.choices[0].message.content
-    console.log('📝 原始内容长度:', content.length)
-
-    // 解析JSON内容
-    let parsedReport: any
     try {
-      console.log('🔍 开始解析JSON内容...')
-      console.log('📝 原始内容长度:', content.length)
-      console.log('📄 内容预览:', content.substring(0, 500) + '...')
+      console.log('🚀 开始生成报告...')
       
-      // 多种方法提取JSON
-      let jsonContent = ''
-      
-      // 方法1: 寻找最外层的JSON对象
-      const jsonMatch = content.match(/\{[\s\S]*\}/g)
-      if (jsonMatch && jsonMatch.length > 0) {
-        // 取最长的JSON字符串
-        jsonContent = jsonMatch.reduce((longest, current) => 
-          current.length > longest.length ? current : longest, ''
+      // 用户认证
+      const authHeader = request.headers.get('Authorization')
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return NextResponse.json(
+          { error: 'Missing or invalid Authorization header' },
+          { status: 401 }
         )
       }
-      
-      // 方法2: 如果没找到，尝试寻找代码块中的JSON
-      if (!jsonContent) {
-        const codeBlockMatch = content.match(/```json\s*(\{[\s\S]*?\})\s*```/i)
-        if (codeBlockMatch) {
-          jsonContent = codeBlockMatch[1]
-        }
-      }
-      
-      // 方法3: 如果还没找到，尝试寻找任何JSON结构
-      if (!jsonContent) {
-        const anyJsonMatch = content.match(/(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})/g)
-        if (anyJsonMatch) {
-          jsonContent = anyJsonMatch[anyJsonMatch.length - 1] // 取最后一个
-        }
-      }
-      
-      if (!jsonContent) {
-        throw new Error('未找到JSON格式的报告内容')
-      }
-      
-      console.log('📋 提取的JSON长度:', jsonContent.length)
-      console.log('🔍 JSON预览:', jsonContent.substring(0, 200) + '...')
-      
-      // 清理JSON内容
-      jsonContent = jsonContent
-        .replace(/```json/gi, '')
-        .replace(/```/g, '')
-        .replace(/\n\s*\n/g, '\n')
-        .trim()
-      
-      parsedReport = JSON.parse(jsonContent)
-      
-      console.log('✅ JSON解析成功')
-      console.log('📊 报告结构:', Object.keys(parsedReport))
 
-      // 验证必需的字段
-      const requiredFields = ['fundamentalAnalysis', 'businessSegments', 'growthCatalysts', 'valuationAnalysis']
-      for (const field of requiredFields) {
-        if (!parsedReport[field]) {
-          throw new Error(`缺少必需字段: ${field}`)
-        }
-      }
+      const userId = authHeader.replace('Bearer ', '')
+      console.log('🔍 用户ID:', userId)
 
-    } catch (parseError) {
-      console.error('❌ JSON解析失败:', parseError)
-      console.log('🔄 尝试从自然语言中构建报告结构...')
-      
-      try {
-        // 如果JSON解析失败，尝试从自然语言内容中提取各部分
-        parsedReport = parseNaturalLanguageReport(content)
-        console.log('✅ 自然语言解析成功')
-        console.log('📊 报告结构:', Object.keys(parsedReport))
-      } catch (fallbackError) {
-        console.error('❌ 自然语言解析也失败:', fallbackError)
-        console.log('📄 原始内容示例:', content.substring(0, 1000) + '...')
-        
+      // 验证用户
+      const supabase = createApiSupabaseClient(request)
+      const { data: user, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single()
+
+      if (userError || !user) {
+        console.error('❌ 用户验证失败:', userError)
         return NextResponse.json(
-          { 
-            error: 'Failed to parse report content', 
-            details: `JSON解析失败: ${String(parseError)}. 自然语言解析失败: ${String(fallbackError)}`,
-            debug: {
-              contentLength: content.length,
-              contentPreview: content.substring(0, 500)
-            }
+          { error: 'User not found' },
+          { status: 404 }
+        )
+      }
+
+      // 检查用户是否可以生成报告
+      const canGenerate = await canGenerateReport(user.id)
+      if (!canGenerate.canGenerate) {
+        return NextResponse.json(
+          { error: 'Report generation limit reached', details: canGenerate.reason },
+          { status: 403 }
+        )
+      }
+
+      // 获取请求数据
+      const { stockData, locale = 'zh' } = await request.json()
+      console.log('📊 股票数据:', stockData)
+      console.log('🌍 语言设置:', locale)
+
+      if (!stockData) {
+        return NextResponse.json(
+          { error: 'Missing stock data' },
+          { status: 400 }
+        )
+      }
+
+      // 构建API请求
+      const perplexityRequest: PerplexityRequestBody = {
+        model: 'sonar-deep-research',
+        messages: [
+          {
+            role: 'system',
+            content: buildSystemPrompt(locale)
           },
+          {
+            role: 'user',
+            content: buildDetailedUserPrompt(stockData, locale)
+          }
+        ],
+        max_tokens: 18000,
+        temperature: 0.05,
+        search_queries: true,
+        search_recency_filter: 'month',
+        return_citations: true,
+        top_p: 0.9,
+        presence_penalty: 0.15
+      }
+
+      console.log('📤 发送Perplexity API请求...')
+
+      let response: Response
+      try {
+        response = await fetch('https://api.perplexity.ai/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(perplexityRequest),
+          signal: controller.signal
+        })
+      } catch (fetchError: any) {
+        clearTimeout(timeoutId)
+        console.error('❌ Perplexity API请求失败:', fetchError)
+        
+        if (fetchError.name === 'AbortError') {
+          return NextResponse.json(
+            { error: 'Request timeout', details: '请求超时，请稍后重试' },
+            { status: 408 }
+          )
+        }
+        
+        if (fetchError.message.includes('fetch failed')) {
+          return NextResponse.json(
+            { error: 'Network error', details: '网络连接失败，请检查网络连接后重试' },
+            { status: 503 }
+          )
+        }
+        
+        throw fetchError
+      }
+
+      clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('❌ Perplexity API错误:', response.status, errorText)
+        return NextResponse.json(
+          { error: 'Perplexity API error', details: errorText },
+          { status: response.status }
+        )
+      }
+
+      const data: PerplexityResponse = await response.json()
+      console.log('✅ 收到Perplexity响应')
+
+      // 监控token使用量
+      const tokensUsed = data.usage?.total_tokens || 0
+      const estimatedCost = (tokensUsed / 1000000) * 2.0 // $2.0 per 1M tokens
+      console.log(`💰 Token使用: ${tokensUsed}, 预估成本: $${estimatedCost.toFixed(4)}`)
+      
+      if (estimatedCost > 0.8) {
+        console.warn(`⚠️ 成本超出预期: $${estimatedCost.toFixed(4)} > $0.8`)
+      }
+
+      if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+        console.error('❌ 无效的API响应结构')
+        return NextResponse.json(
+          { error: 'Invalid API response' },
           { status: 500 }
         )
       }
-    }
 
-    console.log('✅ 报告生成成功!')
-    
-    // 保存报告到数据库
-    console.log('💾 保存报告到数据库...')
-    
-    try {
-      await createReport(
-        user.id,
-        stockData.symbol,
-        stockData.name,
-        JSON.stringify(parsedReport)
-      )
-      console.log('✅ 报告保存成功')
+      const content = data.choices[0].message.content
+      console.log('📝 原始内容长度:', content.length)
+
+      // 解析JSON内容
+      let parsedReport: any
+      try {
+        console.log('🔍 开始解析JSON内容...')
+        console.log('📝 原始内容长度:', content.length)
+        console.log('📄 内容预览:', content.substring(0, 500) + '...')
+        
+        // 多种方法提取JSON
+        let jsonContent = ''
+        
+        // 方法1: 寻找最外层的JSON对象
+        const jsonMatch = content.match(/\{[\s\S]*\}/g)
+        if (jsonMatch && jsonMatch.length > 0) {
+          // 取最长的JSON字符串
+          jsonContent = jsonMatch.reduce((longest, current) => 
+            current.length > longest.length ? current : longest, ''
+          )
+        }
+        
+        // 方法2: 如果没找到，尝试寻找代码块中的JSON
+        if (!jsonContent) {
+          const codeBlockMatch = content.match(/```json\s*(\{[\s\S]*?\})\s*```/i)
+          if (codeBlockMatch) {
+            jsonContent = codeBlockMatch[1]
+          }
+        }
+        
+        // 方法3: 如果还没找到，尝试寻找任何JSON结构
+        if (!jsonContent) {
+          const anyJsonMatch = content.match(/(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})/g)
+          if (anyJsonMatch) {
+            jsonContent = anyJsonMatch[anyJsonMatch.length - 1] // 取最后一个
+          }
+        }
+        
+        if (!jsonContent) {
+          throw new Error('未找到JSON格式的报告内容')
+        }
+        
+        console.log('📋 提取的JSON长度:', jsonContent.length)
+        console.log('🔍 JSON预览:', jsonContent.substring(0, 200) + '...')
+        
+        // 清理JSON内容
+        jsonContent = jsonContent
+          .replace(/```json/gi, '')
+          .replace(/```/g, '')
+          .replace(/\n\s*\n/g, '\n')
+          .trim()
+        
+        parsedReport = JSON.parse(jsonContent)
+        
+        console.log('✅ JSON解析成功')
+        console.log('📊 报告结构:', Object.keys(parsedReport))
+
+        // 验证必需的字段
+        const requiredFields = ['fundamentalAnalysis', 'businessSegments', 'growthCatalysts', 'valuationAnalysis']
+        for (const field of requiredFields) {
+          if (!parsedReport[field]) {
+            throw new Error(`缺少必需字段: ${field}`)
+          }
+        }
+
+      } catch (parseError) {
+        console.error('❌ JSON解析失败:', parseError)
+        console.log('🔄 尝试从自然语言中构建报告结构...')
+        
+        try {
+          // 如果JSON解析失败，尝试从自然语言内容中提取各部分
+          parsedReport = parseNaturalLanguageReport(content)
+          console.log('✅ 自然语言解析成功')
+          console.log('📊 报告结构:', Object.keys(parsedReport))
+        } catch (fallbackError) {
+          console.error('❌ 自然语言解析也失败:', fallbackError)
+          console.log('📄 原始内容示例:', content.substring(0, 1000) + '...')
+          
+          return NextResponse.json(
+            { 
+              error: 'Failed to parse report content', 
+              details: `JSON解析失败: ${String(parseError)}. 自然语言解析失败: ${String(fallbackError)}`,
+              debug: {
+                contentLength: content.length,
+                contentPreview: content.substring(0, 500)
+              }
+            },
+            { status: 500 }
+          )
+        }
+      }
+
+      console.log('✅ 报告生成成功!')
       
-      // 更新用户使用量
-      await incrementReportUsage(user.id)
-      console.log('✅ 用户使用量更新成功')
-    } catch (dbError) {
-      console.error('❌ 保存报告到数据库时出错:', dbError)
-      // 即使保存失败，也返回报告数据，不影响用户体验
+      // 保存报告到数据库
+      console.log('💾 保存报告到数据库...')
+      
+      try {
+        await createReport(
+          user.id,
+          stockData.symbol,
+          stockData.name,
+          JSON.stringify(parsedReport)
+        )
+        console.log('✅ 报告保存成功')
+        
+        // 更新用户使用量
+        await incrementReportUsage(user.id)
+        console.log('✅ 用户使用量更新成功')
+      } catch (dbError) {
+        console.error('❌ 保存报告到数据库时出错:', dbError)
+        // 即使保存失败，也返回报告数据，不影响用户体验
+      }
+      
+      return NextResponse.json(parsedReport)
+
+    } catch (error) {
+      clearTimeout(timeoutId)
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      console.error('❌ 报告生成失败:', errorMessage)
+      
+      // 确保返回正确的JSON格式
+      return NextResponse.json({
+        error: '报告生成失败',
+        details: errorMessage,
+        timestamp: new Date().toISOString(),
+        responseTime: Date.now() - startTime
+      }, { status: 500 })
     }
     
-    return NextResponse.json(parsedReport)
-
   } catch (error) {
-    console.error('❌ 生成报告失败:', error)
-    return NextResponse.json(
-      { 
-        error: 'Failed to generate report', 
-        details: error instanceof Error ? error.message : String(error) 
-      },
-      { status: 500 }
-    )
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('❌ 报告生成失败:', errorMessage)
+    
+    // 确保返回正确的JSON格式
+    return NextResponse.json({
+      error: '报告生成失败',
+      details: errorMessage,
+      timestamp: new Date().toISOString(),
+      responseTime: Date.now() - startTime
+    }, { status: 500 })
   }
 }
 
