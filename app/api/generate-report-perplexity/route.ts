@@ -125,10 +125,10 @@ export async function POST(request: NextRequest) {
 
       let response: Response
       try {
-        response = await fetch('https://api.perplexity.ai/chat/completions', {
+        response = await fetch('https://api.ai190.com/v1/chat/completions', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
+            'Authorization': `Bearer sk-sX0Z3wACDSCYPO4dzUqXfwojhpOdP4LbnyD5D61bKZRCOzrm`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(perplexityRequest),

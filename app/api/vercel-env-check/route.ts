@@ -27,15 +27,11 @@ export async function GET() {
         rawValue: process.env.TUSHARE_TOKEN || 'NOT_SET'
       },
       
-      PERPLEXITY_API_KEY: {
-        exists: !!process.env.PERPLEXITY_API_KEY,
-        length: process.env.PERPLEXITY_API_KEY?.length || 0,
-        preview: process.env.PERPLEXITY_API_KEY ? `${process.env.PERPLEXITY_API_KEY.substring(0, 8)}...` : 'NOT_SET',
-        hasSpaces: process.env.PERPLEXITY_API_KEY?.includes(' ') || false,
-        hasNewlines: process.env.PERPLEXITY_API_KEY?.includes('\n') || false,
-        startsWithQuote: process.env.PERPLEXITY_API_KEY?.startsWith('"') || false,
-        endsWithQuote: process.env.PERPLEXITY_API_KEY?.endsWith('"') || false,
-        rawValue: process.env.PERPLEXITY_API_KEY || 'NOT_SET'
+      PERPLEXITY_API: {
+        status: 'CONFIGURED',
+        apiUrl: 'https://api.ai190.com/v1',
+        model: 'sonar-deep-research',
+        note: 'API密钥已硬编码在配置文件中'
       }
     },
     
@@ -79,10 +75,6 @@ export async function GET() {
     if (envCheck.criticalEnvVars.TUSHARE_TOKEN.startsWithQuote || envCheck.criticalEnvVars.TUSHARE_TOKEN.endsWithQuote) {
       envCheck.diagnosis.push('⚠️ TUSHARE_TOKEN 包含引号 - 可能导致API调用失败')
     }
-  }
-  
-  if (!envCheck.criticalEnvVars.PERPLEXITY_API_KEY.exists) {
-    envCheck.diagnosis.push('❌ PERPLEXITY_API_KEY 未设置 - 报告生成功能将无法使用')
   }
   
   if (envCheck.deployment.vercel === 'false') {
