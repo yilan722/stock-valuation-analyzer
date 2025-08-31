@@ -251,6 +251,19 @@ const A_STOCK_NAME_MAP: Record<string, string> = {
   '688133': '泰坦科技'
 }
 
+// 为300080添加mock数据
+mockStockData['300080'] = {
+  symbol: '300080',
+  name: '易成新能',
+  price: 4.2,
+  marketCap: 15600000000,
+  peRatio: 18.5,
+  amount: 45000000,
+  volume: 107142857,
+  change: 0.12,
+  changePercent: 2.94,
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const ticker = searchParams.get('ticker')?.toUpperCase()
@@ -281,9 +294,18 @@ export async function GET(request: NextRequest) {
         console.log(`✅ tushare API成功获取A股 ${ticker} 数据`)
         return NextResponse.json(tushareData)
       } catch (tushareError) {
-        console.error(`tushare API failed for ${ticker}:`, tushareError)
+        console.error(`❌ Tushare API 完全失败 for ${ticker}:`, tushareError)
+        console.error('详细错误信息:', {
+          message: (tushareError as Error).message,
+          stack: (tushareError as Error).stack
+        })
+        
         return NextResponse.json(
-          { error: `A股 ${ticker} 数据获取失败，tushare API暂时不可用。请稍后重试。` },
+          { 
+            error: `A股 ${ticker} 数据获取失败`,
+            details: `Tushare API 错误: ${(tushareError as Error).message}`,
+            suggestion: '请检查股票代码是否正确，或稍后重试'
+          },
           { status: 500 }
         )
       }

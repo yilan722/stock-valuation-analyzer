@@ -2,7 +2,14 @@ import axios from 'axios'
 import { StockData } from '../types'
 
 const TUSHARE_TOKEN = process.env.TUSHARE_TOKEN || '37255ab7622b653af54060333c28848e064585a8bf2ba3a85f8f3fe9'
-const TUSHARE_API_URL = 'http://api.tushare.pro'
+
+// 在函数开始时记录 token 状态
+console.log('🔑 Tushare Token 状态:', {
+  hasEnvToken: !!process.env.TUSHARE_TOKEN,
+  tokenPreview: TUSHARE_TOKEN ? `${TUSHARE_TOKEN.substring(0, 8)}...` : 'none',
+  tokenLength: TUSHARE_TOKEN?.length || 0
+})
+const TUSHARE_API_URL = 'https://api.tushare.pro'
 
 // A股模拟数据作为备用方案
 const aStockMockData: Record<string, StockData> = {
@@ -75,20 +82,27 @@ const aStockMockData: Record<string, StockData> = {
 }
 
 export const fetchAStockData = async (ticker: string): Promise<StockData> => {
+  console.log(`🚀 开始获取 A股 ${ticker} 数据...`)
+  console.log('🔑 使用的 Token:', TUSHARE_TOKEN ? `${TUSHARE_TOKEN.substring(0, 8)}...` : 'undefined')
+  
   // 判断是深市还是沪市
   const isShanghai = ticker.startsWith('6') || ticker.startsWith('9')
   const marketSuffix = isShanghai ? '.SH' : '.SZ'
+  console.log(`📍 市场判断: ${ticker} -> ${ticker}${marketSuffix}`)
   
   // 首先获取公司基本信息（包括中文名称）
   let companyName = `${ticker} (A股)`
   try {
+    console.log(`🔍 获取 ${ticker} 基本信息...`)
     const basicInfo = await fetchStockBasicInfo(ticker, marketSuffix)
     if (basicInfo && basicInfo.name) {
       companyName = basicInfo.name
       console.log(`✅ 获取到公司名称: ${companyName}`)
+    } else {
+      console.log(`⚠️ 未获取到 ${ticker} 的公司名称，使用默认名称`)
     }
   } catch (basicError) {
-    console.log('Failed to fetch basic info, using default name')
+    console.log(`❌ 获取基本信息失败: ${(basicError as Error).message}`)
   }
 
   try {
@@ -247,16 +261,30 @@ export const fetchAStockData = async (ticker: string): Promise<StockData> => {
     }
 
   } catch (error) {
-    console.error(`Tushare API failed for ${ticker}:`, error)
+    console.error(`❌ Tushare API 调用失败 for ${ticker}:`)
+    console.error('错误类型:', error.constructor.name)
+    console.error('错误消息:', (error as Error).message)
     
-    // 如果Tushare API失败，使用模拟数据作为备用方案
-    if (aStockMockData[ticker]) {
-      console.log(`Using mock data for ${ticker} as fallback`)
-      return aStockMockData[ticker]
+    if (axios.isAxiosError(error)) {
+      console.error('响应状态:', error.response?.status)
+      console.error('响应数据:', error.response?.data)
+      console.error('请求配置:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        timeout: error.config?.timeout
+      })
     }
     
-    // 如果没有模拟数据，抛出错误
-    throw new Error(`A股 ${ticker} 数据获取失败，Tushare API不可用且无备用数据`)
+    // 记录详细的 API 调用信息
+    console.error('API 调用详情:', {
+      token: TUSHARE_TOKEN ? `${TUSHARE_TOKEN.substring(0, 8)}...` : 'undefined',
+      url: TUSHARE_API_URL,
+      tsCode: `${ticker}${marketSuffix}`,
+      hasEnvToken: !!process.env.TUSHARE_TOKEN
+    })
+    
+    // 不使用 mock 数据，直接抛出详细错误
+    throw new Error(`Tushare API 调用失败: ${(error as Error).message}. 请检查网络连接和 API 配置。`)
   }
 }
 
