@@ -68,16 +68,7 @@ export async function GET(request: NextRequest) {
         },
         body: JSON.stringify({
           model: 'o4-mini-deep-research',
-          messages: [
-            {
-              role: 'system',
-              content: '你是一个专业的股票分析师，请用中文回答。'
-            },
-            {
-              role: 'user',
-              content: '请简单介绍一下你的能力，用一句话回答。'
-            }
-          ],
+          input: '请简单介绍一下你的能力，用一句话回答。', // 使用input字段
           max_tokens: 100,
           temperature: 0.1
         })
@@ -125,16 +116,7 @@ export async function GET(request: NextRequest) {
         },
         body: JSON.stringify({
           model: 'o4-mini-deep-research',
-          messages: [
-            {
-              role: 'system',
-              content: '你是一个专业的股票分析师，请用中文回答。'
-            },
-            {
-              role: 'user',
-              content: '请简单介绍一下你的能力，用一句话回答。'
-            }
-          ],
+          input: '请简单介绍一下你的能力，用一句话回答。', // 使用input字段
           max_tokens: 100,
           temperature: 0.1
         })

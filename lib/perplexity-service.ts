@@ -6,10 +6,7 @@ import { PERPLEXITY_CONFIG } from '../perplexity-config'
 
 export interface PerplexityRequestBody {
   model: string
-  messages: Array<{
-    role: 'system' | 'user' | 'assistant'
-    content: string
-  }>
+  input: string  // 使用input字段而不是messages
   max_tokens?: number
   temperature?: number
   search_queries?: boolean
@@ -46,10 +43,7 @@ export class PerplexityService {
   ): Promise<PerplexityResponse> {
     const requestBody: PerplexityRequestBody = {
       model,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
-      ],
+      input: `${systemPrompt}\n\n${userPrompt}`, // 合并system和user prompt到input字段
       ...PERPLEXITY_CONFIG.DEFAULT_PARAMS
     }
 

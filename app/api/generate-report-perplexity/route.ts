@@ -99,19 +99,10 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      // 构建API请求
-      const perplexityRequest: PerplexityRequestBody = {
+      // 构建API请求 - 使用input字段适配v1/responses端点
+      const perplexityRequest = {
         model: 'o4-mini-deep-research',
-        messages: [
-          {
-            role: 'system',
-            content: buildSystemPrompt(locale)
-          },
-          {
-            role: 'user',
-            content: buildDetailedUserPrompt(stockData, locale)
-          }
-        ],
+        input: buildDetailedUserPrompt(stockData, locale), // 直接使用input字段
         max_tokens: 18000,
         temperature: 0.05,
         search_queries: true,
