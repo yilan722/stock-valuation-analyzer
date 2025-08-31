@@ -58,7 +58,9 @@ export async function GET(request: NextRequest) {
     } else if (testType === 'chat') {
       // 测试2: 测试聊天功能
       console.log('💬 测试2: 测试聊天功能...')
-      const chatResponse = await fetch('https://api.nuwaapi.com/v1/chat/completions', {
+      
+      // o4-mini-deep-research模型使用v1/responses端点
+      const chatResponse = await fetch('https://api.nuwaapi.com/v1/responses', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR`,
@@ -115,7 +117,7 @@ export async function GET(request: NextRequest) {
       }
 
       // 再测试聊天
-      const chatResponse = await fetch('https://api.nuwaapi.com/v1/chat/completions', {
+      const chatResponse = await fetch('https://api.nuwaapi.com/v1/responses', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR`,

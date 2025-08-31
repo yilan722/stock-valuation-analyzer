@@ -394,9 +394,9 @@ export default function MultiCompanyModal({
           const realData = await getRealStockData(company.symbol)
           
           return {
-            ...company,
+          ...company,
             scores,
-            keyMetrics: {
+          keyMetrics: {
               // 优先使用AI分析中的真实数据，如果没有则使用备用计算
               targetPrice: extractTargetPriceFromAnalysis(geminiAnalysis, company.symbol) || realData?.price || 0,
               upsidePotential: extractUpsidePotentialFromAnalysis(geminiAnalysis, company.symbol) || realData?.changePercent || 0,
@@ -630,42 +630,42 @@ export default function MultiCompanyModal({
 
           {/* Analysis Controls - 固定底部 */}
           <div className="sticky bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 flex-shrink-0 z-10">
-            <div className="flex justify-between items-center">
-              <div className="text-sm text-gray-600">
+          <div className="flex justify-between items-center">
+            <div className="text-sm text-gray-600">
                 {companies.length >= 2 ? (
                   <span className="text-green-600">✅ 已选择 {companies.length} 家公司，可以开始分析</span>
                 ) : (
                   <span className="text-orange-600">⚠️ 请至少选择 2 家公司进行对比</span>
                 )}
-              </div>
-              <div className="flex space-x-3">
-                <button
-                  onClick={onClose}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  取消
-                </button>
-                <button
-                  onClick={startAnalysis}
-                  disabled={companies.length < 2 || isAnalyzing}
+            </div>
+            <div className="flex space-x-3">
+              <button
+                onClick={onClose}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                取消
+              </button>
+              <button
+                onClick={startAnalysis}
+                disabled={companies.length < 2 || isAnalyzing}
                   className={`px-6 py-2 rounded-lg transition-colors flex items-center ${
                     companies.length >= 2 
                       ? 'bg-blue-600 text-white hover:bg-blue-700' 
                       : 'bg-gray-400 text-gray-200 cursor-not-allowed'
                   }`}
-                >
-                  {isAnalyzing ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      分析中...
-                    </>
-                  ) : (
-                    <>
-                      <BarChart3 size={16} className="inline mr-2" />
-                      开始分析
-                    </>
-                  )}
-                </button>
+              >
+                {isAnalyzing ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    分析中...
+                  </>
+                ) : (
+                  <>
+                    <BarChart3 size={16} className="inline mr-2" />
+                    开始分析
+                  </>
+                )}
+              </button>
               </div>
             </div>
           </div>

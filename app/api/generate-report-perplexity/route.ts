@@ -125,7 +125,8 @@ export async function POST(request: NextRequest) {
 
       let response: Response
       try {
-        response = await fetch('https://api.nuwaapi.com/v1/chat/completions', {
+        // o4-mini-deep-research模型使用v1/responses端点
+        response = await fetch('https://api.nuwaapi.com/v1/responses', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR`,

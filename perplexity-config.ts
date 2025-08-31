@@ -14,6 +14,12 @@ export const PERPLEXITY_CONFIG = {
     SONAR_LARGE: 'o4-mini-deep-research'
   },
   
+  // o4-mini-deep-research模型使用v1/responses端点
+  ENDPOINTS: {
+    CHAT: '/v1/responses',  // 用于o4-mini-deep-research模型
+    MODELS: '/v1/models'    // 获取模型列表
+  },
+  
   DEFAULT_PARAMS: {
     max_tokens: 18000,
     temperature: 0.05,

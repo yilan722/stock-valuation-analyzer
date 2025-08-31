@@ -53,7 +53,10 @@ export class PerplexityService {
       ...PERPLEXITY_CONFIG.DEFAULT_PARAMS
     }
 
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
+    // o4-mini-deep-research模型使用v1/responses端点
+    const endpoint = `${this.baseUrl}${PERPLEXITY_CONFIG.ENDPOINTS.CHAT}`
+
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${this.apiKey}`,
