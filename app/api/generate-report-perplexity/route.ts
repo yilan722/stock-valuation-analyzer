@@ -99,19 +99,10 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      // 构建API请求 - 使用标准OpenAI格式
+      // 构建API请求 - o4-mini-deep-research模型使用v1/responses端点
       const perplexityRequest = {
         model: 'o4-mini-deep-research',
-        messages: [
-          {
-            role: 'system',
-            content: buildSystemPrompt(locale)
-          },
-          {
-            role: 'user',
-            content: buildDetailedUserPrompt(stockData, locale)
-          }
-        ],
+        input: `${buildSystemPrompt(locale)}\n\n${buildDetailedUserPrompt(stockData, locale)}`, // 合并到input字段
         max_tokens: 18000,
         temperature: 0.05,
         top_p: 0.9,
@@ -122,8 +113,8 @@ export async function POST(request: NextRequest) {
 
       let response: Response
       try {
-        // 使用标准的OpenAI聊天完成端点
-        response = await fetch('https://api.nuwaapi.com/v1/chat/completions', {
+        // o4-mini-deep-research模型使用v1/responses端点
+        response = await fetch('https://api.nuwaapi.com/v1/responses', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR`,
