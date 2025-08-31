@@ -8,10 +8,10 @@ export const PERPLEXITY_CONFIG = {
   API_KEY: 'sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR',
   
   MODELS: {
-    SONAR_DEEP_RESEARCH: 'gpt-4o-mini',  // 使用可用的gpt-4o-mini模型
-    SONAR_PRO: 'gpt-4o-mini',
-    SONAR_MEDIUM: 'gpt-4o-mini',
-    SONAR_LARGE: 'gpt-4o-mini'
+    SONAR_DEEP_RESEARCH: 'o3-deep-research',  // 使用专门用于深度研究的o3-deep-research模型
+    SONAR_PRO: 'o3-deep-research',
+    SONAR_MEDIUM: 'o3-deep-research',
+    SONAR_LARGE: 'o3-deep-research'
   },
   
   // 使用标准的OpenAI聊天完成端点
