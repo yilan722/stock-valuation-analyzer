@@ -102,7 +102,8 @@ export const fetchAStockData = async (ticker: string): Promise<StockData> => {
       console.log(`⚠️ 未获取到 ${ticker} 的公司名称，使用默认名称`)
     }
   } catch (basicError) {
-    console.log(`❌ 获取基本信息失败: ${(basicError as Error).message}`)
+    const errorMessage = basicError instanceof Error ? basicError.message : String(basicError)
+    console.log(`❌ 获取基本信息失败: ${errorMessage}`)
   }
 
   try {
@@ -194,7 +195,8 @@ export const fetchAStockData = async (ticker: string): Promise<StockData> => {
         console.log(`No basic data found for ${ticker} on ${tradeDate}`)
       }
     } catch (basicError) {
-      console.log(`Failed to fetch basic financial data for ${ticker}:`, (basicError as Error).message)
+      const errorMessage = basicError instanceof Error ? basicError.message : String(basicError)
+      console.log(`Failed to fetch basic financial data for ${ticker}:`, errorMessage)
     }
 
     // 如果P/E为0或null，尝试通过income API计算
@@ -233,7 +235,8 @@ export const fetchAStockData = async (ticker: string): Promise<StockData> => {
           }
         }
       } catch (incomeError) {
-        console.log(`Failed to fetch income data for ${ticker}:`, (incomeError as Error).message)
+        const errorMessage = incomeError instanceof Error ? incomeError.message : String(incomeError)
+        console.log(`Failed to fetch income data for ${ticker}:`, errorMessage)
       }
     }
 
@@ -262,8 +265,13 @@ export const fetchAStockData = async (ticker: string): Promise<StockData> => {
 
   } catch (error) {
     console.error(`❌ Tushare API 调用失败 for ${ticker}:`)
-    console.error('错误类型:', error.constructor.name)
-    console.error('错误消息:', (error as Error).message)
+    
+    // 安全的错误处理
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    const errorName = error instanceof Error ? error.constructor.name : 'Unknown'
+    
+    console.error('错误类型:', errorName)
+    console.error('错误消息:', errorMessage)
     
     if (axios.isAxiosError(error)) {
       console.error('响应状态:', error.response?.status)
@@ -284,7 +292,7 @@ export const fetchAStockData = async (ticker: string): Promise<StockData> => {
     })
     
     // 不使用 mock 数据，直接抛出详细错误
-    throw new Error(`Tushare API 调用失败: ${(error as Error).message}. 请检查网络连接和 API 配置。`)
+    throw new Error(`Tushare API 调用失败: ${errorMessage}. 请检查网络连接和 API 配置。`)
   }
 }
 
