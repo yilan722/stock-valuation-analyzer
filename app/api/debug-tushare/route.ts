@@ -34,7 +34,13 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    const apiResult = {
+    const apiResult: {
+      code: any
+      message: any
+      hasData: boolean
+      itemCount: any
+      stockPrice?: number
+    } = {
       code: testResponse.data.code,
       message: testResponse.data.msg || 'success',
       hasData: !!(testResponse.data.data?.items?.length),
@@ -61,8 +67,13 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('调试过程中发生错误:', error)
     
-    const errorInfo = {
-      type: error.constructor.name,
+    const errorInfo: {
+      type: string
+      message: string
+      status?: number
+      responseData?: any
+    } = {
+      type: error instanceof Error ? error.constructor.name : 'Unknown',
       message: error instanceof Error ? error.message : String(error)
     }
 
