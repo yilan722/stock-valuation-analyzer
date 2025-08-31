@@ -6,11 +6,10 @@ import { PERPLEXITY_CONFIG } from '../perplexity-config'
 
 export interface PerplexityRequestBody {
   model: string
-  messages?: Array<{
+  messages: Array<{
     role: 'system' | 'user' | 'assistant'
     content: string
   }>
-  input?: string
   max_tokens?: number
   temperature?: number
   top_p?: number
@@ -42,32 +41,17 @@ export class PerplexityService {
     userPrompt: string,
     model: string = PERPLEXITY_CONFIG.MODELS.SONAR_DEEP_RESEARCH
   ): Promise<PerplexityResponse> {
-    // 根据模型类型选择端点和格式
-    const isResponsesModel = model === 'o3-deep-research'
-    
-    let requestBody: PerplexityRequestBody
-    let endpoint: string
-    
-    if (isResponsesModel) {
-      // o3-deep-research模型使用v1/responses端点
-      requestBody = {
-        model,
-        input: `${systemPrompt}\n\n${userPrompt}`, // 合并到input字段
-        ...PERPLEXITY_CONFIG.RESPONSES_PARAMS
-      }
-      endpoint = `${this.baseUrl}${PERPLEXITY_CONFIG.ENDPOINTS.RESPONSES}`
-    } else {
-      // 其他模型使用标准OpenAI格式
-      requestBody = {
-        model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ],
-        ...PERPLEXITY_CONFIG.CHAT_PARAMS
-      }
-      endpoint = `${this.baseUrl}${PERPLEXITY_CONFIG.ENDPOINTS.CHAT}`
+    const requestBody: PerplexityRequestBody = {
+      model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ],
+      ...PERPLEXITY_CONFIG.CHAT_PARAMS
     }
+
+    // 使用标准的OpenAI聊天完成端点
+    const endpoint = `${this.baseUrl}${PERPLEXITY_CONFIG.ENDPOINTS.CHAT}`
 
     const response = await fetch(endpoint, {
       method: 'POST',

@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     apiConfig: {
       baseUrl: 'https://api.nuwaapi.com',
       apiKey: 'sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR',
-      model: 'o4-mini-deep-research'
+      model: 'gpt-4o-mini'
     },
     testType,
     results: {},
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'o4-mini-deep-research',
+          model: 'gpt-4o-mini',
           messages: [
             {
               role: 'system',
@@ -124,7 +124,7 @@ export async function GET(request: NextRequest) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'o4-mini-deep-research',
+          model: 'gpt-4o-mini',
           messages: [
             {
               role: 'system',
