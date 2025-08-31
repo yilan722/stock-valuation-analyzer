@@ -6,12 +6,12 @@ import { PERPLEXITY_CONFIG } from '../perplexity-config'
 
 export interface PerplexityRequestBody {
   model: string
-  input: string  // 使用input字段而不是messages
+  messages: Array<{
+    role: 'system' | 'user' | 'assistant'
+    content: string
+  }>
   max_tokens?: number
   temperature?: number
-  search_queries?: boolean
-  search_recency_filter?: string
-  return_citations?: boolean
   top_p?: number
   presence_penalty?: number
 }
@@ -43,11 +43,14 @@ export class PerplexityService {
   ): Promise<PerplexityResponse> {
     const requestBody: PerplexityRequestBody = {
       model,
-      input: `${systemPrompt}\n\n${userPrompt}`, // 合并system和user prompt到input字段
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ],
       ...PERPLEXITY_CONFIG.DEFAULT_PARAMS
     }
 
-    // o4-mini-deep-research模型使用v1/responses端点
+    // 使用标准的OpenAI聊天完成端点
     const endpoint = `${this.baseUrl}${PERPLEXITY_CONFIG.ENDPOINTS.CHAT}`
 
     const response = await fetch(endpoint, {

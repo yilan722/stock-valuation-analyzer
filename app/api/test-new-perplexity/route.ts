@@ -59,8 +59,8 @@ export async function GET(request: NextRequest) {
       // 测试2: 测试聊天功能
       console.log('💬 测试2: 测试聊天功能...')
       
-      // o4-mini-deep-research模型使用v1/responses端点
-      const chatResponse = await fetch('https://api.nuwaapi.com/v1/responses', {
+      // 使用标准的OpenAI聊天完成端点
+      const chatResponse = await fetch('https://api.nuwaapi.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR`,
@@ -68,7 +68,16 @@ export async function GET(request: NextRequest) {
         },
         body: JSON.stringify({
           model: 'o4-mini-deep-research',
-          input: '请简单介绍一下你的能力，用一句话回答。', // 使用input字段
+          messages: [
+            {
+              role: 'system',
+              content: '你是一个专业的股票分析师，请用中文回答。'
+            },
+            {
+              role: 'user',
+              content: '请简单介绍一下你的能力，用一句话回答。'
+            }
+          ],
           max_tokens: 100,
           temperature: 0.1
         })
@@ -108,7 +117,7 @@ export async function GET(request: NextRequest) {
       }
 
       // 再测试聊天
-      const chatResponse = await fetch('https://api.nuwaapi.com/v1/responses', {
+      const chatResponse = await fetch('https://api.nuwaapi.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR`,
@@ -116,7 +125,16 @@ export async function GET(request: NextRequest) {
         },
         body: JSON.stringify({
           model: 'o4-mini-deep-research',
-          input: '请简单介绍一下你的能力，用一句话回答。', // 使用input字段
+          messages: [
+            {
+              role: 'system',
+              content: '你是一个专业的股票分析师，请用中文回答。'
+            },
+            {
+              role: 'user',
+              content: '请简单介绍一下你的能力，用一句话回答。'
+            }
+          ],
           max_tokens: 100,
           temperature: 0.1
         })

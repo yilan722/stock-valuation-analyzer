@@ -14,18 +14,15 @@ export const PERPLEXITY_CONFIG = {
     SONAR_LARGE: 'o4-mini-deep-research'
   },
   
-  // o4-mini-deep-research模型使用v1/responses端点
+  // 使用标准的OpenAI聊天完成端点
   ENDPOINTS: {
-    CHAT: '/v1/responses',  // 用于o4-mini-deep-research模型
-    MODELS: '/v1/models'    // 获取模型列表
+    CHAT: '/v1/chat/completions',  // 标准OpenAI格式
+    MODELS: '/v1/models'            // 获取模型列表
   },
   
   DEFAULT_PARAMS: {
     max_tokens: 18000,
     temperature: 0.05,
-    search_queries: true,
-    search_recency_filter: 'month',
-    return_citations: true,
     top_p: 0.9,
     presence_penalty: 0.15
   }
