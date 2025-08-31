@@ -14,10 +14,19 @@ export const PERPLEXITY_CONFIG = {
     SONAR_LARGE: 'o3-deep-research'
   },
   
-  // 使用标准的OpenAI聊天完成端点
+  // o3-deep-research模型使用v1/responses端点
   ENDPOINTS: {
-    CHAT: '/v1/chat/completions',  // 标准OpenAI格式
-    MODELS: '/v1/models'            // 获取模型列表
+    RESPONSES: '/v1/responses',      // 用于o3-deep-research模型
+    CHAT: '/v1/chat/completions',    // 用于其他标准模型
+    MODELS: '/v1/models'             // 获取模型列表
+  },
+  
+  // o3-deep-research模型的特殊参数
+  RESPONSES_PARAMS: {
+    max_tokens: 18000,
+    temperature: 0.05,
+    top_p: 0.9,
+    presence_penalty: 0.15
   },
   
   // 标准OpenAI模型的参数

@@ -27,12 +27,14 @@ interface PerplexityRequestBody {
 }
 
 interface PerplexityResponse {
-  choices: Array<{
+  choices?: Array<{
     message: {
       content: string
     }
   }>
-  usage: {
+  text?: string
+  content?: string
+  usage?: {
     prompt_tokens: number
     completion_tokens: number
     total_tokens: number
@@ -99,9 +101,9 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      // 构建API请求 - o4-mini-deep-research模型使用v1/responses端点
+      // 构建API请求 - o3-deep-research模型使用v1/responses端点
       const perplexityRequest = {
-        model: 'o4-mini-deep-research',
+        model: 'o3-deep-research',
         input: `${buildSystemPrompt(locale)}\n\n${buildDetailedUserPrompt(stockData, locale)}`, // 合并到input字段
         max_tokens: 18000,
         temperature: 0.05,
@@ -167,7 +169,7 @@ export async function POST(request: NextRequest) {
         console.warn(`⚠️ 成本超出预期: $${estimatedCost.toFixed(4)} > $0.8`)
       }
 
-      if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      if (!data.choices && !data.content) {
         console.error('❌ 无效的API响应结构')
         return NextResponse.json(
           { error: 'Invalid API response' },
@@ -175,96 +177,39 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      const content = data.choices[0].message.content
+      const content = data.choices?.[0]?.message?.content || data.content || ''
       console.log('📝 原始内容长度:', content.length)
 
-      // 解析JSON内容
-      let parsedReport: any
+      // 解析AI响应
+      let reportContent: any
       try {
-        console.log('🔍 开始解析JSON内容...')
-        console.log('📝 原始内容长度:', content.length)
-        console.log('📄 内容预览:', content.substring(0, 500) + '...')
+        // 尝试解析JSON响应
+        const responseText = data.choices?.[0]?.message?.content || data.text || data.content || ''
         
-        // 多种方法提取JSON
-        let jsonContent = ''
-        
-        // 方法1: 寻找最外层的JSON对象
-        const jsonMatch = content.match(/\{[\s\S]*\}/g)
-        if (jsonMatch && jsonMatch.length > 0) {
-          // 取最长的JSON字符串
-          jsonContent = jsonMatch.reduce((longest, current) => 
-            current.length > longest.length ? current : longest, ''
-          )
-        }
-        
-        // 方法2: 如果没找到，尝试寻找代码块中的JSON
-        if (!jsonContent) {
-          const codeBlockMatch = content.match(/```json\s*(\{[\s\S]*?\})\s*```/i)
-          if (codeBlockMatch) {
-            jsonContent = codeBlockMatch[1]
-          }
-        }
-        
-        // 方法3: 如果还没找到，尝试寻找任何JSON结构
-        if (!jsonContent) {
-          const anyJsonMatch = content.match(/(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})/g)
-          if (anyJsonMatch) {
-            jsonContent = anyJsonMatch[anyJsonMatch.length - 1] // 取最后一个
-          }
-        }
-        
-        if (!jsonContent) {
-          throw new Error('未找到JSON格式的报告内容')
-        }
-        
-        console.log('📋 提取的JSON长度:', jsonContent.length)
-        console.log('🔍 JSON预览:', jsonContent.substring(0, 200) + '...')
-        
-        // 清理JSON内容
-        jsonContent = jsonContent
-          .replace(/```json/gi, '')
-          .replace(/```/g, '')
-          .replace(/\n\s*\n/g, '\n')
-          .trim()
-        
-        parsedReport = JSON.parse(jsonContent)
-        
-        console.log('✅ JSON解析成功')
-        console.log('📊 报告结构:', Object.keys(parsedReport))
-
-        // 验证必需的字段
-        const requiredFields = ['fundamentalAnalysis', 'businessSegments', 'growthCatalysts', 'valuationAnalysis']
-        for (const field of requiredFields) {
-          if (!parsedReport[field]) {
-            throw new Error(`缺少必需字段: ${field}`)
-          }
-        }
-
-      } catch (parseError) {
-        console.error('❌ JSON解析失败:', parseError)
-        console.log('🔄 尝试从自然语言中构建报告结构...')
-        
+        // 首先尝试直接解析
         try {
-          // 如果JSON解析失败，尝试从自然语言内容中提取各部分
-          parsedReport = parseNaturalLanguageReport(content)
-          console.log('✅ 自然语言解析成功')
-          console.log('📊 报告结构:', Object.keys(parsedReport))
-        } catch (fallbackError) {
-          console.error('❌ 自然语言解析也失败:', fallbackError)
-          console.log('📄 原始内容示例:', content.substring(0, 1000) + '...')
-          
-          return NextResponse.json(
-            { 
-              error: 'Failed to parse report content', 
-              details: `JSON解析失败: ${String(parseError)}. 自然语言解析失败: ${String(fallbackError)}`,
-              debug: {
-                contentLength: content.length,
-                contentPreview: content.substring(0, 500)
-              }
-            },
-            { status: 500 }
-          )
+          reportContent = JSON.parse(responseText)
+        } catch (parseError) {
+          // 如果直接解析失败，尝试提取JSON部分
+          const jsonMatch = responseText.match(/\{[\s\S]*\}/)
+          if (jsonMatch) {
+            try {
+              reportContent = JSON.parse(jsonMatch[0])
+            } catch (secondParseError) {
+              // 如果还是失败，使用自然语言解析
+              reportContent = parseNaturalLanguageReport(responseText, locale)
+            }
+          } else {
+            // 如果没有找到JSON，使用自然语言解析
+            reportContent = parseNaturalLanguageReport(responseText, locale)
+          }
         }
+      } catch (parseError) {
+        console.error('❌ 解析AI响应失败:', parseError)
+        
+        // 最后的备选方案：使用自然语言解析
+        const responseText = data.choices?.[0]?.message?.content || data.text || data.content || ''
+        reportContent = parseNaturalLanguageReport(responseText, locale)
       }
 
       console.log('✅ 报告生成成功!')
@@ -277,7 +222,7 @@ export async function POST(request: NextRequest) {
           user.id,
           stockData.symbol,
           stockData.name,
-          JSON.stringify(parsedReport)
+          JSON.stringify(reportContent)
         )
         console.log('✅ 报告保存成功')
         
@@ -289,7 +234,7 @@ export async function POST(request: NextRequest) {
         // 即使保存失败，也返回报告数据，不影响用户体验
       }
       
-      return NextResponse.json(parsedReport)
+      return NextResponse.json(reportContent)
 
     } catch (error) {
       clearTimeout(timeoutId)
@@ -522,7 +467,7 @@ REQUIREMENTS:
 Please provide a comprehensive, detailed analysis in ${locale === 'zh' ? 'Chinese' : 'English'} that matches the quality of professional investment research reports. 针对中英文报告分别使用对应的语言`
 }
 
-function parseNaturalLanguageReport(content: string): any {
+function parseNaturalLanguageReport(content: string, locale: string): any {
   console.log('🔍 开始自然语言解析...')
   
   // 首先清理内容，移除思考过程和元信息
