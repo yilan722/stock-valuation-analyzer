@@ -309,6 +309,13 @@ export async function GET(request: NextRequest) {
           tokenLength: process.env.TUSHARE_TOKEN?.length || 0
         })
         
+        // 检查是否有模拟数据可用
+        if (mockStockData[ticker]) {
+          console.log(`🔄 使用模拟数据作为备用方案 for ${ticker}`)
+          return NextResponse.json(mockStockData[ticker])
+        }
+        
+        // 返回404而不是500，这样前端会正确处理
         return NextResponse.json(
           { 
             error: `A股 ${ticker} 数据获取失败`,
@@ -319,7 +326,7 @@ export async function GET(request: NextRequest) {
               tokenLength: process.env.TUSHARE_TOKEN?.length || 0
             }
           },
-          { status: 500 }
+          { status: 404 }
         )
       }
     } else if (isHKStock) {
