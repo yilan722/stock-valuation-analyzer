@@ -5,7 +5,10 @@
   "installCommand": "npm install",
   "functions": {
     "app/api/**/*.ts": {
-      "maxDuration": 60
+      "maxDuration": 300
+    },
+    "app/api/generate-report-perplexity/route.ts": {
+      "maxDuration": 600
     }
   },
   "headers": [

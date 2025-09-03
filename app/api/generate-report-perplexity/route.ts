@@ -128,10 +128,15 @@ export async function POST(request: NextRequest) {
       let response: Response
       try {
         // 使用Perplexity API端点
+        const perplexityApiKey = process.env.PERPLEXITY_API_KEY
+        if (!perplexityApiKey) {
+          throw new Error('PERPLEXITY_API_KEY environment variable is not set')
+        }
+        
         response = await fetch('https://api.perplexity.ai/chat/completions', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer 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`,
+            'Authorization': `Bearer ${perplexityApiKey}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(perplexityRequest),
@@ -162,9 +167,28 @@ export async function POST(request: NextRequest) {
 
       if (!response.ok) {
         const errorText = await response.text()
-        console.error('❌ Perplexity API错误:', response.status, errorText)
+        console.error('❌ Perplexity API错误:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorText: errorText,
+          timestamp: new Date().toISOString()
+        })
+        
+        // 确保返回有效的JSON格式
+        let errorDetails
+        try {
+          errorDetails = JSON.parse(errorText)
+        } catch {
+          errorDetails = { message: errorText }
+        }
+        
         return NextResponse.json(
-          { error: 'Perplexity API error', details: errorText },
+          { 
+            error: 'Perplexity API error', 
+            details: errorDetails,
+            status: response.status,
+            timestamp: new Date().toISOString()
+          },
           { status: response.status }
         )
       }
