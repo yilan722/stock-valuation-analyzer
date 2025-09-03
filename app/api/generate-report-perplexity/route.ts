@@ -101,9 +101,9 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      // 构建API请求 - 使用标准OpenAI格式
+      // 构建API请求 - 使用Perplexity Sonar Deep Research模型
       const perplexityRequest = {
-        model: 'gpt-4o-mini',
+        model: 'sonar-deep-research',
         messages: [
           {
             role: 'system',
@@ -120,15 +120,15 @@ export async function POST(request: NextRequest) {
         presence_penalty: 0.15
       }
 
-      console.log('📤 发送OpenAI API请求...')
+      console.log('📤 发送Perplexity Sonar Deep Research API请求...')
 
       let response: Response
       try {
-        // 使用标准的OpenAI聊天完成端点
-        response = await fetch('https://api.nuwaapi.com/v1/chat/completions', {
+        // 使用Perplexity API端点
+        response = await fetch('https://api.perplexity.ai/chat/completions', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR`,
+            'Authorization': `Bearer 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`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(perplexityRequest),
@@ -366,8 +366,17 @@ function buildSystemPrompt(locale: string): string {
           - 确保四个部分内容均衡分布，businessSegments不能为空
           - 所有估值数据基于真实计算，不使用模板数据
           - 每个表格必须包含完整的真实数据，不能有空行或缺失数据
+          - 绝对不要显示<think>标签或任何思考过程
 
-          返回格式：仅返回包含四个部分的有效JSON对象，每部分内容为专业HTML格式字符串，直接开始正式的分析内容。`
+          **CRITICAL**: 你必须直接返回一个有效的JSON对象，格式如下：
+          {
+            "fundamentalAnalysis": "HTML格式的基本面分析内容...",
+            "businessSegments": "HTML格式的业务板块分析内容...",
+            "growthCatalysts": "HTML格式的增长催化剂分析内容...",
+            "valuationAnalysis": "HTML格式的估值分析内容..."
+          }
+          
+          不要包含任何其他文本、解释或思考过程，只返回这个JSON对象。`
   } else {
     return `You are a professional stock analyst with top-tier investment bank and research institute expertise. Please generate a high-quality equity valuation analysis report following professional investment research report standards (like 300080_valuation_report_2025-08-30.pdf format).
 
@@ -450,8 +459,17 @@ Analysis Requirements:
 - Ensure balanced content distribution across four sections, businessSegments cannot be empty
 - All valuation data based on real calculations, not template data
 - Each table must contain complete real data, no empty rows or missing data
+- Absolutely NO <think> tags or any thinking process
 
-Return Format: Only return valid JSON object with four sections as professional HTML formatted strings, directly start with formal analysis content.`
+**CRITICAL**: You must directly return a valid JSON object in this exact format:
+{
+  "fundamentalAnalysis": "HTML formatted fundamental analysis content...",
+  "businessSegments": "HTML formatted business segments analysis content...",
+  "growthCatalysts": "HTML formatted growth catalysts analysis content...",
+  "valuationAnalysis": "HTML formatted valuation analysis content..."
+}
+
+Do not include any other text, explanations, or thinking processes, only return this JSON object.`
   }
 }
 

@@ -4,20 +4,20 @@
  */
 
 export const PERPLEXITY_CONFIG = {
-  API_BASE_URL: 'https://api.nuwaapi.com',
-  API_KEY: 'sk-88seMXjnLEzEYYD3ABw8G0Z70f7zoWbXXNhGRwu5jslCzFIR',
+  API_BASE_URL: 'https://api.perplexity.ai',
+  API_KEY: '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',
   
   MODELS: {
-    SONAR_DEEP_RESEARCH: 'gpt-4o-mini',  // 使用可用的gpt-4o-mini模型
-    SONAR_PRO: 'gpt-4o-mini',
-    SONAR_MEDIUM: 'gpt-4o-mini',
-    SONAR_LARGE: 'gpt-4o-mini'
+    SONAR_DEEP_RESEARCH: 'sonar-deep-research',  // 使用Perplexity Sonar Deep Research模型
+    SONAR_PRO: 'sonar-pro',
+    SONAR_MEDIUM: 'sonar-medium',
+    SONAR_LARGE: 'sonar-large'
   },
   
-  // 使用标准的OpenAI聊天完成端点
+  // 使用Perplexity的聊天完成端点
   ENDPOINTS: {
-    CHAT: '/v1/chat/completions',  // 标准OpenAI格式
-    MODELS: '/v1/models'            // 获取模型列表
+    CHAT: '/chat/completions',  // Perplexity格式
+    MODELS: '/v1/models'         // 获取模型列表
   },
   
   // 标准OpenAI模型的参数
