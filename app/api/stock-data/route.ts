@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { StockData } from '@/types'
 // 移除akshare-api引用，只使用tushare和yfinance
 
+// 强制动态渲染，因为使用了request.url
+export const dynamic = 'force-dynamic'
+
 // 模拟股票数据 - 包含美股和A股
 const mockStockData: Record<string, StockData> = {
   // 美股

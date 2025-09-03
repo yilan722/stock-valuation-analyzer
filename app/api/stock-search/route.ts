@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// 强制动态渲染，因为使用了request.url
+export const dynamic = 'force-dynamic'
+
 interface StockSearchResult {
   symbol: string
   name: string

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createApiSupabaseClient } from '../../../lib/supabase-server'
 
+// 强制动态渲染，因为使用了request和数据库操作
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     console.log('📊 开始获取用户报告...')
