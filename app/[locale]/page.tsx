@@ -181,7 +181,7 @@ export default function HomePage({ params }: PageProps) {
 
     try {
       console.log('📡 发送生成报告请求...')
-      const response = await fetch('/api/generate-report-perplexity', {
+      const response = await fetch('/api/generate-report-simple', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
