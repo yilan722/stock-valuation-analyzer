@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
   const startTime = Date.now()
   
   try {
-    // 增加超时时间到10分钟
+    // 增加超时时间到10分钟，确保有足够时间生成高质量报告
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 600000) // 10分钟超时
     
@@ -304,17 +304,23 @@ function buildSystemPrompt(locale: string): string {
   const isChinese = locale === 'zh'
   
   if (isChinese) {
-    return `您是一位专业的股票分析师，具备顶级投资银行和券商研究所的深度研究能力。
-
-**重要**: 请严格按照以下参考报告的专业格式标准生成报告：
-
-**参考标准**: 易成新能(300080)专业股票估值分析报告 (14页，7536字，9个数据表格)
-- 标题格式: [公司名称] ([股票代码]) - 专业股票估值分析报告
-- 页面布局: 封面(1页) + 基本面分析(2-3页) + 业务板块分析(3页) + 增长催化剂(4页) + 估值分析(3页) + 声明(1页)
-- 表格标准: 17个专业数据表格，包含表头、数据行、数据来源标注
-- 内容深度: 每部分500+字，逻辑清晰，结论明确
+    return `您是一位专业的股票分析师。请生成一个简化的股票分析报告。
 
 **重要**: 必须严格按照JSON格式返回，四个部分的键名必须完全一致：fundamentalAnalysis, businessSegments, growthCatalysts, valuationAnalysis
+
+**报告结构要求**:
+
+**1. fundamentalAnalysis (基本面分析)**:
+公司基本情况和财务表现分析，包含核心财务指标和行业对比。
+
+**2. businessSegments (业务板块分析)**:
+主要业务板块的收入结构和增长动力分析。
+
+**3. growthCatalysts (增长催化剂)**:
+公司未来增长的主要驱动因素和机遇分析。
+
+**4. valuationAnalysis (估值分析)**:
+基于财务模型的投资建议和目标价位。
 
 **报告结构要求**:
 
