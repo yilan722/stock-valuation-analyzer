@@ -280,8 +280,10 @@ export async function GET(request: NextRequest) {
 
   // 判断股票类型
   const isAStock = /^[0-9]{6}$/.test(ticker) || ticker.startsWith('688') || ticker.startsWith('300')
-  // 港股识别：支持 1347, 01347, 1347.HK, 01347.HK 等格式
-  const isHKStock = ticker.includes('.HK') || ticker.includes('.hk') || /^[0-9]{4,5}$/.test(ticker)
+  // 港股识别：只识别明确包含.HK的代码，避免与A股冲突
+  const isHKStock = ticker.includes('.HK') || ticker.includes('.hk')
+  // 美股识别：纯字母代码
+  const isUSStock = /^[A-Z]{1,5}$/.test(ticker)
   
   try {
     if (isAStock) {
@@ -333,7 +335,7 @@ export async function GET(request: NextRequest) {
           { status: 500 }
         )
       }
-    } else {
+    } else if (isUSStock) {
       // 使用实时股票数据API获取美股数据
       try {
         // 优先使用Yahoo Finance基础API（免费且现在正常工作）
@@ -376,6 +378,16 @@ export async function GET(request: NextRequest) {
           { status: 500 }
         )
       }
+    } else {
+      // 无法识别的股票代码
+      console.error(`无法识别的股票代码: ${ticker}`)
+      return NextResponse.json(
+        { 
+          error: `无法识别的股票代码: ${ticker}`,
+          suggestion: '请检查股票代码格式：A股(6位数字)、美股(1-5位字母)、港股(代码.HK)'
+        },
+        { status: 400 }
+      )
     }
   } catch (error) {
     console.error('Unexpected error in stock data API:', error)

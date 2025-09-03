@@ -9,46 +9,55 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.error('Missing Supabase configuration:', { supabaseUrl, supabaseAnonKey: supabaseAnonKey ? '***' : 'undefined' })
 }
 
-// Client-side Supabase client with proper session management
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-    flowType: 'pkce',
-    storage: typeof window !== 'undefined' ? window.localStorage : undefined
-  },
-  global: {
-    headers: {
-      'X-Client-Info': 'supabase-js/2.x'
-    }
-  },
-  // 添加超时配置
-  db: {
-    schema: 'public'
-  },
-  // 设置请求超时
-  realtime: {
-    timeout: 30000 // 30秒超时
-  }
-})
+// 单例Supabase客户端，避免多实例警告
+let supabaseInstance: any = null
 
-// 创建专门用于权限检查的客户端，使用更长的超时时间
-export const authSupabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false
-  },
-  global: {
-    headers: {
-      'X-Client-Info': 'supabase-js/2.x'
-    }
-  },
-  // 设置更长的超时时间
-  realtime: {
-    timeout: 60000 // 60秒超时
+export const supabase = (() => {
+  if (!supabaseInstance) {
+    supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        flowType: 'pkce',
+        storage: typeof window !== 'undefined' ? window.localStorage : undefined
+      },
+      global: {
+        headers: {
+          'X-Client-Info': 'supabase-js/2.x'
+        }
+      },
+      db: {
+        schema: 'public'
+      },
+      realtime: {
+        timeout: 30000
+      }
+    })
   }
-})
+  return supabaseInstance
+})()
+
+// 用于权限检查的客户端（仅在服务器端使用）
+export const authSupabase = (() => {
+  if (typeof window === 'undefined') {
+    return createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false
+      },
+      global: {
+        headers: {
+          'X-Client-Info': 'supabase-js/2.x'
+        }
+      },
+      realtime: {
+        timeout: 60000
+      }
+    })
+  }
+  return supabase // 在客户端使用同一个实例
+})()
 
 // 测试连接
 export async function testSupabaseConnection() {

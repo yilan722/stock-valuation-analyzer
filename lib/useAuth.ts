@@ -106,7 +106,7 @@ export default function useAuth() {
     
     // 监听认证状态变化
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: any, session: any) => {
         debugLog(`🔄 认证状态变化: ${event} ${session?.user?.id || 'null'}`)
         
         // 只在状态真正变化时更新
