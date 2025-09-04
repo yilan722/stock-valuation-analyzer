@@ -33,13 +33,15 @@ npm run build
 
 **Build output directory**: 
 ```
-.next
+out
 ```
 
 **Root directory**: 
 ```
 /
 ```
+
+**Node.js version**: `18.x` 或 `20.x`
 
 ### 4. 配置环境变量
 在 "Environment variables" 部分添加：
