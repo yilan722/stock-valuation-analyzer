@@ -1,8 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Cloudflare Pages支持 - 静态导出
-  output: 'export',
-  trailingSlash: true,
+  // Cloudflare Pages支持 - 使用Pages Functions
+  // output: 'export', // 注释掉，使用Pages Functions支持API路由
   
   // 图片优化
   images: {

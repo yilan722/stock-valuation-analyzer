@@ -24,7 +24,7 @@
 ### 3. 配置构建设置
 在构建设置页面中：
 
-**Framework preset**: `Next.js (Static HTML Export)`
+**Framework preset**: `Next.js`
 
 **Build command**: 
 ```bash
@@ -33,7 +33,7 @@ npm run build
 
 **Build output directory**: 
 ```
-out
+.next
 ```
 
 **Root directory**: 
@@ -69,24 +69,24 @@ NODE_ENV=production
 
 ## 重要配置说明
 
-### Next.js配置
-确保 `next.config.js` 包含以下配置：
+### Pages Functions支持
+Cloudflare Pages通过Pages Functions支持API路由：
 
-```javascript
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  output: 'export',
-  trailingSlash: true,
-  images: {
-    unoptimized: true
-  }
-}
+- ✅ **支持API路由** - 通过 `/functions` 目录
+- ✅ **无超时限制** - 支持长时间运行的API请求
+- ✅ **全球CDN** - API请求也享受CDN加速
+- ✅ **自动部署** - 与前端一起部署
 
-module.exports = nextConfig
+### API路由文件结构
+```
+functions/
+  api/
+    stock-data.js      # 股票数据API
+    generate-report.js # 报告生成API
 ```
 
-### API路由配置
-Cloudflare Pages支持Next.js API路由，但需要特殊配置。
+### 环境变量配置
+Pages Functions可以访问在Cloudflare Pages中设置的环境变量。
 
 ## 优势对比
 
