@@ -181,8 +181,8 @@ export default function HomePage({ params }: PageProps) {
 
     try {
       console.log('📡 发送生成报告请求...')
-      // 使用Edge Runtime版本，支持sonar-deep-research模型 - 部署测试
-      const response = await fetch('/api/generate-report-edge', {
+      // 使用完整的报告生成API，支持sonar-deep-research模型（Railway无超时限制）
+      const response = await fetch('/api/generate-report-perplexity', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
