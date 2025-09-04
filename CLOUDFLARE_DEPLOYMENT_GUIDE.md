@@ -1,25 +1,18 @@
-# Cloudflare Pages部署指南
+# Cloudflare Pages 部署指南
 
-## 为什么选择Cloudflare Pages？
-
-- ✅ **无函数超时限制** - 支持长时间运行的API请求
-- ✅ **免费额度充足** - 每月100,000次请求
-- ✅ **全球CDN** - 访问速度极快
-- ✅ **自动部署** - 从GitHub自动部署
-- ✅ **支持Next.js** - 完美支持我们的应用
+## 概述
+Cloudflare Pages提供免费的静态网站托管，支持Pages Functions实现API路由功能。
 
 ## 部署步骤
 
-### 1. 注册Cloudflare账户
-1. 访问 [https://pages.cloudflare.com](https://pages.cloudflare.com)
-2. 使用GitHub账户登录
-3. 连接您的GitHub账户
+### 1. 准备代码
+确保代码已推送到GitHub仓库。
 
-### 2. 创建新项目
-1. 点击 "Create a project"
-2. 选择 "Connect to Git"
-3. 选择 `yilan722/TopAnalyst` 仓库
-4. 点击 "Begin setup"
+### 2. 连接Cloudflare Pages
+1. 访问 https://pages.cloudflare.com
+2. 点击 "Create a project"
+3. 选择 "Connect to Git"
+4. 授权GitHub并选择仓库 `yilan722/TopAnalyst`
 
 ### 3. 配置构建设置
 在构建设置页面中：
@@ -41,25 +34,15 @@ npm run build
 /
 ```
 
-**Node.js version**: `18.x` 或 `20.x`
-
-### 4. 配置环境变量
+### 4. 环境变量配置
 在 "Environment variables" 部分添加：
 
-```bash
-# Supabase配置
+```
 NEXT_PUBLIC_SUPABASE_URL=https://decmecsshjqymhkykazg.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlY21lY3NzaGpxeW1oa3lrYXpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2MzIyNTMsImV4cCI6MjA3MDIwODI1M30.-eRwyHINS0jflhYeWT3bvZAmpdvSOLmpFmKCztMLzU0
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlY21lY3NzaGpxeW1oa3lrYXpnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDYzMjI1MywiZXhwIjoyMDcwMjA4MjUzfQ.TYomlDXMETtWVXPcyoL8kDdRga4cw48cJmmQnfxmWkI
-
-# Perplexity API配置
-PERPLEXITY_API_KEY=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
-
-# Tushare API配置
 TUSHARE_TOKEN=37255ab7622b653af54060333c28848e064585a8bf2ba3a85f8f3fe9
-
-# 应用配置
-NODE_ENV=production
+PERPLEXITY_API_KEY=你的Perplexity_API_KEY
 ```
 
 ### 5. 部署完成
@@ -80,6 +63,8 @@ Cloudflare Pages通过Pages Functions支持API路由：
 ### API路由文件结构
 ```
 functions/
+  _worker.js           # 入口文件
+  tsconfig.json        # Functions专用TypeScript配置
   api/
     stock-data.js      # 股票数据API
     generate-report.js # 报告生成API
@@ -100,6 +85,13 @@ Pages Functions可以访问在Cloudflare Pages中设置的环境变量。
 }
 ```
 
+### 文件大小限制解决方案
+Cloudflare Pages有25MB文件大小限制，已通过以下方式解决：
+
+1. **禁用webpack缓存**: `config.cache = false`
+2. **优化构建输出**: 减少不必要的文件
+3. **排除缓存目录**: 在`.gitignore`中排除`.next/cache/`
+
 ### Pages Functions文件结构
 ```
 functions/
@@ -114,22 +106,34 @@ functions/
 
 | 平台 | 免费超时限制 | 免费额度 | 全球CDN | 推荐度 |
 |------|-------------|----------|---------|--------|
-| **Cloudflare Pages** | 无限制 | 100,000请求/月 | ✅ | ⭐⭐⭐⭐⭐ |
-| **Railway** | 无限制 | $5/月 | ❌ | ⭐⭐⭐⭐ |
-| **Render** | 15分钟 | 750小时/月 | ❌ | ⭐⭐⭐⭐ |
-| **Vercel** | 10秒 | 100GB/月 | ✅ | ⭐⭐ |
+| **Cloudflare Pages** | ✅ 无限制 | 100,000请求/月 | ✅ | ⭐⭐⭐⭐⭐ |
+| **Railway** | ✅ 无限制 | $5/月 | ❌ | ⭐⭐⭐⭐ |
+| **Vercel** | ❌ 10秒 | 100GB/月 | ✅ | ⭐⭐ |
 
-## 测试部署
+## 故障排除
 
-部署完成后，测试以下功能：
+### 1. 构建失败
+- 检查环境变量是否正确设置
+- 确保TypeScript配置使用ES2020+
+- 查看构建日志中的具体错误信息
 
-1. **环境检查**: `https://your-project.pages.dev/api/check-env`
-2. **股票数据**: `https://your-project.pages.dev/api/stock-data?ticker=300080`
-3. **报告生成**: 使用完整的 `sonar-deep-research` 模型
+### 2. API路由不工作
+- 确保`functions/`目录存在且包含API文件
+- 检查`functions/_worker.js`入口文件
+- 验证环境变量在Pages Functions中可用
 
-## 注意事项
+### 3. 文件大小超限
+- 确保webpack缓存已禁用
+- 检查`.gitignore`是否排除了缓存目录
+- 使用`npm run build:cloudflare`进行优化构建
 
-- Cloudflare Pages的免费额度通常足够个人项目使用
-- 如果超出免费额度，会暂停服务，但不会收费
-- 可以随时升级到付费计划获得更多资源
-- 全球CDN确保访问速度极快
+## 总结
+
+Cloudflare Pages是部署Next.js应用的优秀选择，特别适合需要API路由且无超时限制的应用。通过Pages Functions，您可以获得：
+
+- 🚀 **无超时限制** - 支持长时间运行的API请求
+- 🌍 **全球CDN** - 所有请求享受CDN加速
+- 💰 **完全免费** - 100,000请求/月免费额度
+- 🔧 **易于部署** - 与GitHub集成，自动部署
+
+现在您可以成功部署并使用`sonar-deep-research`模型生成高质量报告了！

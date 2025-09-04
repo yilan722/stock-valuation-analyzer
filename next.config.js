@@ -31,6 +31,37 @@ const nextConfig = {
   // 生产环境优化
   swcMinify: true,
   
+  // Webpack优化 - 减少构建文件大小
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // 服务器端优化
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            default: {
+              minChunks: 1,
+              priority: -20,
+              reuseExistingChunk: true,
+            },
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              priority: -10,
+              chunks: 'all',
+            },
+          },
+        },
+      }
+    }
+    
+    // 禁用webpack缓存以避免Cloudflare Pages 25MB限制
+    config.cache = false
+    
+    return config
+  },
+  
   // 安全头 - 临时禁用 CSP 以解决 eval 问题
   async headers() {
     return [
