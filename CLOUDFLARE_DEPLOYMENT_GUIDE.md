@@ -88,6 +88,28 @@ functions/
 ### 环境变量配置
 Pages Functions可以访问在Cloudflare Pages中设置的环境变量。
 
+### TypeScript配置
+确保 `tsconfig.json` 使用ES2020+目标：
+
+```json
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "lib": ["dom", "dom.iterable", "es2020"]
+  }
+}
+```
+
+### Pages Functions文件结构
+```
+functions/
+  _worker.js           # 入口文件
+  tsconfig.json        # Functions专用TypeScript配置
+  api/
+    stock-data.js      # 股票数据API
+    generate-report.js # 报告生成API
+```
+
 ## 优势对比
 
 | 平台 | 免费超时限制 | 免费额度 | 全球CDN | 推荐度 |
