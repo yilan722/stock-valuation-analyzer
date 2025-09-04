@@ -181,7 +181,7 @@ export default function HomePage({ params }: PageProps) {
 
     try {
       console.log('📡 发送生成报告请求...')
-      // 尝试使用Edge Runtime版本，支持sonar-deep-research模型
+      // 使用Edge Runtime版本，支持sonar-deep-research模型 - 部署测试
       const response = await fetch('/api/generate-report-edge', {
         method: 'POST',
         headers: {
