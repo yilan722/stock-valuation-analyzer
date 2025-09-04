@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Cloudflare Pages支持 - 使用Pages Functions
-  // output: 'export', // 注释掉，使用Pages Functions支持API路由
+  // Cloudflare Pages支持 - 使用静态导出
+  output: 'export',
+  trailingSlash: true,
   
   // 图片优化
   images: {
@@ -33,6 +34,32 @@ const nextConfig = {
   
   // Webpack优化 - 减少构建文件大小
   webpack: (config, { isServer }) => {
+    // 修复 "self is not defined" 错误
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      net: false,
+      tls: false,
+      crypto: false,
+      stream: false,
+      url: false,
+      zlib: false,
+      http: false,
+      https: false,
+      assert: false,
+      os: false,
+      path: false,
+    }
+
+    // 添加全局变量定义
+    config.plugins.push(
+      new config.webpack.DefinePlugin({
+        'typeof window': JSON.stringify(isServer ? 'undefined' : 'object'),
+        'typeof self': JSON.stringify(isServer ? 'undefined' : 'object'),
+        'typeof global': JSON.stringify(isServer ? 'object' : 'undefined'),
+      })
+    )
+
     if (isServer) {
       // 服务器端优化
       config.optimization = {
