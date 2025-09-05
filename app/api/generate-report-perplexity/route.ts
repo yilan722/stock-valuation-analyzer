@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
   try {
     // 增加超时时间到15分钟，确保有足够时间生成高质量报告
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 800000) // 13分钟超时（Vercel免费计划限制）
+    const timeoutId = setTimeout(() => controller.abort(), 900000) // 15分钟超时（Vercel Pro支持）
     
     try {
       console.log('🚀 开始生成报告...')
