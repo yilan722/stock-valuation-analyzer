@@ -1,8 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Cloudflare Pages支持 - 使用静态导出
-  output: 'export',
-  trailingSlash: true,
+  // Cloudflare Pages支持 - 使用Pages Functions
+  // output: 'export', // 注释掉，使用Pages Functions支持API路由
   
   // 图片优化
   images: {
@@ -32,8 +31,8 @@ const nextConfig = {
   // 生产环境优化
   swcMinify: true,
   
-  // Webpack优化 - 减少构建文件大小
-  webpack: (config, { isServer }) => {
+  // Webpack优化 - Cloudflare Pages兼容
+  webpack: (config, { isServer, dev }) => {
     // 修复 "self is not defined" 错误
     config.resolve.fallback = {
       ...config.resolve.fallback,
@@ -60,12 +59,14 @@ const nextConfig = {
       })
     )
 
-    if (isServer) {
-      // 服务器端优化
+    // 优化构建输出
+    if (!dev) {
       config.optimization = {
         ...config.optimization,
         splitChunks: {
           chunks: 'all',
+          minSize: 20000,
+          maxSize: 244000, // 确保单个文件不超过25MB
           cacheGroups: {
             default: {
               minChunks: 1,
@@ -77,14 +78,17 @@ const nextConfig = {
               name: 'vendors',
               priority: -10,
               chunks: 'all',
+              maxSize: 200000,
             },
           },
         },
       }
     }
     
-    // 禁用webpack缓存以避免Cloudflare Pages 25MB限制
-    config.cache = false
+    // 在Cloudflare Pages上禁用缓存以避免25MB限制
+    if (process.env.CF_PAGES) {
+      config.cache = false
+    }
     
     return config
   },

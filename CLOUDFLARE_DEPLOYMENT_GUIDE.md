@@ -21,12 +21,12 @@ Cloudflare Pages提供免费的静态网站托管，支持Pages Functions实现A
 
 **Build command**: 
 ```bash
-npm run build
+npm run build:cloudflare
 ```
 
 **Build output directory**: 
 ```
-out
+.next
 ```
 
 **Root directory**: 
@@ -52,16 +52,14 @@ PERPLEXITY_API_KEY=你的Perplexity_API_KEY
 
 ## 重要配置说明
 
-### 静态导出模式
-由于构建问题，我们使用静态导出模式：
+### Pages Functions支持
+Cloudflare Pages通过Pages Functions支持API路由：
 
-- ✅ **静态网站** - 预渲染的HTML文件
-- ✅ **全球CDN** - 所有文件享受CDN加速
-- ✅ **快速加载** - 无需服务器端渲染
-- ❌ **API路由** - 静态导出不支持API路由
-- ❌ **动态功能** - 无法使用服务器端功能
-
-**注意**: 静态导出模式不支持API路由，如需API功能，建议使用Railway部署。
+- ✅ **支持API路由** - 通过 `/functions` 目录
+- ✅ **无超时限制** - 支持长时间运行的API请求
+- ✅ **全球CDN** - API请求也享受CDN加速
+- ✅ **自动部署** - 与前端一起部署
+- ✅ **完整功能** - 支持所有Next.js功能
 
 ### API路由文件结构
 ```
