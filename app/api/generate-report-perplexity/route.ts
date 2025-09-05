@@ -48,9 +48,9 @@ export async function POST(request: NextRequest) {
   const startTime = Date.now()
   
   try {
-    // 增加超时时间到10分钟，确保有足够时间生成高质量报告
+    // 增加超时时间到15分钟，确保有足够时间生成高质量报告
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 600000) // 10分钟超时
+    const timeoutId = setTimeout(() => controller.abort(), 900000) // 15分钟超时
     
     try {
       console.log('🚀 开始生成报告...')
@@ -147,8 +147,14 @@ export async function POST(request: NextRequest) {
         console.error('❌ Perplexity API请求失败:', fetchError)
         
         if (fetchError.name === 'AbortError') {
+          console.error('⏰ 请求超时，已使用时间:', Date.now() - startTime, 'ms')
           return NextResponse.json(
-            { error: 'Request timeout', details: '请求超时，请稍后重试' },
+            { 
+              error: 'Request timeout', 
+              details: '报告生成超时，请稍后重试。Vercel Pro支持最长15分钟执行时间。',
+              timeout: true,
+              elapsedTime: Date.now() - startTime
+            },
             { status: 408 }
           )
         }
