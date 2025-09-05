@@ -1,0 +1,212 @@
+/* 股票估值报告专业样式 - 参考300053_valuation_report_2025-09-03.pdf */
+
+/* 报告标题 */
+.report-title {
+  font-size: 2.2em;
+  font-weight: bold;
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 0.5em;
+  border-bottom: 3px solid #3498db;
+  padding-bottom: 0.3em;
+}
+
+/* 主要部分标题 */
+.section-title {
+  font-size: 1.6em;
+  font-weight: bold;
+  color: #34495e;
+  margin-top: 2em;
+  margin-bottom: 1em;
+  padding-left: 0.5em;
+  border-left: 4px solid #3498db;
+  background-color: #f8f9fa;
+  padding: 0.5em;
+}
+
+/* 子部分标题 */
+.subsection-title {
+  font-size: 1.3em;
+  font-weight: bold;
+  color: #7f8c8d;
+  margin-top: 1.5em;
+  margin-bottom: 0.8em;
+  padding-left: 0.3em;
+  border-left: 2px solid #95a5a6;
+}
+
+/* 数据表格 */
+.metric-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.2em 0;
+  font-size: 0.95em;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.metric-table th {
+  background-color: #ecf0f1;
+  font-weight: bold;
+  padding: 0.8em 0.6em;
+  text-align: left;
+  border: 1px solid #bdc3c7;
+  color: #2c3e50;
+}
+
+.metric-table td {
+  padding: 0.6em;
+  border: 1px solid #bdc3c7;
+  text-align: right;
+}
+
+.metric-table td:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+
+/* 高亮信息框 */
+.highlight-box {
+  background-color: #f8f9fa;
+  border-left: 4px solid #3498db;
+  padding: 1.2em;
+  margin: 1.2em 0;
+  border-radius: 0 4px 4px 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* 颜色编码 */
+.positive {
+  color: #27ae60;
+  font-weight: bold;
+}
+
+.negative {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+.neutral {
+  color: #7f8c8d;
+  font-weight: 500;
+}
+
+/* 投资建议标签 */
+.recommendation-buy {
+  background-color: #d5f4e6;
+  color: #27ae60;
+  padding: 0.4em 0.8em;
+  border-radius: 6px;
+  font-weight: bold;
+  display: inline-block;
+  margin: 0.2em;
+}
+
+.recommendation-sell {
+  background-color: #fadbd8;
+  color: #e74c3c;
+  padding: 0.4em 0.8em;
+  border-radius: 6px;
+  font-weight: bold;
+  display: inline-block;
+  margin: 0.2em;
+}
+
+.recommendation-hold {
+  background-color: #f8f9fa;
+  color: #7f8c8d;
+  padding: 0.4em 0.8em;
+  border-radius: 6px;
+  font-weight: bold;
+  display: inline-block;
+  margin: 0.2em;
+  border: 1px solid #bdc3c7;
+}
+
+/* 重要数据突出显示 */
+.key-metric {
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  padding: 0.5em;
+  border-radius: 4px;
+  margin: 0.5em 0;
+  font-weight: bold;
+}
+
+/* 趋势箭头 */
+.trend-up::after {
+  content: " ↗";
+  color: #27ae60;
+  font-weight: bold;
+}
+
+.trend-down::after {
+  content: " ↘";
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+.trend-stable::after {
+  content: " →";
+  color: #7f8c8d;
+  font-weight: bold;
+}
+
+/* 段落间距 */
+.report-content p {
+  line-height: 1.6;
+  margin-bottom: 1em;
+  text-align: justify;
+}
+
+/* 列表样式 */
+.report-content ul, .report-content ol {
+  margin: 1em 0;
+  padding-left: 2em;
+}
+
+.report-content li {
+  margin-bottom: 0.5em;
+  line-height: 1.5;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .report-title {
+    font-size: 1.8em;
+  }
+  
+  .section-title {
+    font-size: 1.4em;
+  }
+  
+  .metric-table {
+    font-size: 0.85em;
+  }
+  
+  .metric-table th,
+  .metric-table td {
+    padding: 0.4em;
+  }
+}
+
+/* 打印样式 */
+@media print {
+  .report-title {
+    color: #000;
+    border-bottom: 2px solid #000;
+  }
+  
+  .section-title {
+    color: #000;
+    background-color: #f0f0f0;
+  }
+  
+  .metric-table {
+    border: 1px solid #000;
+  }
+  
+  .highlight-box {
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+  }
+}

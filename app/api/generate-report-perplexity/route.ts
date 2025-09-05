@@ -358,7 +358,18 @@ valuationAnalysis (估值分析):
 - 显示"Trading Amount"（交易金额）而非"Volume"（交易量）
 - 包含具体的数字、百分比和数据点
 - 提供详细分析及支持性证据
-- 使用专业的 HTML 样式，并带有以下类名：'metric-table', 'highlight-box', 'positive', 'negative', 'neutral', 'recommendation-buy', 'recommendation-sell', 'recommendation-hold'
+
+📊 专业格式要求（参考300053_valuation_report_2025-09-03.pdf）：
+- 使用专业的HTML样式，严格按照以下类名：'report-title', 'section-title', 'subsection-title', 'metric-table', 'highlight-box', 'positive', 'negative', 'neutral', 'recommendation-buy', 'recommendation-sell', 'recommendation-hold'
+- 报告标题使用大标题格式：<h1>公司名称 (股票代码) 估值分析报告</h1>
+- 每个主要部分使用二级标题：<h2>1. 基本面分析</h2>
+- 子部分使用三级标题：<h3>1.1 公司概况</h3>
+- 数据表格使用专业格式：表头粗体，数据对齐，边框清晰
+- 重要数据使用高亮框突出显示
+- 百分比和趋势使用颜色编码（绿色=正面，红色=负面，灰色=中性）
+- 投资建议使用醒目的标签样式
+
+📋 内容结构要求：
 - 确保 JSON 格式正确且有效
 - 每个部分都应全面且详细 (每个部分最少 500 字)
 - 每个部分必须包含至少2-3个数据表格来支撑分析
@@ -411,7 +422,18 @@ valuationAnalysis (Valuation Analysis):
 - Display "Trading Amount" instead of "Volume"
 - Include specific numbers, percentages, and data points
 - Provide detailed analysis with supporting evidence
-- Use professional HTML styling with these class names: 'metric-table', 'highlight-box', 'positive', 'negative', 'neutral', 'recommendation-buy', 'recommendation-sell', 'recommendation-hold'
+
+📊 Professional Format Requirements (Reference: 300053_valuation_report_2025-09-03.pdf):
+- Use professional HTML styling with these exact class names: 'report-title', 'section-title', 'subsection-title', 'metric-table', 'highlight-box', 'positive', 'negative', 'neutral', 'recommendation-buy', 'recommendation-sell', 'recommendation-hold'
+- Report title format: <h1>Company Name (Ticker) Valuation Analysis Report</h1>
+- Main sections use h2: <h2>1. Fundamental Analysis</h2>
+- Subsections use h3: <h3>1.1 Company Overview</h3>
+- Data tables use professional format: bold headers, aligned data, clear borders
+- Important data highlighted in boxes
+- Percentages and trends color-coded (green=positive, red=negative, gray=neutral)
+- Investment recommendations use prominent label styles
+
+📋 Content Structure Requirements:
 - Ensure correct and valid JSON format
 - Each section should be comprehensive and detailed (minimum 500 words per section)
 - Each section must include at least 2-3 data tables to support analysis
