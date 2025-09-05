@@ -496,6 +496,30 @@ Please provide a comprehensive, detailed analysis in ${locale === 'zh' ? 'Chines
 function parseNaturalLanguageReport(content: string, locale: string): any {
   console.log('🔍 开始自然语言解析...')
   
+  // 首先尝试解析JSON格式
+  try {
+    // 清理内容，移除可能的JSON包装
+    let jsonContent = content.trim()
+    
+    // 如果内容被包装在代码块中，提取JSON部分
+    if (jsonContent.includes('```json')) {
+      const jsonMatch = jsonContent.match(/```json\s*(\{[\s\S]*\})\s*```/)
+      if (jsonMatch) {
+        jsonContent = jsonMatch[1]
+      }
+    }
+    
+    // 如果内容以{开始，尝试直接解析JSON
+    if (jsonContent.startsWith('{')) {
+      const parsed = JSON.parse(jsonContent)
+      console.log('✅ 成功解析JSON格式')
+      return parsed
+    }
+  } catch (error) {
+    console.log('⚠️ JSON解析失败，尝试自然语言解析')
+  }
+  
+  // 如果JSON解析失败，进行自然语言解析
   // 首先清理内容，移除思考过程和元信息
   let cleanedContent = content
     // 移除思考过程段落
@@ -552,8 +576,8 @@ function parseNaturalLanguageReport(content: string, locale: string): any {
       key: 'valuationAnalysis',
       patterns: [
         /"valuationAnalysis":\s*"([^"]*(?:"[^"]*"[^"]*)*)"[^}]*$/,
-        /(?:估值分析|价值评估|Valuation Analysis?)[\s\S]*$/i,
-        /(?:DCF|分部估值|可比公司|投资建议)[\s\S]*$/i
+        /(?:估值分析|价值评估|Valuation Analysis?)[\s\S]*?(?=$)/i,
+        /(?:DCF|分部估值|可比公司|投资建议)[\s\S]*?(?=$)/i
       ]
     }
   ]
@@ -564,6 +588,16 @@ function parseNaturalLanguageReport(content: string, locale: string): any {
       const match = cleanedContent.match(pattern)
       if (match && match[0]) {
         let sectionContent = match[0].trim()
+        
+        // 清理JSON格式符号
+        sectionContent = sectionContent
+          .replace(/^"[^"]*":\s*"/, '') // 移除开头的 "key": "
+          .replace(/"\s*,\s*$/, '') // 移除结尾的 ",
+          .replace(/"\s*}\s*$/, '') // 移除结尾的 "}
+          .replace(/\\"/g, '"') // 转换转义引号
+          .replace(/\\n/g, '\n') // 转换换行符
+          .replace(/\\t/g, '\t') // 转换制表符
+          .trim()
         
         // 清理章节标题
         sectionContent = sectionContent
