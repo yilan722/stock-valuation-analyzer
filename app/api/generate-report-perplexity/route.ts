@@ -5,8 +5,8 @@ import { canGenerateReport, incrementReportUsage, createReport } from '../../../
 // 强制动态渲染，因为使用了request.headers和数据库操作
 export const dynamic = 'force-dynamic'
 
-// Vercel Pro配置 - 15分钟超时
-export const maxDuration = 900
+// Vercel配置 - 13分钟超时（确保兼容性）
+export const maxDuration = 800
 
 interface StockData {
   symbol: string
