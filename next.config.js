@@ -32,7 +32,7 @@ const nextConfig = {
   swcMinify: true,
   
   // Webpack优化 - Cloudflare Pages兼容
-  webpack: (config, { isServer, dev }) => {
+  webpack: (config, { isServer, dev, webpack }) => {
     // 修复 "self is not defined" 错误
     config.resolve.fallback = {
       ...config.resolve.fallback,
@@ -51,7 +51,6 @@ const nextConfig = {
     }
 
     // 添加全局变量定义
-    const webpack = require('webpack');
     config.plugins.push(
       new webpack.DefinePlugin({
         'typeof window': JSON.stringify(isServer ? 'undefined' : 'object'),
