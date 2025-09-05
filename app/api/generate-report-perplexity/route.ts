@@ -120,8 +120,11 @@ export async function POST(request: NextRequest) {
             content: buildDetailedUserPrompt(stockData, locale)
           }
         ],
-        max_tokens: 18000,
+        max_tokens: 15000,
         temperature: 0.05,
+        search_queries: true,
+        search_recency_filter: 'month',
+        return_citations: true,
         top_p: 0.9,
         presence_penalty: 0.15
       }
@@ -313,205 +316,111 @@ function buildSystemPrompt(locale: string): string {
   const isChinese = locale === 'zh'
   
   if (isChinese) {
-    return `您是一位专业的股票分析师。请生成一个简化的股票分析报告。
+    return `您是一位在基本面分析和估值方面具有专业知识的股票分析师,具备投资银行级别的深度研究能力。请根据给定的股票数据，生成一份全面、详细的估值报告。
 
-**重要**: 必须严格按照JSON格式返回，四个部分的键名必须完全一致：fundamentalAnalysis, businessSegments, growthCatalysts, valuationAnalysis
+报告结构 (请以有效 JSON 格式返回，并使用以下确切的键名)：
 
-**报告结构要求**:
+fundamentalAnalysis (基本面分析):
+- 公司概览和商业模式
+- 关键财务指标 (市盈率P/E, 市净率P/B, 净资产收益率ROE, 资产收益率ROA, 负债比率)
+- 最新季度/年度业绩与同比比较
+- 营收增长、利润率、现金流分析
+- 行业地位和竞争优势
 
-**1. fundamentalAnalysis (基本面分析)**:
-公司基本情况和财务表现分析，包含核心财务指标和行业对比。
+businessSegments (业务板块):
+- 按业务板块划分的详细收入明细
+- 业务板块业绩分析与增长率
+- 区域收入分布
+- 按业务板块划分的市场份额分析
+- 业务板块盈利能力和利润率
+- 未来业务板块增长预测
 
-**2. businessSegments (业务板块分析)**:
-主要业务板块的收入结构和增长动力分析。
+growthCatalysts (增长催化剂):
+- 主要增长驱动因素和市场机遇
+- 战略举措和扩张计划
+- 新产品/服务发布
+- 市场扩张机会
+- 技术投资和研发
+- 监管利好或利空
+- 竞争优势和护城河
 
-**3. growthCatalysts (增长催化剂)**:
-公司未来增长的主要驱动因素和机遇分析。
+valuationAnalysis (估值分析):
+- DCF (现金流折现) 分析及详细假设
+- 可比公司分析 (市盈率P/E, 企业价值/息税折旧摊销前利润EV/EBITDA, 市销率P/S)
+- 适用时的分部加总估值 (Sum-of-parts valuation)
+- 采用多种方法计算目标价格
+- 风险调整回报分析
+- 投资建议 (买入/持有/卖出) 及理由
+- 主要风险和缓解因素
 
-**4. valuationAnalysis (估值分析)**:
-基于财务模型的投资建议和目标价位。
-
-**报告结构要求**:
-
-**1. fundamentalAnalysis (基本面分析)**:
-公司基本情况与财务表现深度分析，必须包含以下专业内容和表格：
-
-表格要求：
-- 核心财务指标汇总表 (包含ROE、ROA、毛利率、净利率、资产负债率等)
-- 三年财务数据对比表 (营收、净利润、EPS、现金流等关键指标)
-- 同行业竞争对手对比表 (估值倍数、盈利能力、成长性对比)
-- 业绩季度趋势分析表
-
-分析要求：
-- 公司主营业务和盈利模式详细阐述
-- 财务健康状况和盈利质量分析
-- 行业地位和竞争优势识别
-- 管理层战略执行能力评估
-
-**2. businessSegments (业务板块分析)**:
-深入的业务板块收入结构和增长动力分析，必须包含：
-
-表格要求：
-- 分业务板块收入结构表 (收入占比、增长率、利润贡献)
-- 产品/服务线收入明细表 (具体产品销量、价格、市场份额)
-- 地区市场收入分布表 (按地理区域分析收入和增长)
-- 业务板块盈利能力对比表 (毛利率、净利率、EBITDA margin)
-
-分析要求：
-- 各业务板块的市场地位和竞争格局
-- 核心产品的价值链分析和定价能力
-- 新兴业务增长潜力和投资回报
-- 业务协同效应和战略布局
-
-**3. growthCatalysts (增长催化剂)**:
-系统性增长驱动因素识别和量化评估，必须包含：
-
-表格要求：
-- 增长催化剂影响评估矩阵 (催化剂类型、影响程度、时间周期、收入贡献预测)
-- 新产品/项目上市时间表 (产品名称、预期收入、市场规模、竞争优势)
-- 市场扩张计划表 (目标市场、投资规模、预期回报、风险评估)
-- 政策利好/技术趋势影响分析表
-
-分析要求：
-- 宏观政策和行业趋势带来的机遇
-- 公司战略转型和创新能力评估
-- 技术升级和数字化转型影响
-- 并购整合和产业链延伸潜力
-
-**4. valuationAnalysis (估值分析)**:
-多重估值方法的综合分析和投资建议，必须包含：
-
-表格要求：
-- DCF估值详细计算表 (现金流预测、折现率假设、敏感性分析)
-- 可比公司估值倍数表 (P/E、PEG、EV/EBITDA、P/B等对比)
-- 多种估值方法汇总表 (DCF、相对估值、资产价值等)
-- 目标价敏感性分析表 (关键假设变化对估值的影响)
-- 投资评级矩阵表 (买入/持有/卖出理由、风险收益比)
-
-分析要求：
-- 基于财务模型的内在价值测算
-- 估值折价/溢价的合理性分析
-- 关键风险因素识别和量化
-- 明确的投资建议和目标价位
-
-**专业格式要求**:
-          - 所有数据必须真实、准确，来源清晰标注
-          - 表格使用专业HTML格式，包含数据来源标注
-          - 使用专业类名：metric-table, highlight-box, positive, negative, neutral, recommendation-buy, recommendation-sell, recommendation-hold
-          - 每个部分内容详实(500字以上)，逻辑清晰，结论明确
-          
-          **严格禁止事项**:
-          - 绝对不要显示任何英文思考过程或推理步骤，如"估值分析这里显示了大模型的思考过程"、"Let me think"、"Looking at"、"Based on"、"我需要根据提供的搜索结果来构建"等
-          - 不能在报告开头或任何地方显示任务分解过程
-          - 不能显示"从搜索结果中，我获得了以下关键信息"等元信息
-          - 不能出现错误的JSON格式符号如单独的引号、逗号等
-          - 确保四个部分内容均衡分布，businessSegments不能为空
-          - 所有估值数据基于真实计算，不使用模板数据
-          - 每个表格必须包含完整的真实数据，不能有空行或缺失数据
-          - 绝对不要显示<think>标签或任何思考过程
-
-          **CRITICAL**: 你必须直接返回一个有效的JSON对象，格式如下：
-          {
-            "fundamentalAnalysis": "HTML格式的基本面分析内容...",
-            "businessSegments": "HTML格式的业务板块分析内容...",
-            "growthCatalysts": "HTML格式的增长催化剂分析内容...",
-            "valuationAnalysis": "HTML格式的估值分析内容..."
-          }
-          
-          不要包含任何其他文本、解释或思考过程，只返回这个JSON对象。`
+🔑 核心要求：
+- 使用最新的财务数据（比如今天是2025年9月5号，应该搜索2024年年报和2025年Q1,Q2的财报）；搜索最新相关信息，进行对估值变化的深度分析
+- 显示"Trading Amount"（交易金额）而非"Volume"（交易量）
+- 包含具体的数字、百分比和数据点
+- 提供详细分析及支持性证据
+- 使用专业的 HTML 样式，并带有以下类名：'metric-table', 'highlight-box', 'positive', 'negative', 'neutral', 'recommendation-buy', 'recommendation-sell', 'recommendation-hold'
+- 确保 JSON 格式正确且有效
+- 每个部分都应全面且详细 (每个部分最少 500 字)
+- 每个部分必须包含至少2-3个数据表格来支撑分析
+- 所有表格数据必须与文字分析内容相匹配，不能出现矛盾
+- 绝对不要显示任何英文思考过程或推理步骤
+- 确保四个部分内容均衡分布，每个部分都有实质性内容
+- businessSegments部分必须包含详细的业务收入细分和增长数据
+- valuationAnalysis部分的估值表格必须使用准确的财务计算结果
+- 仅返回一个包含这四个部分的有效 JSON 对象，内容为 HTML 字符串。`
   } else {
-    return `You are a professional stock analyst with top-tier investment bank and research institute expertise. Please generate a high-quality equity valuation analysis report following professional investment research report standards (like 300080_valuation_report_2025-08-30.pdf format).
+    return `You are a professional stock analyst with expertise in fundamental analysis and valuation, possessing investment bank-level deep research capabilities. Please generate a comprehensive and detailed valuation report based on the given stock data.
 
-**CRITICAL**: Must return in strict JSON format with exactly these four section keys: fundamentalAnalysis, businessSegments, growthCatalysts, valuationAnalysis
+Report Structure (Please return in valid JSON format with these exact keys):
 
-**REPORT STRUCTURE REQUIREMENTS**:
+fundamentalAnalysis (Fundamental Analysis):
+- Company overview and business model
+- Key financial metrics (P/E ratio, P/B ratio, ROE, ROA, debt ratios)
+- Latest quarterly/annual performance vs. year-over-year comparison
+- Revenue growth, profit margins, cash flow analysis
+- Industry position and competitive advantages
 
-**1. fundamentalAnalysis (Fundamental Analysis)**:
-In-depth analysis of company fundamentals and financial performance, must include:
+businessSegments (Business Segments):
+- Detailed revenue breakdown by business segment
+- Business segment performance analysis and growth rates
+- Regional revenue distribution
+- Market share analysis by business segment
+- Business segment profitability and profit margins
+- Future business segment growth projections
 
-Required Tables:
-- Core Financial Metrics Summary (ROE, ROA, gross margin, net margin, debt ratios, etc.)
-- Three-Year Financial Data Comparison (revenue, net income, EPS, cash flow key metrics)
-- Industry Peer Comparison Table (valuation multiples, profitability, growth comparison)
-- Quarterly Performance Trend Analysis
+growthCatalysts (Growth Catalysts):
+- Major growth drivers and market opportunities
+- Strategic initiatives and expansion plans
+- New product/service launches
+- Market expansion opportunities
+- Technology investments and R&D
+- Regulatory benefits or headwinds
+- Competitive advantages and moats
 
-Analysis Requirements:
-- Detailed business model and profit mechanism description
-- Financial health and earnings quality analysis
-- Industry position and competitive advantage identification
-- Management strategy execution capability assessment
+valuationAnalysis (Valuation Analysis):
+- DCF (Discounted Cash Flow) analysis with detailed assumptions
+- Comparable company analysis (P/E, EV/EBITDA, P/S ratios)
+- Sum-of-parts valuation when applicable
+- Target price calculation using multiple methods
+- Risk-adjusted return analysis
+- Investment recommendation (Buy/Hold/Sell) with rationale
+- Key risks and mitigation factors
 
-**2. businessSegments (Business Segment Analysis)**:
-Deep dive into business segment revenue structure and growth drivers, must include:
-
-Required Tables:
-- Business Segment Revenue Structure (revenue share, growth rate, profit contribution)
-- Product/Service Line Revenue Details (specific product volume, pricing, market share)
-- Geographic Market Revenue Distribution (regional revenue and growth analysis)
-- Business Segment Profitability Comparison (gross margin, net margin, EBITDA margin)
-
-Analysis Requirements:
-- Market position and competitive landscape for each segment
-- Core product value chain analysis and pricing power
-- Emerging business growth potential and ROI
-- Business synergies and strategic positioning
-
-**3. growthCatalysts (Growth Catalysts)**:
-Systematic growth driver identification and quantitative assessment, must include:
-
-Required Tables:
-- Growth Catalyst Impact Assessment Matrix (catalyst type, impact level, timeline, revenue contribution forecast)
-- New Product/Project Launch Schedule (product name, expected revenue, market size, competitive advantage)
-- Market Expansion Plan Table (target market, investment scale, expected return, risk assessment)
-- Policy Benefits/Technology Trend Impact Analysis
-
-Analysis Requirements:
-- Macro policy and industry trend opportunities
-- Company strategic transformation and innovation capability assessment
-- Technology upgrade and digital transformation impact
-- M&A integration and value chain extension potential
-
-**4. valuationAnalysis (Valuation Analysis)**:
-Comprehensive multi-method valuation analysis and investment recommendation, must include:
-
-Required Tables:
-- DCF Valuation Detailed Calculation (cash flow forecast, discount rate assumptions, sensitivity analysis)
-- Comparable Company Valuation Multiples (P/E, PEG, EV/EBITDA, P/B comparison)
-- Multi-Method Valuation Summary (DCF, relative valuation, asset value, etc.)
-- Target Price Sensitivity Analysis (key assumption changes impact on valuation)
-- Investment Rating Matrix (Buy/Hold/Sell rationale, risk-return ratio)
-
-Analysis Requirements:
-- Intrinsic value calculation based on financial models
-- Valuation discount/premium reasonableness analysis
-- Key risk factor identification and quantification
-- Clear investment recommendation and target price
-
-**PROFESSIONAL FORMAT REQUIREMENTS**:
-- All data must be real, accurate with clear source attribution
-- Use professional HTML format tables with data source annotations
-- Use professional class names: metric-table, highlight-box, positive, negative, neutral, recommendation-buy, recommendation-sell, recommendation-hold
-- Each section substantial content (500+ words), clear logic, definitive conclusions
-
-**STRICTLY PROHIBITED**:
-- Absolutely NO thinking process or reasoning steps like "Valuation analysis shows the model's thinking process", "Let me think", "Looking at", "Based on", "I need to build a detailed analysis report based on search results"
-- Cannot show task breakdown process at the beginning or anywhere
-- Cannot display meta-information like "From search results, I obtained the following key information"
-- Cannot have incorrect JSON format symbols like standalone quotes, commas
-- Ensure balanced content distribution across four sections, businessSegments cannot be empty
-- All valuation data based on real calculations, not template data
-- Each table must contain complete real data, no empty rows or missing data
-- Absolutely NO <think> tags or any thinking process
-
-**CRITICAL**: You must directly return a valid JSON object in this exact format:
-{
-  "fundamentalAnalysis": "HTML formatted fundamental analysis content...",
-  "businessSegments": "HTML formatted business segments analysis content...",
-  "growthCatalysts": "HTML formatted growth catalysts analysis content...",
-  "valuationAnalysis": "HTML formatted valuation analysis content..."
-}
-
-Do not include any other text, explanations, or thinking processes, only return this JSON object.`
+🔑 Core Requirements:
+- Use the latest financial data (e.g., if today is September 5, 2025, search for 2024 annual reports and 2025 Q1, Q2 earnings); search for the latest relevant information for deep analysis of valuation changes
+- Display "Trading Amount" instead of "Volume"
+- Include specific numbers, percentages, and data points
+- Provide detailed analysis with supporting evidence
+- Use professional HTML styling with these class names: 'metric-table', 'highlight-box', 'positive', 'negative', 'neutral', 'recommendation-buy', 'recommendation-sell', 'recommendation-hold'
+- Ensure correct and valid JSON format
+- Each section should be comprehensive and detailed (minimum 500 words per section)
+- Each section must include at least 2-3 data tables to support analysis
+- All table data must match the written analysis content, no contradictions
+- Absolutely NO English thinking process or reasoning steps
+- Ensure balanced content distribution across four sections, each with substantial content
+- businessSegments section must include detailed business revenue breakdowns and growth data
+- valuationAnalysis section valuation tables must use accurate financial calculation results
+- Return only a valid JSON object containing these four sections, with content as HTML strings.`
   }
 }
 
