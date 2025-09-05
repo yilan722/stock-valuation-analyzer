@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import puppeteer from 'puppeteer'
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,7 +11,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create HTML content for PDF
+    // Create HTML content for PDF with improved styling
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -20,116 +19,181 @@ export async function POST(request: NextRequest) {
           <meta charset="UTF-8">
           <title>${stockName} (${stockSymbol}) - 股票估值分析报告</title>
           <style>
+            @page {
+              size: A4;
+              margin: 20mm;
+            }
+            
             body {
-              font-family: 'Microsoft YaHei', Arial, sans-serif;
+              font-family: 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
               line-height: 1.6;
               color: #333;
               margin: 0;
-              padding: 20px;
+              padding: 0;
               background: white;
+              font-size: 14px;
             }
+            
             .header {
               text-align: center;
               border-bottom: 3px solid #2c3e50;
               padding-bottom: 20px;
               margin-bottom: 30px;
             }
+            
             .header h1 {
               color: #2c3e50;
               margin: 0;
-              font-size: 28px;
+              font-size: 24px;
+              font-weight: bold;
             }
+            
             .header .subtitle {
               color: #7f8c8d;
               font-size: 16px;
               margin-top: 10px;
             }
+            
             .report-date {
               text-align: right;
               color: #7f8c8d;
-              font-size: 14px;
+              font-size: 12px;
               margin-bottom: 30px;
             }
+            
             .section {
-              margin-bottom: 40px;
+              margin-bottom: 30px;
               page-break-inside: avoid;
             }
+            
             .section h2 {
               color: #2c3e50;
               border-bottom: 2px solid #3498db;
-              padding-bottom: 10px;
-              margin-bottom: 20px;
+              padding-bottom: 8px;
+              margin-bottom: 15px;
+              font-size: 18px;
+              font-weight: bold;
             }
+            
+            .section h3 {
+              color: #34495e;
+              margin-top: 20px;
+              margin-bottom: 10px;
+              font-size: 16px;
+              font-weight: bold;
+            }
+            
             .metric-table {
               width: 100%;
               border-collapse: collapse;
-              margin: 20px 0;
+              margin: 15px 0;
+              font-size: 12px;
             }
+            
             .metric-table th,
             .metric-table td {
               border: 1px solid #ddd;
-              padding: 12px;
+              padding: 8px;
               text-align: left;
+              vertical-align: top;
             }
+            
             .metric-table th {
               background-color: #f8f9fa;
               font-weight: bold;
+              color: #2c3e50;
             }
+            
+            .metric-table td:first-child {
+              font-weight: 500;
+            }
+            
             .highlight-box {
               background-color: #f8f9fa;
               border-left: 4px solid #3498db;
-              padding: 20px;
-              margin: 20px 0;
+              padding: 15px;
+              margin: 15px 0;
+              border-radius: 4px;
             }
+            
             .positive {
               color: #27ae60;
               font-weight: bold;
             }
+            
             .negative {
               color: #e74c3c;
               font-weight: bold;
             }
+            
             .neutral {
               color: #7f8c8d;
             }
+            
             .recommendation-buy {
               background-color: #d5f4e6;
               border: 2px solid #27ae60;
-              padding: 20px;
-              border-radius: 8px;
-              margin: 20px 0;
+              padding: 15px;
+              border-radius: 6px;
+              margin: 15px 0;
             }
+            
             .recommendation-sell {
               background-color: #fadbd8;
               border: 2px solid #e74c3c;
-              padding: 20px;
-              border-radius: 8px;
-              margin: 20px 0;
+              padding: 15px;
+              border-radius: 6px;
+              margin: 15px 0;
             }
+            
             .recommendation-hold {
               background-color: #fef9e7;
               border: 2px solid #f39c12;
-              padding: 20px;
-              border-radius: 8px;
-              margin: 20px 0;
+              padding: 15px;
+              border-radius: 6px;
+              margin: 15px 0;
             }
+            
             .page-break {
               page-break-before: always;
             }
-            ul {
+            
+            ul, ol {
               margin: 10px 0;
               padding-left: 20px;
             }
+            
             li {
               margin: 5px 0;
             }
+            
+            p {
+              margin: 10px 0;
+              text-align: justify;
+            }
+            
             .footer {
               text-align: center;
-              margin-top: 40px;
-              padding-top: 20px;
+              margin-top: 30px;
+              padding-top: 15px;
               border-top: 1px solid #ddd;
               color: #7f8c8d;
-              font-size: 12px;
+              font-size: 10px;
+            }
+            
+            /* Print optimizations */
+            @media print {
+              body {
+                font-size: 12px;
+              }
+              
+              .section {
+                page-break-inside: avoid;
+              }
+              
+              .metric-table {
+                font-size: 10px;
+              }
             }
           </style>
         </head>
@@ -144,23 +208,23 @@ export async function POST(request: NextRequest) {
           </div>
 
           <div class="section">
-            <h2>基本面分析</h2>
-            ${reportData.fundamentalAnalysis}
+            <h2>1. 基本面分析</h2>
+            ${reportData.fundamentalAnalysis || '暂无数据'}
           </div>
 
           <div class="section page-break">
-            <h2>业务板块分析</h2>
-            ${reportData.businessSegments}
+            <h2>2. 业务板块分析</h2>
+            ${reportData.businessSegments || '暂无数据'}
           </div>
 
           <div class="section page-break">
-            <h2>成长催化剂</h2>
-            ${reportData.growthCatalysts}
+            <h2>3. 增长催化剂</h2>
+            ${reportData.growthCatalysts || '暂无数据'}
           </div>
 
           <div class="section page-break">
-            <h2>估值分析</h2>
-            ${reportData.valuationAnalysis}
+            <h2>4. 估值分析</h2>
+            ${reportData.valuationAnalysis || '暂无数据'}
           </div>
 
           <div class="footer">
@@ -171,53 +235,11 @@ export async function POST(request: NextRequest) {
       </html>
     `
 
-    // Launch browser with optimized settings
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--single-process',
-        '--disable-gpu'
-      ]
-    })
-
-    const page = await browser.newPage()
-    
-    // Set viewport and wait for content to load
-    await page.setViewport({ width: 1200, height: 800 })
-    await page.setContent(htmlContent, { waitUntil: 'networkidle0' })
-    
-    // Wait a bit more for any dynamic content
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    // Generate PDF with optimized settings
-    const pdf = await page.pdf({
-      format: 'A4',
-      margin: {
-        top: '20mm',
-        right: '20mm',
-        bottom: '20mm',
-        left: '20mm'
-      },
-      printBackground: true,
-      displayHeaderFooter: true,
-      headerTemplate: '<div></div>',
-      footerTemplate: '<div style="font-size: 10px; text-align: center; width: 100%; color: #7f8c8d;">第 <span class="pageNumber"></span> 页，共 <span class="totalPages"></span> 页</div>',
-      preferCSSPageSize: true
-    })
-
-    await browser.close()
-
-    // Return PDF as response with proper headers
-    return new NextResponse(Buffer.from(pdf), {
+    // Return HTML content with PDF headers for browser to handle
+    return new NextResponse(htmlContent, {
       headers: {
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="${stockSymbol}_valuation_report_${new Date().toISOString().split('T')[0]}.pdf"`,
+        'Content-Type': 'text/html; charset=utf-8',
+        'Content-Disposition': `inline; filename="${stockSymbol}_valuation_report_${new Date().toISOString().split('T')[0]}.html"`,
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Pragma': 'no-cache',
         'Expires': '0'
@@ -227,24 +249,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('PDF generation error:', error)
     
-    // Return more specific error messages
-    if (error instanceof Error) {
-      if (error.message.includes('timeout')) {
-        return NextResponse.json(
-          { error: 'PDF generation timed out. Please try again.' },
-          { status: 408 }
-        )
-      }
-      if (error.message.includes('memory')) {
-        return NextResponse.json(
-          { error: 'Insufficient memory for PDF generation. Please try again.' },
-          { status: 507 }
-        )
-      }
-    }
-    
     return NextResponse.json(
-      { error: 'Failed to generate PDF. Please try again later.' },
+      { error: 'Failed to generate report. Please try again later.' },
       { status: 500 }
     )
   }

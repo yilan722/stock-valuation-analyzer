@@ -52,32 +52,36 @@ export default function ValuationReport({ stockData, reportData, isLoading, loca
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to generate PDF')
+        throw new Error(errorData.error || 'Failed to generate report')
       }
 
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `${stockData.symbol}_valuation_report_${new Date().toISOString().split('T')[0]}.pdf`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
+      // Get the HTML content
+      const htmlContent = await response.text()
+      
+      // Create a new window with the HTML content
+      const printWindow = window.open('', '_blank')
+      if (!printWindow) {
+        throw new Error('Unable to open print window. Please allow popups.')
+      }
+      
+      printWindow.document.write(htmlContent)
+      printWindow.document.close()
+      
+      // Wait for content to load, then trigger print
+      printWindow.onload = () => {
+        setTimeout(() => {
+          printWindow.print()
+          // Close the window after printing (optional)
+          // printWindow.close()
+        }, 500)
+      }
       
       // Show success message
-      toast.success('PDF downloaded successfully!')
+      toast.success('报告已准备打印，请使用浏览器的打印功能保存为PDF')
     } catch (error) {
       console.error('Download error:', error)
       const errorMessage = error instanceof Error ? error.message : 'Download failed'
       toast.error(errorMessage)
-      
-      // Retry logic for certain errors
-      if (errorMessage.includes('timeout') || errorMessage.includes('memory')) {
-        if (confirm('PDF generation failed. Would you like to try again?')) {
-          setTimeout(() => handleDownloadPDF(), 2000)
-        }
-      }
     } finally {
       setIsDownloading(false)
     }

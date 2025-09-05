@@ -261,9 +261,9 @@ export const translations: Record<Locale, TranslationKeys> = {
     dataUpdated: 'Data updated successfully',
     
     // Download
-    downloadPDF: 'Download PDF',
-    generatingPDF: 'Generating PDF...',
-    downloadError: 'Download failed, please try again',
+    downloadPDF: 'Print Report',
+    generatingPDF: 'Preparing Print...',
+    downloadError: 'Print failed, please try again',
     
     // Report Generation
     generatingReport: 'Generating Report',
@@ -486,8 +486,8 @@ export const translations: Record<Locale, TranslationKeys> = {
     dataUpdated: '数据更新成功',
     
     // Download
-    downloadPDF: '下载PDF',
-    generatingPDF: '生成PDF中...',
+    downloadPDF: '打印报告',
+    generatingPDF: '准备打印中...',
     downloadError: '下载失败，请稍后重试',
     
     // Report Generation

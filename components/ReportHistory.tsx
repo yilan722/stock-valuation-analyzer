@@ -112,18 +112,30 @@ export default function ReportHistory({ locale, isOpen, onClose }: ReportHistory
       })
 
       if (!response.ok) {
-        throw new Error('Failed to generate PDF')
+        throw new Error('Failed to generate report')
       }
 
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `${report.stock_symbol}_valuation_report.pdf`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
+      // Get the HTML content
+      const htmlContent = await response.text()
+      
+      // Create a new window with the HTML content
+      const printWindow = window.open('', '_blank')
+      if (!printWindow) {
+        throw new Error('Unable to open print window. Please allow popups.')
+      }
+      
+      printWindow.document.write(htmlContent)
+      printWindow.document.close()
+      
+      // Wait for content to load, then trigger print
+      printWindow.onload = () => {
+        setTimeout(() => {
+          printWindow.print()
+        }, 500)
+      }
+      
+      // Show success message
+      alert(locale === 'zh' ? '报告已准备打印，请使用浏览器的打印功能保存为PDF' : 'Report ready for printing. Please use browser print function to save as PDF')
     } catch (error) {
       console.error('Download error:', error)
       alert(locale === 'zh' ? '下载错误' : 'Download error')
