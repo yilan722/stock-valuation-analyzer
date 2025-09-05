@@ -4,9 +4,6 @@
   "framework": "nextjs",
   "installCommand": "npm install",
   "functions": {
-    "app/api/**/*.ts": {
-      "maxDuration": 300
-    },
     "app/api/generate-report-perplexity/route.ts": {
       "maxDuration": 900
     }
