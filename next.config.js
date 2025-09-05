@@ -51,8 +51,9 @@ const nextConfig = {
     }
 
     // 添加全局变量定义
+    const webpack = require('webpack');
     config.plugins.push(
-      new config.webpack.DefinePlugin({
+      new webpack.DefinePlugin({
         'typeof window': JSON.stringify(isServer ? 'undefined' : 'object'),
         'typeof self': JSON.stringify(isServer ? 'undefined' : 'object'),
         'typeof global': JSON.stringify(isServer ? 'object' : 'undefined'),
