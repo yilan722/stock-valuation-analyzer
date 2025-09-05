@@ -31,9 +31,9 @@ const nextConfig = {
   // 生产环境优化
   swcMinify: true,
   
-  // Webpack优化 - Cloudflare Pages兼容
-  webpack: (config, { isServer, dev, webpack }) => {
-    // 修复 "self is not defined" 错误
+  // Webpack优化 - 简化配置
+  webpack: (config, { isServer, dev }) => {
+    // 基本fallback配置
     config.resolve.fallback = {
       ...config.resolve.fallback,
       fs: false,
@@ -48,46 +48,6 @@ const nextConfig = {
       assert: false,
       os: false,
       path: false,
-    }
-
-    // 添加全局变量定义
-    config.plugins.push(
-      new webpack.DefinePlugin({
-        'typeof window': JSON.stringify(isServer ? 'undefined' : 'object'),
-        'typeof self': JSON.stringify(isServer ? 'undefined' : 'object'),
-        'typeof global': JSON.stringify(isServer ? 'object' : 'undefined'),
-      })
-    )
-
-    // 优化构建输出
-    if (!dev) {
-      config.optimization = {
-        ...config.optimization,
-        splitChunks: {
-          chunks: 'all',
-          minSize: 20000,
-          maxSize: 244000, // 确保单个文件不超过25MB
-          cacheGroups: {
-            default: {
-              minChunks: 1,
-              priority: -20,
-              reuseExistingChunk: true,
-            },
-            vendor: {
-              test: /[\\/]node_modules[\\/]/,
-              name: 'vendors',
-              priority: -10,
-              chunks: 'all',
-              maxSize: 200000,
-            },
-          },
-        },
-      }
-    }
-    
-    // 在Cloudflare Pages上禁用缓存以避免25MB限制
-    if (process.env.CF_PAGES) {
-      config.cache = false
     }
     
     return config
