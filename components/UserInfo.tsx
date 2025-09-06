@@ -36,12 +36,11 @@ interface UserInfoProps {
   onLogin: () => void
   onOpenSubscription: () => void
   onOpenReportHistory: () => void
-  onOpenDebugPanel: () => void
   locale: Locale
   isCompact?: boolean
 }
 
-export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSubscription, onOpenReportHistory, onOpenDebugPanel, locale, isCompact = false }: UserInfoProps) {
+export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSubscription, onOpenReportHistory, locale, isCompact = false }: UserInfoProps) {
   const [isLoading, setIsLoading] = useState(false)
   const { forceSignOut } = useAuth()
 
@@ -204,14 +203,6 @@ export default function UserInfo({ user, onLogout, onRefresh, onLogin, onOpenSub
                 <span className="sm:hidden">Plan</span>
               </button>
               
-              <button
-                onClick={onOpenDebugPanel}
-                className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium bg-red-500/20 text-red-300 border border-red-500/30 rounded-md hover:bg-red-500/30 transition-colors font-inter"
-                title="Debug Panel"
-              >
-                <span className="hidden sm:inline">Debug</span>
-                <span className="sm:hidden">🐛</span>
-              </button>
               
               <button
                 onClick={handleLogout}

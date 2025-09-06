@@ -360,6 +360,11 @@ valuationAnalysis (估值分析) - 必须包含以下内容：
 - 显示"Trading Amount"（交易金额）而非"Volume"（交易量）
 - 包含具体的数字、百分比和数据点
 - 提供详细分析及支持性证据
+- 为所有重要数据添加可点击的验证链接，格式为：<a href="数据来源URL" target="_blank" class="data-source-link">数据来源名称</a>
+- 数据来源包括：公司官网、SEC文件、财报、新闻网站、行业报告等权威来源
+- 每个财务数据、市场数据、行业数据都必须包含可验证的链接
+- 链接应该指向原始数据源，如：公司官网投资者关系页面、SEC EDGAR数据库、财报PDF、权威新闻网站等
+- 在表格中，每行数据都应该包含相应的数据来源链接
 
 📊 专业格式要求（参考300053_valuation_report_2025-09-03.pdf）：
 - 使用专业的HTML样式，严格按照以下类名：'report-title', 'section-title', 'subsection-title', 'metric-table', 'highlight-box', 'positive', 'negative', 'neutral', 'recommendation-buy', 'recommendation-sell', 'recommendation-hold'
@@ -437,6 +442,11 @@ valuationAnalysis (Valuation Analysis) - Must include:
 - Display "Trading Amount" instead of "Volume"
 - Include specific numbers, percentages, and data points
 - Provide detailed analysis with supporting evidence
+- Add clickable verification links for all important data in format: <a href="data-source-URL" target="_blank" class="data-source-link">Data Source Name</a>
+- Data sources include: company websites, SEC filings, earnings reports, news websites, industry reports, and other authoritative sources
+- Every financial data, market data, and industry data must include verifiable links
+- Links should point to original data sources such as: company investor relations pages, SEC EDGAR database, earnings report PDFs, authoritative news websites, etc.
+- In tables, each row of data should include corresponding data source links
 
 📊 Professional Format Requirements (Reference: 300053_valuation_report_2025-09-03.pdf):
 - Use professional HTML styling with these exact class names: 'report-title', 'section-title', 'subsection-title', 'metric-table', 'highlight-box', 'positive', 'negative', 'neutral', 'recommendation-buy', 'recommendation-sell', 'recommendation-hold'

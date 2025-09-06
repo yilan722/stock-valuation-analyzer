@@ -10,7 +10,6 @@ import AuthModal from '../../components/AuthModal'
 import SubscriptionModal from '../../components/SubscriptionModal'
 import ReportHistory from '../../components/ReportHistory'
 import GenerationModal from '../../components/GenerationModal'
-import DebugPanel from '../../components/DebugPanel'
 import Footer from '../../components/Footer'
 import { StockData, ValuationReportData, MultiCompanyAnalysis } from '../../types'
 import { type Locale } from '../../lib/i18n'
@@ -84,7 +83,6 @@ export default function HomePage({ params }: PageProps) {
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false)
   const [showReportHistory, setShowReportHistory] = useState(false)
   const [showGenerationModal, setShowGenerationModal] = useState(false)
-  const [showDebugPanel, setShowDebugPanel] = useState(false)
 
   // 新功能状态
   const [showPersonalResearchModal, setShowPersonalResearchModal] = useState(false)
@@ -334,7 +332,6 @@ export default function HomePage({ params }: PageProps) {
         onLogin={handleLogin}
         onOpenSubscription={handleOpenSubscription}
         onOpenReportHistory={handleOpenReportHistory}
-        onOpenDebugPanel={() => setShowDebugPanel(true)}
       />
       
       <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-6 sm:py-8">
@@ -498,11 +495,6 @@ export default function HomePage({ params }: PageProps) {
         locale={params.locale}
       />
       
-      {/* 调试面板 */}
-      <DebugPanel 
-        isOpen={showDebugPanel} 
-        onClose={() => setShowDebugPanel(false)} 
-      />
 
       {/* 新功能模态框 */}
       {featureFlags.ENABLE_PERSONAL_RESEARCH && (

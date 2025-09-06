@@ -189,6 +189,53 @@
   }
 }
 
+/* 数据来源链接样式 */
+.data-source-link {
+  color: #3498db;
+  text-decoration: none;
+  font-size: 0.85em;
+  font-weight: 500;
+  border-bottom: 1px dotted #3498db;
+  transition: all 0.2s ease;
+  margin-left: 4px;
+}
+
+.data-source-link:hover {
+  color: #2980b9;
+  border-bottom: 1px solid #2980b9;
+  text-decoration: none;
+}
+
+.data-source-link:after {
+  content: " 🔗";
+  font-size: 0.8em;
+  margin-left: 2px;
+}
+
+/* 数据来源容器 */
+.data-source {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background-color: #f8f9fa;
+  border-left: 3px solid #3498db;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: #6c757d;
+}
+
+.data-source-title {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 4px;
+}
+
+/* 内联数据来源 */
+.inline-source {
+  font-size: 0.8em;
+  color: #6c757d;
+  font-style: italic;
+}
+
 /* 打印样式 */
 @media print {
   .report-title {
@@ -208,5 +255,14 @@
   .highlight-box {
     border: 1px solid #ccc;
     background-color: #f9f9f9;
+  }
+  
+  .data-source-link:after {
+    content: " (链接)";
+  }
+  
+  .data-source-link {
+    color: #000;
+    text-decoration: underline;
   }
 }
