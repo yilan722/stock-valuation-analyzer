@@ -46,12 +46,12 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
       id: 'free-trial',
       name: getTranslation(locale, 'basicPlan'),
       monthlyFee: 0,
-      welcomeCredits: 2,
+      welcomeCredits: 1,
       monthlyCredits: 0,
       dailyGrowth: 0,
-      totalMonthlyCredits: 2,
+      totalMonthlyCredits: 1,
       costPerReport: 0,
-      onDemandLimit: '2 reports',
+      onDemandLimit: '1 report',
       features: [
         getTranslation(locale, 'aiDrivenDeepAnalysis'),
         getTranslation(locale, 'realTimeMarketData')
@@ -265,7 +265,7 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
             {plans.map((plan) => (
               <div
                 key={plan.id}
-                className={`relative bg-white border-2 rounded-lg p-3 sm:p-6 transition-all duration-200 hover:shadow-lg ${
+                className={`relative bg-white border-2 rounded-lg p-3 sm:p-6 transition-all duration-200 hover:shadow-lg flex flex-col ${
                   plan.popular ? 'border-blue-500 shadow-lg' : 'border-gray-200'
                 } ${plan.bestValue ? 'border-amber-500 shadow-lg' : ''}`}
               >
@@ -302,7 +302,12 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
                 {/* Monthly Fee */}
                 <div className="text-center mb-3 sm:mb-4">
                   <span className="text-2xl sm:text-3xl font-bold text-blue-600">
-                    {plan.monthlyFee === 0 ? getTranslation(locale, 'free') : `${locale === 'en' ? '$' : '¥'}${plan.monthlyFee}`}
+                    {plan.monthlyFee === 0 ? getTranslation(locale, 'free') : 
+                      locale === 'en' ? `$${plan.monthlyFee}` : 
+                      plan.monthlyFee === 49 ? '¥399' :
+                      plan.monthlyFee === 299 ? '¥2599' :
+                      plan.monthlyFee === 599 ? '¥4699' : `¥${plan.monthlyFee * 8.1}`
+                    }
                   </span>
                   {plan.monthlyFee > 0 && (
                     <span className="text-gray-500 ml-1 text-sm">/month</span>
@@ -315,6 +320,21 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
                     {plan.monthlyCredits > 0 && (
                       <div className="mb-2">
                         <span className="text-blue-600 font-bold">{plan.monthlyCredits}</span> <span className="text-sm sm:text-base">{getTranslation(locale, 'reportsPerMonth')}</span>
+                        {plan.monthlyCredits === 8 && (
+                          <div className="text-xs text-gray-500 mt-1">
+                            {getTranslation(locale, 'reportsPerDay')}: 0.3 | {getTranslation(locale, 'totalReports')}: 8
+                          </div>
+                        )}
+                        {plan.monthlyCredits === 60 && (
+                          <div className="text-xs text-gray-500 mt-1">
+                            {getTranslation(locale, 'reportsPerDay')}: 2 | {getTranslation(locale, 'totalReports')}: 60
+                          </div>
+                        )}
+                        {plan.monthlyCredits === 140 && (
+                          <div className="text-xs text-gray-500 mt-1">
+                            {getTranslation(locale, 'reportsPerDay')}: 4.7 | {getTranslation(locale, 'totalReports')}: 140
+                          </div>
+                        )}
                       </div>
                     )}
                     {plan.welcomeCredits > 0 && plan.monthlyCredits === 0 && (
@@ -324,12 +344,12 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
                     )}
                     {plan.costPerReport > 0 && (
                       <div className="text-xs sm:text-sm text-gray-600">
-                        {getTranslation(locale, 'averageCost')}: {locale === 'en' ? '$' : '¥'}{plan.costPerReport}/篇
+                        {getTranslation(locale, 'averageCost')}: {locale === 'en' ? '$' : '¥'}{plan.costPerReport.toFixed(2)}/篇
                       </div>
                     )}
                     {plan.costPerReport > 0 && plan.id !== 'enterprise' && (
                       <div className="text-xs sm:text-sm text-gray-500">
-                        {getTranslation(locale, 'additionalPurchase')}: {locale === 'en' ? '$' : '¥'}{plan.costPerReport + 2}/篇
+                        {getTranslation(locale, 'additionalPurchase')}: {locale === 'en' ? '$' : '¥'}{(plan.costPerReport + 2).toFixed(2)}/篇
                       </div>
                     )}
                   </div>
@@ -345,20 +365,22 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
                   ))}
                 </ul>
 
-                {/* Action Button */}
-                <button
-                  onClick={() => handleSubscribe(plan.id)}
-                  disabled={isLoading}
-                  className={`w-full py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg font-medium transition-colors text-sm ${
-                    plan.popular
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                      : plan.bestValue
-                      ? 'bg-amber-600 hover:bg-amber-700 text-white'
-                      : 'bg-gray-600 hover:bg-gray-700 text-white'
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
-                >
-                  {isLoading ? getTranslation(locale, 'loading') : plan.buttonText}
-                </button>
+                {/* Action Button - Fixed at bottom */}
+                <div className="mt-auto pt-4">
+                  <button
+                    onClick={() => handleSubscribe(plan.id)}
+                    disabled={isLoading}
+                    className={`w-full py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg font-medium transition-colors text-sm ${
+                      plan.popular
+                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                        : plan.bestValue
+                        ? 'bg-amber-600 hover:bg-amber-700 text-white'
+                        : 'bg-gray-600 hover:bg-gray-700 text-white'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    {isLoading ? getTranslation(locale, 'loading') : plan.buttonText}
+                  </button>
+                </div>
               </div>
             ))}
           </div>

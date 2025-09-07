@@ -186,6 +186,8 @@ export type TranslationKeys = {
     upgradeToBusiness: string
     contactUs: string
     valueDescription: string
+    reportsPerDay: string
+    totalReports: string
     monthlyFee: string
     welcomeCredits: string
     monthlyCredits: string
@@ -415,6 +417,8 @@ export const translations: Record<Locale, TranslationKeys> = {
     upgradeToBusiness: 'Upgrade to Business',
     contactUs: 'Contact Us',
     valueDescription: 'A comprehensive analysis report that can complete the equivalent of 1-2 working days of data collection, organization, and analysis work by a junior researcher. Free your team from tedious basic research and focus on higher-value strategic decisions.',
+    reportsPerDay: 'Reports per Day',
+    totalReports: 'Total Reports',
     monthlyFee: 'Monthly Fee',
     welcomeCredits: 'Welcome Credits',
     monthlyCredits: 'Monthly Credits',
@@ -646,6 +650,8 @@ export const translations: Record<Locale, TranslationKeys> = {
     upgradeToBusiness: '升级商业版',
     contactUs: '联系我们',
     valueDescription: '一篇深度分析报告，能够完成相当于一位初级研究员 1-2个工作日 的数据搜集、整理与分析工作。让您的团队从繁琐的基础研究中解放出来，专注于更高价值的战略决策。',
+    reportsPerDay: '每日报告数',
+    totalReports: '总报告数',
     monthlyFee: '月费',
     welcomeCredits: '欢迎积分',
     monthlyCredits: '每月积分',
