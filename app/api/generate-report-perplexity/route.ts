@@ -540,6 +540,12 @@ function parseNaturalLanguageReport(content: string, locale: string): any {
     .replace(/基于搜索结果和市场数据[\s\S]*?(?=```|$)/g, '')
     .replace(/我将重点关注BC技术的发展潜力[\s\S]*?(?=\n|$)/g, '')
     .replace(/通过分析搜索结果中的最新财务数据[\s\S]*?(?=\n|$)/g, '')
+    // 移除思考内容开头的段落
+    .replace(/^估值分析：[\s\S]*?(?=\n|$)/gm, '')
+    .replace(/^[\s]*估值分析：[\s\S]*?(?=\n|$)/gm, '')
+    .replace(/^[\s]*-[\s\S]*?(?=\n|$)/gm, '')
+    .replace(/^[\s]*我将重点关注[\s\S]*?(?=\n|$)/gm, '')
+    .replace(/^[\s]*通过分析搜索结果[\s\S]*?(?=\n|$)/gm, '')
     // 移除错误的JSON符号和格式
     .replace(/```json\s*\{/g, '')
     .replace(/^"[,\s]*$/gm, '')
@@ -549,6 +555,10 @@ function parseNaturalLanguageReport(content: string, locale: string): any {
     .replace(/^[\s]*"[^"]*":\s*$/gm, '')
     .replace(/^[\s]*}[\s]*$/gm, '')
     .replace(/^[\s]*```[\s]*$/gm, '')
+    // 移除末尾的多余符号
+    .replace(/^[\s]*"[\s]*}[\s]*$/gm, '')
+    .replace(/^[\s]*}[\s]*"[\s]*$/gm, '')
+    .replace(/^[\s]*```[\s]*}[\s]*$/gm, '')
     .trim()
   
   console.log('🧹 内容清理完成，长度:', cleanedContent.length)
@@ -625,6 +635,19 @@ function parseNaturalLanguageReport(content: string, locale: string): any {
           .replace(/^#+\s*/gm, '<h3>')
           .replace(/(<h3>.*?)$/gm, '$1</h3>')
           .trim()
+        
+        // 特别处理估值分析部分，移除思考内容
+        if (section.key === 'valuationAnalysis') {
+          sectionContent = sectionContent
+            .replace(/^估值分析：[\s\S]*?(?=\n|$)/g, '')
+            .replace(/^[\s]*-[\s\S]*?(?=\n|$)/gm, '')
+            .replace(/^[\s]*我将重点关注[\s\S]*?(?=\n|$)/gm, '')
+            .replace(/^[\s]*通过分析搜索结果[\s\S]*?(?=\n|$)/gm, '')
+            .replace(/^[\s]*基于搜索结果和市场数据[\s\S]*?(?=\n|$)/gm, '')
+            .replace(/^[\s]*以下是基于最新数据的全面分析[\s\S]*?(?=\n|$)/gm, '')
+            .replace(/^[\s]*重点关注公司的基本面改善[\s\S]*?(?=\n|$)/gm, '')
+            .trim()
+        }
         
         if (sectionContent.length > 100) { // 至少100字符才认为是有效内容
           report[section.key] = sectionContent
