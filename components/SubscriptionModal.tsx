@@ -302,7 +302,8 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
                 {/* Monthly Fee */}
                 <div className="text-center mb-3 sm:mb-4">
                   <span className="text-2xl sm:text-3xl font-bold text-blue-600">
-                    {plan.monthlyFee === 0 ? getTranslation(locale, 'free') : 
+                    {plan.id === 'enterprise' ? (locale === 'en' ? 'Flexible' : '灵活定价') :
+                      plan.monthlyFee === 0 ? getTranslation(locale, 'free') : 
                       locale === 'en' ? `$${plan.monthlyFee}` : 
                       plan.monthlyFee === 49 ? '¥399' :
                       plan.monthlyFee === 299 ? '¥2599' :
