@@ -43,15 +43,15 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
 
   const plans: SubscriptionPlan[] = [
     {
-      id: 'basic',
+      id: 'free-trial',
       name: getTranslation(locale, 'basicPlan'),
       monthlyFee: 0,
-      welcomeCredits: 20,
+      welcomeCredits: 2,
       monthlyCredits: 0,
-      dailyGrowth: 1,
-      totalMonthlyCredits: 0,
-      costPerReport: 2.59,
-      onDemandLimit: getTranslation(locale, 'dailyLimit2'),
+      dailyGrowth: 0,
+      totalMonthlyCredits: 2,
+      costPerReport: 0,
+      onDemandLimit: '2 reports',
       features: [
         getTranslation(locale, 'aiDrivenDeepAnalysis'),
         getTranslation(locale, 'realTimeMarketData')
@@ -61,35 +61,33 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
       buttonAction: 'free'
     },
     {
-      id: 'standard',
+      id: 'basic',
       name: getTranslation(locale, 'standardPlan'),
-      monthlyFee: 29,
+      monthlyFee: 49,
       welcomeCredits: 0,
-      monthlyCredits: 280,
-      dailyGrowth: 2,
-      totalMonthlyCredits: 340,
-      costPerReport: 1.70,
-      onDemandLimit: getTranslation(locale, 'unlimited'),
+      monthlyCredits: 8,
+      dailyGrowth: 0,
+      totalMonthlyCredits: 8,
+      costPerReport: 6.13,
+      onDemandLimit: '8 reports/month',
       features: [
         getTranslation(locale, 'aiDrivenDeepAnalysis'),
-        getTranslation(locale, 'realTimeMarketData'),
-        getTranslation(locale, 'priorityCustomerSupport')
+        getTranslation(locale, 'realTimeMarketData')
       ],
-      popular: true,
       icon: <Zap className="h-6 w-6" />,
-      buttonText: getTranslation(locale, 'upgradeSave34'),
+      buttonText: getTranslation(locale, 'subscribeNow'),
       buttonAction: 'subscribe'
     },
     {
-      id: 'pro',
+      id: 'professional',
       name: getTranslation(locale, 'proPlan'),
-      monthlyFee: 59,
+      monthlyFee: 299,
       welcomeCredits: 0,
-      monthlyCredits: 620,
-      dailyGrowth: 4,
-      totalMonthlyCredits: 740,
-      costPerReport: 1.59,
-      onDemandLimit: getTranslation(locale, 'unlimited'),
+      monthlyCredits: 60,
+      dailyGrowth: 0,
+      totalMonthlyCredits: 60,
+      costPerReport: 4.98,
+      onDemandLimit: '60 reports/month',
       features: [
         getTranslation(locale, 'aiDrivenDeepAnalysis'),
         getTranslation(locale, 'realTimeMarketData'),
@@ -101,23 +99,44 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
       buttonAction: 'subscribe'
     },
     {
-      id: 'flagship',
+      id: 'business',
       name: getTranslation(locale, 'flagshipPlan'),
-      monthlyFee: 129,
+      monthlyFee: 599,
       welcomeCredits: 0,
-      monthlyCredits: 1840,
-      dailyGrowth: 6,
-      totalMonthlyCredits: 2020,
-      costPerReport: 1.28,
-      onDemandLimit: getTranslation(locale, 'unlimited'),
+      monthlyCredits: 140,
+      dailyGrowth: 0,
+      totalMonthlyCredits: 140,
+      costPerReport: 4.28,
+      onDemandLimit: '140 reports/month',
       features: [
         getTranslation(locale, 'aiDrivenDeepAnalysis'),
         getTranslation(locale, 'realTimeMarketData'),
         getTranslation(locale, 'priorityCustomerSupport'),
-        getTranslation(locale, 'technicalAnalysisVipConsulting')
+        'API Access / Dedicated Account Manager'
       ],
       icon: <Crown className="h-6 w-6" />,
-      buttonText: getTranslation(locale, 'contactUsUpgrade'),
+      buttonText: getTranslation(locale, 'upgradeToBusiness'),
+      buttonAction: 'subscribe'
+    },
+    {
+      id: 'enterprise',
+      name: getTranslation(locale, 'enterprisePlan'),
+      monthlyFee: 0,
+      welcomeCredits: 0,
+      monthlyCredits: 0,
+      dailyGrowth: 0,
+      totalMonthlyCredits: 0,
+      costPerReport: 0,
+      onDemandLimit: 'Custom',
+      features: [
+        getTranslation(locale, 'aiDrivenDeepAnalysis'),
+        getTranslation(locale, 'realTimeMarketData'),
+        getTranslation(locale, 'priorityCustomerSupport'),
+        'API Access / Dedicated Account Manager',
+        getTranslation(locale, 'technicalAnalysisVipConsulting')
+      ],
+      icon: <TrendingUp className="h-6 w-6" />,
+      buttonText: getTranslation(locale, 'contactUs'),
       buttonAction: 'contact'
     }
   ]
@@ -224,9 +243,14 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
       <div className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex justify-between items-center p-3 sm:p-6 border-b">
-          <h2 className="text-lg sm:text-2xl font-bold text-gray-900">
-            {getTranslation(locale, 'subscriptionPlans')}
-          </h2>
+          <div>
+            <h2 className="text-lg sm:text-2xl font-bold text-gray-900">
+              {getTranslation(locale, 'subscriptionPlans')}
+            </h2>
+            <p className="text-sm text-gray-600 mt-2 max-w-4xl">
+              {getTranslation(locale, 'valueDescription')}
+            </p>
+          </div>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -237,7 +261,7 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
 
         {/* Plans Grid */}
         <div className="p-3 sm:p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
             {plans.map((plan) => (
               <div
                 key={plan.id}
@@ -285,25 +309,29 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
                   )}
                 </div>
 
-                {/* Credits and Reports Info */}
+                {/* Reports and Cost Info */}
                 <div className="text-center mb-4 sm:mb-6 space-y-2">
                   <div className="text-base sm:text-lg font-semibold text-gray-700">
-                    {plan.welcomeCredits > 0 && (
-                      <div className="mb-2">
-                        <span className="text-amber-600 font-bold">{plan.welcomeCredits}</span> <span className="text-sm sm:text-base">{getTranslation(locale, 'welcomeCredits')}</span>
-                      </div>
-                    )}
                     {plan.monthlyCredits > 0 && (
                       <div className="mb-2">
-                        <span className="text-blue-600 font-bold">{plan.monthlyCredits}</span> <span className="text-sm sm:text-base">{getTranslation(locale, 'welcomeCredits')}</span>
+                        <span className="text-blue-600 font-bold">{plan.monthlyCredits}</span> <span className="text-sm sm:text-base">{getTranslation(locale, 'reportsPerMonth')}</span>
                       </div>
                     )}
-                    <div className="text-xs sm:text-sm text-gray-600">
-                      {getTranslation(locale, 'costPerReport')}: {locale === 'en' ? '$' : '¥'}{plan.costPerReport}
-                    </div>
-                    <div className="text-xs sm:text-sm text-gray-600">
-                      {getTranslation(locale, 'onDemandLimit')}: {plan.onDemandLimit}
-                    </div>
+                    {plan.welcomeCredits > 0 && plan.monthlyCredits === 0 && (
+                      <div className="mb-2">
+                        <span className="text-amber-600 font-bold">{plan.welcomeCredits}</span> <span className="text-sm sm:text-base">{getTranslation(locale, 'reportsPerMonth')}</span>
+                      </div>
+                    )}
+                    {plan.costPerReport > 0 && (
+                      <div className="text-xs sm:text-sm text-gray-600">
+                        {getTranslation(locale, 'averageCost')}: {locale === 'en' ? '$' : '¥'}{plan.costPerReport}/篇
+                      </div>
+                    )}
+                    {plan.costPerReport > 0 && plan.id !== 'enterprise' && (
+                      <div className="text-xs sm:text-sm text-gray-500">
+                        {getTranslation(locale, 'additionalPurchase')}: {locale === 'en' ? '$' : '¥'}{plan.costPerReport + 2}/篇
+                      </div>
+                    )}
                   </div>
                 </div>
 

@@ -176,6 +176,16 @@ export type TranslationKeys = {
     standardPlan: string
     proPlan: string
     flagshipPlan: string
+    enterprisePlan: string
+    reportsPerMonth: string
+    averageCost: string
+    additionalPurchase: string
+    freeStart: string
+    subscribeNow: string
+    upgradeToPro: string
+    upgradeToBusiness: string
+    contactUs: string
+    valueDescription: string
     monthlyFee: string
     welcomeCredits: string
     monthlyCredits: string
@@ -187,9 +197,7 @@ export type TranslationKeys = {
     aiDrivenDeepAnalysis: string
     priorityCustomerSupport: string
     technicalAnalysisVipConsulting: string
-    freeStart: string
     upgradeSave34: string
-    upgradeToPro: string
     contactUsUpgrade: string
     credits: string
     reports: string
@@ -393,10 +401,20 @@ export const translations: Record<Locale, TranslationKeys> = {
     choosePlan: 'Choose Plan',
 
     // New subscription plan keys
-    basicPlan: 'Basic Plan',
-    standardPlan: 'Standard Plan',
-    proPlan: 'Pro Plan',
-    flagshipPlan: 'Flagship Plan',
+    basicPlan: 'Free Trial',
+    standardPlan: 'Basic',
+    proPlan: 'Professional',
+    flagshipPlan: 'Business',
+    enterprisePlan: 'Enterprise',
+    reportsPerMonth: 'Reports per Month',
+    averageCost: 'Average Cost',
+    additionalPurchase: 'Additional Purchase',
+    freeStart: 'Free Start',
+    subscribeNow: 'Subscribe Now',
+    upgradeToPro: 'Upgrade to Pro',
+    upgradeToBusiness: 'Upgrade to Business',
+    contactUs: 'Contact Us',
+    valueDescription: 'A comprehensive analysis report that can complete the equivalent of 1-2 working days of data collection, organization, and analysis work by a junior researcher. Free your team from tedious basic research and focus on higher-value strategic decisions.',
     monthlyFee: 'Monthly Fee',
     welcomeCredits: 'Welcome Credits',
     monthlyCredits: 'Monthly Credits',
@@ -408,9 +426,7 @@ export const translations: Record<Locale, TranslationKeys> = {
     aiDrivenDeepAnalysis: 'AI-Driven Deep Analysis',
     priorityCustomerSupport: 'Priority Customer Support',
     technicalAnalysisVipConsulting: 'Technical Analysis VIP Consulting',
-    freeStart: 'Free Start',
     upgradeSave34: 'Upgrade Save 34%',
-    upgradeToPro: 'Upgrade to Pro',
     contactUsUpgrade: 'Contact Us for Upgrade',
     credits: 'Credits',
     reports: 'Reports',
@@ -616,10 +632,20 @@ export const translations: Record<Locale, TranslationKeys> = {
     choosePlan: '选择计划',
 
     // New subscription plan keys
-    basicPlan: '基础版',
-    standardPlan: '标准版',
+    basicPlan: '免费试用',
+    standardPlan: '基础版',
     proPlan: '专业版',
-    flagshipPlan: '旗舰版',
+    flagshipPlan: '商业版',
+    enterprisePlan: '企业定制',
+    reportsPerMonth: '报告数量',
+    averageCost: '平均成本',
+    additionalPurchase: '单篇额外购买',
+    freeStart: '免费开始',
+    subscribeNow: '立即订阅',
+    upgradeToPro: '升级专业版',
+    upgradeToBusiness: '升级商业版',
+    contactUs: '联系我们',
+    valueDescription: '一篇深度分析报告，能够完成相当于一位初级研究员 1-2个工作日 的数据搜集、整理与分析工作。让您的团队从繁琐的基础研究中解放出来，专注于更高价值的战略决策。',
     monthlyFee: '月费',
     welcomeCredits: '欢迎积分',
     monthlyCredits: '每月积分',
@@ -631,9 +657,7 @@ export const translations: Record<Locale, TranslationKeys> = {
     aiDrivenDeepAnalysis: 'AI驱动深度分析',
     priorityCustomerSupport: '优先客服支持',
     technicalAnalysisVipConsulting: '技术分析VIP咨询',
-    freeStart: '免费开始',
     upgradeSave34: '升级省34%',
-    upgradeToPro: '升级到专业版',
     contactUsUpgrade: '联系我们升级',
     credits: '积分',
     reports: '报告',
