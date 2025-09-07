@@ -533,17 +533,22 @@ function parseNaturalLanguageReport(content: string, locale: string): any {
   // 首先清理内容，移除思考过程和元信息
   let cleanedContent = content
     // 移除思考过程段落
+    .replace(/估值分析：[\s\S]*?(?=\n|$)/g, '')
     .replace(/估值分析这里显示了大模型的思考过程.*?(?=\n|$)/g, '')
     .replace(/我需要根据提供的搜索结果来构建.*?(?=\n|$)/g, '')
     .replace(/从搜索结果中，我获得了以下关键信息[\s\S]*?(?=\*\*|$)/g, '')
     .replace(/基于搜索结果和市场数据[\s\S]*?(?=```|$)/g, '')
-    // 移除错误的JSON符号
+    .replace(/我将重点关注BC技术的发展潜力[\s\S]*?(?=\n|$)/g, '')
+    .replace(/通过分析搜索结果中的最新财务数据[\s\S]*?(?=\n|$)/g, '')
+    // 移除错误的JSON符号和格式
     .replace(/```json\s*\{/g, '')
     .replace(/^"[,\s]*$/gm, '')
     .replace(/^[,\s]*$/gm, '')
-    // 移除孤立的引号和逗号
     .replace(/^[\s"]*,[\s"]*$/gm, '')
     .replace(/^[\s"]*$\n/gm, '')
+    .replace(/^[\s]*"[^"]*":\s*$/gm, '')
+    .replace(/^[\s]*}[\s]*$/gm, '')
+    .replace(/^[\s]*```[\s]*$/gm, '')
     .trim()
   
   console.log('🧹 内容清理完成，长度:', cleanedContent.length)
@@ -586,8 +591,8 @@ function parseNaturalLanguageReport(content: string, locale: string): any {
       key: 'valuationAnalysis',
       patterns: [
         /"valuationAnalysis":\s*"([^"]*(?:"[^"]*"[^"]*)*)"[^}]*$/,
-        /(?:估值分析|价值评估|Valuation Analysis?)[\s\S]*?(?=$)/i,
-        /(?:DCF|分部估值|可比公司|投资建议)[\s\S]*?(?=$)/i
+        /(?:估值分析|价值评估|Valuation Analysis?)[\s\S]*?(?=\s*$|\s*"fundamentalAnalysis"|\s*"businessSegments"|\s*"growthCatalysts")/i,
+        /(?:DCF|分部估值|可比公司|投资建议)[\s\S]*?(?=\s*$|\s*"fundamentalAnalysis"|\s*"businessSegments"|\s*"growthCatalysts")/i
       ]
     }
   ]
@@ -604,6 +609,11 @@ function parseNaturalLanguageReport(content: string, locale: string): any {
           .replace(/^"[^"]*":\s*"/, '') // 移除开头的 "key": "
           .replace(/"\s*,\s*$/, '') // 移除结尾的 ",
           .replace(/"\s*}\s*$/, '') // 移除结尾的 "}
+          .replace(/^[\s]*"[^"]*":\s*/, '') // 移除开头的键值对
+          .replace(/^[\s]*}[\s]*$/, '') // 移除结尾的 }
+          .replace(/^[\s]*```[\s]*$/, '') // 移除代码块标记
+          .replace(/^[\s]*"[\s]*$/, '') // 移除孤立的引号
+          .replace(/^[\s]*,[\s]*$/, '') // 移除孤立的逗号
           .replace(/\\"/g, '"') // 转换转义引号
           .replace(/\\n/g, '\n') // 转换换行符
           .replace(/\\t/g, '\t') // 转换制表符
