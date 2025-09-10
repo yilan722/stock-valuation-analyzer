@@ -66,7 +66,7 @@ export default function GenerationModal({ isOpen, locale }: GenerationModalProps
         {/* Footer */}
         <div className="mt-6 text-center">
           <p className="text-xs text-gray-500">
-            This process is powered by advanced AI models including Claude Opus 4
+            This process is powered by the most advanced AI models, which utilize inference path exploration to incorporate the latest research and data, ensuring the most comprehensive and up-to-date responses. This thorough analysis may result in a slightly longer processing time.
           </p>
         </div>
       </div>

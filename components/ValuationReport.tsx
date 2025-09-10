@@ -46,7 +46,8 @@ export default function ValuationReport({ stockData, reportData, isLoading, loca
         body: JSON.stringify({
           reportData,
           stockName: stockData.name,
-          stockSymbol: stockData.symbol
+          stockSymbol: stockData.symbol,
+          locale: locale
         })
       })
 
@@ -90,9 +91,21 @@ export default function ValuationReport({ stockData, reportData, isLoading, loca
   if (!stockData) return null
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-3 sm:p-6">
+    <div className="bg-white rounded-lg shadow-md p-3 sm:p-6 relative">
+      {/* Watermark - 移到左上角避免与按钮重叠 */}
+      <div className="absolute top-4 left-4 z-10 bg-white/90 px-3 py-1 rounded shadow-sm">
+        <a 
+          href="https://superanalyst.pro" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+        >
+          Click superanalyst.pro for more professional research
+        </a>
+      </div>
+      
       {/* Stock Information Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 space-y-3 sm:space-y-0">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 space-y-3 sm:space-y-0 pt-8">
         <div>
           <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
             {stockData.name} ({stockData.symbol})

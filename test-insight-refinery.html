@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insight Refinery 测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .button {
+            background: #3b82f6;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #2563eb;
+        }
+        .result {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #3b82f6;
+        }
+        .error {
+            border-left-color: #dc2626;
+            background: #fef2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔬 Insight Refinery 功能测试</h1>
+    
+    <div class="test-section">
+        <h2>1. 测试数据库连接</h2>
+        <button class="button" onclick="testDatabase()">测试数据库</button>
+        <div id="db-result" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. 测试报告API</h2>
+        <button class="button" onclick="testReportsAPI()">测试报告API</button>
+        <div id="reports-result" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. 测试Insight Refinery API</h2>
+        <button class="button" onclick="testInsightRefinery()">测试Insight Refinery</button>
+        <div id="insight-result" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. 创建测试报告</h2>
+        <button class="button" onclick="createTestReport()">创建测试报告</button>
+        <div id="create-result" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api';
+
+        async function testDatabase() {
+            const resultDiv = document.getElementById('db-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '正在测试数据库连接...';
+
+            try {
+                const response = await fetch(`${API_BASE}/setup-insight-refinery`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = '✅ 数据库连接成功！';
+                    resultDiv.className = 'result';
+                } else {
+                    resultDiv.innerHTML = '❌ 数据库连接失败: ' + JSON.stringify(data);
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '❌ 网络错误: ' + error.message;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function testReportsAPI() {
+            const resultDiv = document.getElementById('reports-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '正在测试报告API...';
+
+            try {
+                const response = await fetch(`${API_BASE}/reports?userId=test-user-id`);
+                const data = await response.json();
+                
+                resultDiv.innerHTML = '📊 报告API响应: ' + JSON.stringify(data, null, 2);
+                resultDiv.className = 'result';
+            } catch (error) {
+                resultDiv.innerHTML = '❌ 报告API错误: ' + error.message;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function testInsightRefinery() {
+            const resultDiv = document.getElementById('insight-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '正在测试Insight Refinery API...';
+
+            try {
+                const response = await fetch(`${API_BASE}/insight-refinery/start-session`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        reportId: 'test-report-id',
+                        userId: 'test-user-id'
+                    })
+                });
+                const data = await response.json();
+                
+                resultDiv.innerHTML = '🔬 Insight Refinery API响应: ' + JSON.stringify(data, null, 2);
+                resultDiv.className = 'result';
+            } catch (error) {
+                resultDiv.innerHTML = '❌ Insight Refinery API错误: ' + error.message;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function createTestReport() {
+            const resultDiv = document.getElementById('create-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '正在创建测试报告...';
+
+            try {
+                const testReport = {
+                    stock_name: '测试公司',
+                    stock_symbol: 'TEST',
+                    report_data: JSON.stringify({
+                        fundamentalAnalysis: '<h3>基本面分析</h3><p>这是一个测试报告的基本面分析内容。</p>',
+                        businessSegments: '<h3>业务板块</h3><p>这是业务板块分析内容。</p>',
+                        growthCatalysts: '<h3>增长催化剂</h3><p>这是增长催化剂分析内容。</p>',
+                        valuationAnalysis: '<h3>估值分析</h3><p>这是估值分析内容。</p>'
+                    }),
+                    user_id: 'test-user-id'
+                };
+
+                const response = await fetch(`${API_BASE}/reports`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testReport)
+                });
+                const data = await response.json();
+                
+                resultDiv.innerHTML = '📝 测试报告创建结果: ' + JSON.stringify(data, null, 2);
+                resultDiv.className = 'result';
+            } catch (error) {
+                resultDiv.innerHTML = '❌ 创建测试报告错误: ' + error.message;
+                resultDiv.className = 'result error';
+            }
+        }
+    </script>
+</body>
+</html>
+
+

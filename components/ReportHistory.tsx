@@ -107,7 +107,8 @@ export default function ReportHistory({ locale, isOpen, onClose }: ReportHistory
         body: JSON.stringify({
           reportData,
           stockName: report.stock_name,
-          stockSymbol: report.stock_symbol
+          stockSymbol: report.stock_symbol,
+          locale: locale
         })
       })
 

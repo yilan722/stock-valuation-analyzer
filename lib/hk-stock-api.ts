@@ -277,9 +277,20 @@ const fetchYahooHKData = async (ticker: string): Promise<StockData | null> => {
         finalVolume = 50000000 // 默认5000万股
       }
       
+      // 获取公司全称
+      let companyName = `${ticker} (${ticker}.HK)`
+      try {
+        const basicInfo = await fetchHKStockBasicInfo(ticker)
+        if (basicInfo && basicInfo.name) {
+          companyName = `${basicInfo.name} (${ticker}.HK)`
+        }
+      } catch (error) {
+        console.log(`Failed to get company name for ${ticker}:`, error)
+      }
+      
       return {
         symbol: ticker,
-        name: ticker,
+        name: companyName,
         price: currentPrice,
         marketCap: finalMarketCap,
         peRatio: finalPeRatio,
@@ -325,9 +336,12 @@ const fetchAlphaVantageHKData = async (ticker: string): Promise<StockData | null
       
       if (overviewResponse.data && overviewResponse.data.Name) {
         const overview = overviewResponse.data
-        companyName = overview.Name
+        companyName = `${overview.Name} (${ticker}.HK)`
         marketCap = parseFloat(overview.MarketCapitalization) || 0
         peRatio = parseFloat(overview.PERatio) || 0
+      } else {
+        // 如果无法获取公司名称，使用ticker
+        companyName = `${ticker} (${ticker}.HK)`
       }
       
       // 使用默认值如果数据不可用
@@ -396,14 +410,26 @@ const fetchSinaHKData = async (ticker: string): Promise<StockData | null> => {
             // 新浪财经的volume单位是"手"，1手=100股
             const calculatedAmount = volume * 100 * currentPrice // 成交量(手) × 100 × 价格
             
+            // 获取公司全称
+            let companyName = `${ticker} (${ticker}.HK)`
+            try {
+              const basicInfo = await fetchHKStockBasicInfo(ticker)
+              if (basicInfo && basicInfo.name) {
+                companyName = `${basicInfo.name} (${ticker}.HK)`
+              }
+            } catch (error) {
+              console.log(`Failed to get company name for ${ticker}:`, error)
+            }
+            
             // 验证计算结果的合理性
             if (calculatedAmount > 1000000000000) { // 如果超过1万亿，可能是计算错误
               console.warn(`Suspicious trading amount: ${calculatedAmount}, using fallback calculation`)
               // 使用更保守的计算方法
               const fallbackAmount = volume * 100 * currentPrice * 0.001 // 假设实际成交额是计算的0.1%
+              
               return {
                 symbol: ticker,
-                name: ticker,
+                name: companyName,
                 price: currentPrice,
                 marketCap: currentPrice * 1000000000, // 基于价格估算
                 peRatio: 12.4, // 华虹半导体实际P/E
@@ -416,7 +442,7 @@ const fetchSinaHKData = async (ticker: string): Promise<StockData | null> => {
             
             return {
               symbol: ticker,
-              name: ticker,
+              name: companyName,
               price: currentPrice,
               marketCap: currentPrice * 1000000000, // 基于价格估算
               peRatio: 12.4, // 华虹半导体实际P/E
@@ -464,9 +490,20 @@ const fetchBackupHKData = async (ticker: string): Promise<StockData | null> => {
           const estimatedMarketCap = currentPrice * 1000000000 // 基于价格估算
           const estimatedPeRatio = 15.0 // 行业平均P/E
           
+          // 获取公司全称
+          let companyName = `${ticker} (${ticker}.HK)`
+          try {
+            const basicInfo = await fetchHKStockBasicInfo(ticker)
+            if (basicInfo && basicInfo.name) {
+              companyName = `${basicInfo.name} (${ticker}.HK)`
+            }
+          } catch (error) {
+            console.log(`Failed to get company name for ${ticker}:`, error)
+          }
+          
           return {
             symbol: ticker,
-            name: ticker,
+            name: companyName,
             price: currentPrice,
             marketCap: estimatedMarketCap,
             peRatio: estimatedPeRatio,
@@ -486,16 +523,52 @@ const fetchBackupHKData = async (ticker: string): Promise<StockData | null> => {
   }
 }
 
+// 港股公司名称映射表
+const HK_COMPANY_NAMES: { [key: string]: string } = {
+  '00700': '腾讯控股有限公司',
+  '00941': '中国移动有限公司',
+  '01299': '友邦保险控股有限公司',
+  '02318': '中国平安保险(集团)股份有限公司',
+  '03988': '中国银行股份有限公司',
+  '01398': '中国工商银行股份有限公司',
+  '03968': '招商银行股份有限公司',
+  '00939': '中国建设银行股份有限公司',
+  '00388': '香港交易及结算所有限公司',
+  '01024': '快手科技',
+  '09988': '阿里巴巴集团控股有限公司',
+  '03690': '美团',
+  '09880': '腾讯音乐娱乐集团',
+  '01024': '快手',
+  '02020': '安踏体育用品有限公司',
+  '00762': '中国联通',
+  '00857': '中国石油天然气股份有限公司',
+  '00386': '中国石油化工股份有限公司',
+  '01088': '中国神华能源股份有限公司',
+  '01109': '华润置地有限公司'
+}
+
 // 获取港股基本信息
 export const fetchHKStockBasicInfo = async (ticker: string) => {
   try {
+    // 首先尝试从映射表获取
+    const mappedName = HK_COMPANY_NAMES[ticker]
+    if (mappedName) {
+      return {
+        name: mappedName,
+        industry: '',
+        sector: '',
+        country: 'Hong Kong'
+      }
+    }
+    
+    // 如果映射表中没有，尝试Yahoo Finance API
     const response = await axios.get(`https://query2.finance.yahoo.com/v10/finance/quoteSummary/${ticker}.HK?modules=assetProfile`)
     
     if (response.data.quoteSummary && response.data.quoteSummary.result && response.data.quoteSummary.result[0]) {
       const assetProfile = response.data.quoteSummary.result[0].assetProfile
       if (assetProfile) {
         return {
-          name: assetProfile.longBusinessSummary || ticker,
+          name: assetProfile.longName || assetProfile.shortName || ticker,
           industry: assetProfile.industry,
           sector: assetProfile.sector,
           country: assetProfile.country

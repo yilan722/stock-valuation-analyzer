@@ -55,7 +55,6 @@ export type TranslationKeys = {
   downloadError: string
   
   // 报告生成
-  generatingReport: string
   reportGenerationInProgress: string
   
   // 报告历史
@@ -215,6 +214,71 @@ export type TranslationKeys = {
   register: string
   loginFailed: string
   registerFailed: string
+
+  // Insight Refinery
+  insightRefinery: string
+  discussionAnalysis: string
+  insightSynthesis: string
+  reportEvolution: string
+  askQuestion: string
+  synthesizeInsights: string
+  generateEvolution: string
+  confirmHighlights: string
+  professionalHighlights: string
+  discussionSummary: string
+  keyQuestions: string
+  newPerspectives: string
+  informationGaps: string
+  confirmAll: string
+  confirm: string
+  confirmed: string
+  newInsight: string
+  impact: string
+  high: string
+  medium: string
+  low: string
+  relatedSection: string
+  generatingReport: string
+  enhancedReportGenerated: string
+  basedOnInsights: string
+  printReport: string
+  reportEvolutionFunction: string
+  enhancedReportGenerating: string
+  pleaseWait: string
+  important: string
+  reportGenerationTime: string
+  doNotCloseWindow: string
+  continueUsingTabs: string
+  reportSavedAutomatically: string
+  processingAIAnalysis: string
+  poweredByAI: string
+  pleaseConfirmInsights: string
+  insightsConfirmed: string
+  carefullyReviewHighlights: string
+  confirmWhichInsights: string
+  confirmedInsightsCount: string
+  canGenerateEnhancedReport: string
+  willConsumeReportGeneration: string
+  generatingWithInsights: string
+  generating: string
+  pleaseConfirmAtLeastOne: string
+  generatingEnhancedReport: string
+  basedOnConfirmedInsights: string
+  generatingFailed: string
+  pleaseAskQuestionsFirst: string
+  synthesizingInsights: string
+  insightsSynthesized: string
+  canGenerateEnhanced: string
+  startDiscussion: string
+  askQuestionsAboutReport: string
+  viewFullReport: string
+  hideFullReport: string
+  noConversationsYet: string
+  startConversation: string
+  enterYourQuestion: string
+  send: string
+  superAnalyst: string
+  user: string
 }
 
 export const translations: Record<Locale, TranslationKeys> = {
@@ -276,7 +340,6 @@ export const translations: Record<Locale, TranslationKeys> = {
     downloadError: 'Print failed, please try again',
     
     // Report Generation
-    generatingReport: 'Generating Report',
     reportGenerationInProgress: 'AI analysis in progress...',
     
     // Report History
@@ -451,7 +514,72 @@ export const translations: Record<Locale, TranslationKeys> = {
     noLiabilityAgreement: 'I agree that this platform is not liable for any direct, indirect, incidental, special, or consequential damages arising from my use of this platform or reliance on any information provided herein.',
     serviceFeeAgreement: 'I agree that the fees charged by this platform are only consideration for providing AI computing power, data processing, and technical services, not investment consulting fees or investment profit sharing.',
     cancel: 'Cancel',
-    agreeAndContinue: 'Agree and Continue'
+    agreeAndContinue: 'Agree and Continue',
+
+    // Insight Refinery
+    insightRefinery: 'Insight Refinery',
+    discussionAnalysis: 'Discussion Analysis',
+    insightSynthesis: 'Insight Synthesis',
+    reportEvolution: 'Report Evolution',
+    askQuestion: 'Ask Question',
+    synthesizeInsights: 'Synthesize Insights',
+    generateEvolution: 'Generate Evolution',
+    confirmHighlights: 'Confirm Highlights',
+    professionalHighlights: 'Professional Highlights',
+    discussionSummary: 'Discussion Summary',
+    keyQuestions: 'Key Questions',
+    newPerspectives: 'New Perspectives',
+    informationGaps: 'Information Gaps',
+    confirmAll: 'Confirm All',
+    confirm: 'Confirm',
+    confirmed: 'Confirmed',
+    newInsight: 'New Insight',
+    impact: 'Impact',
+    high: 'High',
+    medium: 'Medium',
+    low: 'Low',
+    relatedSection: 'Related Section',
+    generatingReport: 'Generating Report',
+    enhancedReportGenerated: 'Enhanced Report Generated',
+    basedOnInsights: 'Based on {count} confirmed insights',
+    printReport: 'Print Report',
+    reportEvolutionFunction: 'Report Evolution Function',
+    enhancedReportGenerating: 'Enhanced report is being generated, please wait...',
+    pleaseWait: 'Please wait...',
+    important: 'Important',
+    reportGenerationTime: 'Report generation takes 2-5 minutes',
+    doNotCloseWindow: 'Please do not close this window',
+    continueUsingTabs: 'You can continue using other browser tabs',
+    reportSavedAutomatically: 'Report will be saved automatically',
+    processingAIAnalysis: 'Processing AI analysis...',
+    poweredByAI: 'This process is powered by the most advanced AI models, which utilize inference path exploration to incorporate the latest research and data, ensuring the most comprehensive and up-to-date responses. This thorough analysis may result in a slightly longer processing time.',
+    pleaseConfirmInsights: 'Please confirm key insights',
+    insightsConfirmed: 'Insights confirmed',
+    carefullyReviewHighlights: 'Please carefully review the following professional highlights and confirm which insights have important impact on the original report',
+    confirmWhichInsights: 'Confirm which insights have important impact on the original report',
+    confirmedInsightsCount: 'Confirmed {count} key insights, can generate enhanced report',
+    canGenerateEnhancedReport: 'Can generate enhanced report',
+    willConsumeReportGeneration: 'This will consume one report generation count',
+    generatingWithInsights: 'Generate Enhanced Report ({count} insights)',
+    generating: 'Generating...',
+    pleaseConfirmAtLeastOne: 'Please confirm at least one key insight',
+    generatingEnhancedReport: 'Generating enhanced report...',
+    basedOnConfirmedInsights: 'Based on confirmed insights',
+    generatingFailed: 'Enhanced report generation failed',
+    pleaseAskQuestionsFirst: 'Please ask some questions first before synthesizing insights',
+    synthesizingInsights: 'Synthesizing insights...',
+    insightsSynthesized: 'Insights synthesized',
+    canGenerateEnhanced: 'Can generate enhanced report',
+    startDiscussion: 'Start Discussion',
+    askQuestionsAboutReport: 'Ask questions about this report',
+    viewFullReport: 'View Full Report',
+    hideFullReport: 'Hide Full Report',
+    noConversationsYet: 'No conversations yet',
+    startConversation: 'Start a conversation',
+    enterYourQuestion: 'Enter your question...',
+    send: 'Send',
+    superAnalyst: 'SuperAnalyst',
+    user: 'User'
   },
   zh: {
     // Header
@@ -511,7 +639,6 @@ export const translations: Record<Locale, TranslationKeys> = {
     downloadError: '下载失败，请稍后重试',
     
     // Report Generation
-    generatingReport: '生成报告中',
     reportGenerationInProgress: 'AI分析进行中...',
     
     // Report History
@@ -684,7 +811,72 @@ export const translations: Record<Locale, TranslationKeys> = {
     noLiabilityAgreement: '我同意本平台不对因本人使用本平台或依赖本平台提供的信息而产生的任何直接、间接、偶然、特殊、附带或衍生损害承担责任。',
     serviceFeeAgreement: '我同意本平台收取的费用仅为提供AI算力、数据处理和技术服务的对价，不是投资咨询费用或投资收益分成。',
     cancel: '取消',
-    agreeAndContinue: '同意并继续'
+    agreeAndContinue: '同意并继续',
+
+    // Insight Refinery
+    insightRefinery: '洞察精炼器',
+    discussionAnalysis: '讨论分析',
+    insightSynthesis: '洞察合成',
+    reportEvolution: '报告进化',
+    askQuestion: '提问',
+    synthesizeInsights: '合成洞察',
+    generateEvolution: '生成进化版',
+    confirmHighlights: '确认亮点',
+    professionalHighlights: '专业亮点',
+    discussionSummary: '讨论摘要',
+    keyQuestions: '关键问题',
+    newPerspectives: '新观点',
+    informationGaps: '信息缺口',
+    confirmAll: '全选确认',
+    confirm: '确认',
+    confirmed: '已确认',
+    newInsight: '新洞察',
+    impact: '影响',
+    high: '高',
+    medium: '中',
+    low: '低',
+    relatedSection: '相关章节',
+    generatingReport: '生成报告中',
+    enhancedReportGenerated: '增强版报告生成完成',
+    basedOnInsights: '基于 {count} 个确认洞察点生成',
+    printReport: '打印报告',
+    reportEvolutionFunction: '报告进化功能',
+    enhancedReportGenerating: '增强版报告正在生成中，请稍候...',
+    pleaseWait: '请稍候...',
+    important: '重要',
+    reportGenerationTime: '报告生成需要2-5分钟',
+    doNotCloseWindow: '请不要关闭此窗口',
+    continueUsingTabs: '您可以继续使用其他浏览器标签页',
+    reportSavedAutomatically: '报告将自动保存',
+    processingAIAnalysis: 'AI分析处理中...',
+    poweredByAI: '此过程由包括Claude Opus 4在内的先进AI模型驱动',
+    pleaseConfirmInsights: '请确认关键洞察点',
+    insightsConfirmed: '洞察确认完成',
+    carefullyReviewHighlights: '请仔细审查以下专业亮点，确认哪些洞察对原始报告有重要影响',
+    confirmWhichInsights: '确认哪些洞察对原始报告有重要影响',
+    confirmedInsightsCount: '已确认 {count} 个关键洞察点，可以生成增强版报告',
+    canGenerateEnhancedReport: '可以生成增强版报告',
+    willConsumeReportGeneration: '这将消耗一次研报生成次数',
+    generatingWithInsights: '生成增强版报告 ({count} 个洞察)',
+    generating: '生成中...',
+    pleaseConfirmAtLeastOne: '请先确认至少一个关键洞察点',
+    generatingEnhancedReport: '正在生成增强版报告...',
+    basedOnConfirmedInsights: '基于确认的洞察',
+    generatingFailed: '生成增强版报告失败',
+    pleaseAskQuestionsFirst: '请先进行一些讨论再合成洞察',
+    synthesizingInsights: '正在合成洞察...',
+    insightsSynthesized: '洞察合成完成',
+    canGenerateEnhanced: '可以生成增强版报告',
+    startDiscussion: '开始讨论',
+    askQuestionsAboutReport: '关于此报告提问',
+    viewFullReport: '查看完整报告',
+    hideFullReport: '隐藏完整报告',
+    noConversationsYet: '暂无对话',
+    startConversation: '开始对话',
+    enterYourQuestion: '输入您的问题...',
+    send: '发送',
+    superAnalyst: 'SuperAnalyst',
+    user: '用户'
   }
 }
 

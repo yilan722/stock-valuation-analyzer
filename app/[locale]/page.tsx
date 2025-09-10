@@ -11,7 +11,7 @@ import SubscriptionModal from '../../components/SubscriptionModal'
 import ReportHistory from '../../components/ReportHistory'
 import GenerationModal from '../../components/GenerationModal'
 import Footer from '../../components/Footer'
-import { StockData, ValuationReportData, MultiCompanyAnalysis } from '../../types'
+import { StockData, ValuationReportData } from '../../types'
 import { type Locale } from '../../lib/i18n'
 
 import useAuth from '../../lib/useAuth'
@@ -19,13 +19,9 @@ import { canGenerateReport } from '../../lib/supabase-auth'
 import { supabase } from '../../lib/supabase'
 import toast from 'react-hot-toast'
 
-// 导入新功能组件
-import UserInputModal from '../../src/features/personal-research-center/user-input-modal'
-import DisplayVersionedReport from '../../src/features/personal-research-center/display-versioned-report'
-import MultiCompanyModal from '../../src/features/multi-company-analysis/multi-company-modal'
-import MultiCompanyResults from '../../src/features/multi-company-analysis/multi-company-results'
-import { ReportGenerationAgent } from '../../src/features/personal-research-center/generate-report-agent'
-import { getFeatureFlags } from '../../lib/env'
+// 导入Insight Refinery组件
+import InsightRefineryButton from '../../components/InsightRefinery/InsightRefineryButton'
+import ReportHub from '../../components/InsightRefinery/ReportHub'
 
 interface PageProps {
   params: { locale: Locale }
@@ -84,17 +80,8 @@ export default function HomePage({ params }: PageProps) {
   const [showReportHistory, setShowReportHistory] = useState(false)
   const [showGenerationModal, setShowGenerationModal] = useState(false)
 
-  // 新功能状态
-  const [showPersonalResearchModal, setShowPersonalResearchModal] = useState(false)
-  const [showMultiCompanyModal, setShowMultiCompanyModal] = useState(false)
-  const [showMultiCompanyResults, setShowMultiCompanyResults] = useState(false)
-  const [multiCompanyAnalysis, setMultiCompanyAnalysis] = useState<MultiCompanyAnalysis | null>(null)
-  const [isGeneratingPersonalReport, setIsGeneratingPersonalReport] = useState(false)
-  const [versionedReport, setVersionedReport] = useState<any>(null)
-  const [showVersionedReport, setShowVersionedReport] = useState(false)
-
-  // 功能开关
-  const featureFlags = getFeatureFlags()
+  // Insight Refinery状态
+  const [showReportHub, setShowReportHub] = useState(false)
 
   // 如果检测到loading状态异常，强制重置
   useEffect(() => {
@@ -241,59 +228,13 @@ export default function HomePage({ params }: PageProps) {
     }
   }
 
-  // 新功能处理函数
-  const handlePersonalResearch = () => {
+  // Insight Refinery处理函数
+  const handleOpenReportHub = () => {
     if (!currentUser) {
       setShowAuthModal(true)
       return
     }
-    if (!reportData) {
-      toast.error('请先生成股票分析报告')
-      return
-    }
-    setShowPersonalResearchModal(true)
-  }
-
-  const handlePersonalResearchSubmit = async (customInsights: string) => {
-    if (!stockData || !reportData || !currentUser) return
-
-    setIsGeneratingPersonalReport(true)
-    try {
-      const agent = new ReportGenerationAgent()
-      const response = await agent.generatePersonalizedReport({
-        stockSymbol: stockData.symbol,
-        originalReport: reportData,
-        userInsights: customInsights,
-        userId: currentUser.id
-      })
-
-      if (response.success && response.versionedReport) {
-        setVersionedReport(response.versionedReport)
-        setShowPersonalResearchModal(false)
-        setShowVersionedReport(true)
-        toast.success('个性化报告生成成功！')
-      } else {
-        throw new Error(response.error || '生成失败')
-      }
-    } catch (error) {
-      console.error('Personal research failed:', error)
-      toast.error(error instanceof Error ? error.message : '生成失败')
-    } finally {
-      setIsGeneratingPersonalReport(false)
-    }
-  }
-
-  const handleMultiCompanyAnalysis = () => {
-    if (!currentUser) {
-      setShowAuthModal(true)
-      return
-    }
-    setShowMultiCompanyModal(true)
-  }
-
-  const handleMultiCompanyAnalysisComplete = (analysis: MultiCompanyAnalysis) => {
-    setMultiCompanyAnalysis(analysis)
-    setShowMultiCompanyResults(true)
+    setShowReportHub(true)
   }
 
   const handleLogin = () => {
@@ -409,43 +350,42 @@ export default function HomePage({ params }: PageProps) {
                   </div>
                 </div>
 
-                {/* 新功能按钮区域 */}
-                {featureFlags.ENABLE_PERSONAL_RESEARCH && reportData && (
+                {/* Insight Refinery按钮区域 */}
+                {reportData && currentUser && (
                   <div className="mt-6 pt-6 border-t border-amber-500/30">
                     <div className="flex flex-wrap gap-3 justify-center">
-                      <button
-                        onClick={handlePersonalResearch}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-                      >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                        </svg>
-                        个性化研究中心
-                      </button>
+                      <InsightRefineryButton
+                        reportId={`report-${Date.now()}`}
+                        reportTitle={`${stockData.name} (${stockData.symbol}) 估值分析报告`}
+                        userId={currentUser.id}
+                        locale={params.locale}
+                        variant="primary"
+                        size="md"
+                      />
                     </div>
                   </div>
                 )}
               </div>
             )}
 
-            {/* 多公司对比功能入口 */}
-            {featureFlags.ENABLE_MULTI_COMPANY_ANALYSIS && currentUser && (
+            {/* Insight Refinery 研报中心入口 */}
+            {currentUser && (
               <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-6">
                 <div className="text-center">
                   <h3 className="text-lg font-semibold text-purple-900 mb-2">
-                    我的研究决策中心
+                    🔬 {params.locale === 'zh' ? 'Insight Refinery - 洞察精炼器' : 'Insight Refinery'}
                   </h3>
                   <p className="text-sm text-purple-700 mb-4">
-                    多股对标分析，AI智能推荐，助您做出最佳投资决策
+                    通过AI深度讨论和洞察合成，对研报进行二次精炼和进化
                   </p>
                   <button
-                    onClick={handleMultiCompanyAnalysis}
+                    onClick={handleOpenReportHub}
                     className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center mx-auto"
                   >
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
-                    开始多股对标分析
+                    进入研报中心
                   </button>
                 </div>
               </div>
@@ -496,43 +436,31 @@ export default function HomePage({ params }: PageProps) {
       />
       
 
-      {/* 新功能模态框 */}
-      {featureFlags.ENABLE_PERSONAL_RESEARCH && (
-        <>
-          <UserInputModal
-            isOpen={showPersonalResearchModal}
-            onClose={() => setShowPersonalResearchModal(false)}
-            stockSymbol={stockData?.symbol || ''}
-            stockName={stockData?.name || ''}
-            onSubmit={handlePersonalResearchSubmit}
-            isLoading={isGeneratingPersonalReport}
-          />
-
-          {versionedReport && (
-            <DisplayVersionedReport
-              originalReport={reportData!}
-              versionedReport={versionedReport}
-              onClose={() => setShowVersionedReport(false)}
-            />
-          )}
-        </>
-      )}
-
-      {featureFlags.ENABLE_MULTI_COMPANY_ANALYSIS && (
-        <>
-          <MultiCompanyModal
-            isOpen={showMultiCompanyModal}
-            onClose={() => setShowMultiCompanyModal(false)}
-            onAnalysisComplete={handleMultiCompanyAnalysisComplete}
-          />
-
-          {multiCompanyAnalysis && (
-            <MultiCompanyResults
-              analysis={multiCompanyAnalysis}
-              onClose={() => setShowMultiCompanyResults(false)}
-            />
-          )}
-        </>
+      {/* Insight Refinery 模态框 */}
+      {showReportHub && currentUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-7xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="p-6 border-b bg-white">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  🔬 {params.locale === 'zh' ? 'Insight Refinery - 洞察精炼器' : 'Insight Refinery'}
+                </h2>
+                <button
+                  onClick={() => setShowReportHub(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6">
+              <ReportHub
+                userId={currentUser.id}
+                locale={params.locale}
+              />
+            </div>
+          </div>
+        </div>
       )}
       
       <Footer />

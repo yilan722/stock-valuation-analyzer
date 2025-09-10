@@ -1,5 +1,6 @@
 import LanguageSwitcher from './LanguageSwitcher'
 import UserInfo from './UserInfo'
+import InsightRefineryButton from './InsightRefinery/InsightRefineryButton'
 import { type Locale } from '../lib/i18n'
 import { getTranslation } from '../lib/translations'
 
@@ -62,6 +63,18 @@ export default function Header({ locale, user, onLogout, onRefresh, onLogin, onO
           
           <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
             <LanguageSwitcher currentLocale={locale} />
+            
+            {/* Insight Refinery 按钮 - 仅对已登录用户显示 */}
+            {user && (
+              <InsightRefineryButton
+                userId={user.id}
+                locale={locale}
+                variant="outline"
+                size="sm"
+                showHistoryOption={true}
+                className="text-white border-amber-500/30 hover:bg-amber-500/20"
+              />
+            )}
             
             <UserInfo
               user={user}

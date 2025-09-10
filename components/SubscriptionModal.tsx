@@ -345,12 +345,12 @@ export default function SubscriptionModal({ isOpen, onClose, userId, locale }: S
                     )}
                     {plan.costPerReport > 0 && (
                       <div className="text-xs sm:text-sm text-gray-600">
-                        {getTranslation(locale, 'averageCost')}: {locale === 'en' ? '$' : '¥'}{plan.costPerReport.toFixed(2)}/篇
+                        {getTranslation(locale, 'averageCost')}: {locale === 'en' ? '$' : '¥'}{plan.costPerReport.toFixed(2)}{locale === 'zh' ? '/篇' : '/report'}
                       </div>
                     )}
                     {plan.costPerReport > 0 && plan.id !== 'enterprise' && (
                       <div className="text-xs sm:text-sm text-gray-500">
-                        {getTranslation(locale, 'additionalPurchase')}: {locale === 'en' ? '$' : '¥'}{(plan.costPerReport + 2).toFixed(2)}/篇
+                        {getTranslation(locale, 'additionalPurchase')}: {locale === 'en' ? '$' : '¥'}{(plan.costPerReport + 2).toFixed(2)}{locale === 'zh' ? '/篇' : '/report'}
                       </div>
                     )}
                   </div>

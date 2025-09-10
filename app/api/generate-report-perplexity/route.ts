@@ -369,8 +369,9 @@ valuationAnalysis (估值分析) - 必须包含以下内容：
 📊 专业格式要求（参考300053_valuation_report_2025-09-03.pdf）：
 - 使用专业的HTML样式，严格按照以下类名：'report-title', 'section-title', 'subsection-title', 'metric-table', 'highlight-box', 'positive', 'negative', 'neutral', 'recommendation-buy', 'recommendation-sell', 'recommendation-hold'
 - 报告标题使用大标题格式：<h1>公司名称 (股票代码) 估值分析报告</h1>
-- 每个主要部分使用二级标题：<h2>1. 基本面分析</h2>
+- 重要：不要在每个部分开头添加主要章节标题（如"1. 基本面分析"），这些标题会在PDF模板中自动添加
 - 子部分使用三级标题：<h3>1.1 公司概况</h3>
+- 重要：英文版本中不要包含任何中文标题，所有标题都使用英文
 - 数据表格使用专业格式：表头粗体，数据对齐，边框清晰
 - 重要数据使用高亮框突出显示
 - 百分比和趋势使用颜色编码（绿色=正面，红色=负面，灰色=中性）
@@ -451,8 +452,9 @@ valuationAnalysis (Valuation Analysis) - Must include:
 📊 Professional Format Requirements (Reference: 300053_valuation_report_2025-09-03.pdf):
 - Use professional HTML styling with these exact class names: 'report-title', 'section-title', 'subsection-title', 'metric-table', 'highlight-box', 'positive', 'negative', 'neutral', 'recommendation-buy', 'recommendation-sell', 'recommendation-hold'
 - Report title format: <h1>Company Name (Ticker) Valuation Analysis Report</h1>
-- Main sections use h2: <h2>1. Fundamental Analysis</h2>
+- IMPORTANT: Do NOT include main section titles (like "1. Fundamental Analysis") at the beginning of each section, as these will be automatically added by the PDF template
 - Subsections use h3: <h3>1.1 Company Overview</h3>
+- CRITICAL: Do NOT include any Chinese titles or text in the English version. All content must be in English only.
 - Data tables use professional format: bold headers, aligned data, clear borders
 - Important data highlighted in boxes
 - Percentages and trends color-coded (green=positive, red=negative, gray=neutral)
@@ -629,12 +631,33 @@ function parseNaturalLanguageReport(content: string, locale: string): any {
           .replace(/\\t/g, '\t') // 转换制表符
           .trim()
         
-        // 清理章节标题
+        // 清理章节标题 - 移除所有主要章节标题，避免与PDF模板重复
         sectionContent = sectionContent
           .replace(/^##\s*\d*\.?\s*/m, '')
           .replace(/^#+\s*/gm, '<h3>')
           .replace(/(<h3>.*?)$/gm, '$1</h3>')
           .trim()
+        
+        // 移除主要章节标题，避免与PDF模板重复
+        sectionContent = sectionContent
+          .replace(/<h[1-6][^>]*>\s*\d*\.?\s*(?:基本面分析|Fundamental Analysis)[\s\S]*?<\/h[1-6]>/gi, '')
+          .replace(/<h[1-6][^>]*>\s*\d*\.?\s*(?:业务板块分析|Business Segments? Analysis)[\s\S]*?<\/h[1-6]>/gi, '')
+          .replace(/<h[1-6][^>]*>\s*\d*\.?\s*(?:增长催化剂|Growth Catalysts?)[\s\S]*?<\/h[1-6]>/gi, '')
+          .replace(/<h[1-6][^>]*>\s*\d*\.?\s*(?:估值分析|Valuation Analysis)[\s\S]*?<\/h[1-6]>/gi, '')
+          .replace(/^[\s]*\d*\.?\s*(?:基本面分析|Fundamental Analysis)[\s\S]*?(?=\n|$)/gmi, '')
+          .replace(/^[\s]*\d*\.?\s*(?:业务板块分析|Business Segments? Analysis)[\s\S]*?(?=\n|$)/gmi, '')
+          .replace(/^[\s]*\d*\.?\s*(?:增长催化剂|Growth Catalysts?)[\s\S]*?(?=\n|$)/gmi, '')
+          .replace(/^[\s]*\d*\.?\s*(?:估值分析|Valuation Analysis)[\s\S]*?(?=\n|$)/gmi, '')
+          .trim()
+        
+        // 如果是英文版本，移除中文标题
+        if (locale === 'en') {
+          sectionContent = sectionContent
+            .replace(/<h[1-6][^>]*>[\s\S]*?[\u4e00-\u9fff]+[\s\S]*?<\/h[1-6]>/g, '') // 移除包含中文的标题
+            .replace(/^[\s]*[\u4e00-\u9fff]+[\s\S]*?(?=\n|$)/gm, '') // 移除以中文开头的行
+            .replace(/[\u4e00-\u9fff]+[\s\S]*?(?=\n|$)/gm, '') // 移除包含中文的行
+            .trim()
+        }
         
         // 特别处理估值分析部分，移除思考内容
         if (section.key === 'valuationAnalysis') {
